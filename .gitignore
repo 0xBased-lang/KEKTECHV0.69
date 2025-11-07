@@ -30,6 +30,8 @@ docs/archive/session-reports/
 # IDE
 .vscode/
 .idea/
+.cursor/
+.bmad-core/
 *.swp
 *.swo
 
