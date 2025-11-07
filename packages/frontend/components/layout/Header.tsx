@@ -73,6 +73,14 @@ export function Header() {
             Marketplace
           </Link>
           <Link
+            href="/markets"
+            className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
+              pathname?.startsWith('/markets') ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
+            }`}
+          >
+            Markets 🎯
+          </Link>
+          <Link
             href="/dashboard"
             className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
               pathname === '/dashboard' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
@@ -203,6 +211,17 @@ export function Header() {
             }`}
           >
             Marketplace
+          </Link>
+          <Link
+            href="/markets"
+            onClick={closeMobileMenu}
+            className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
+              pathname?.startsWith('/markets')
+                ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
+                : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
+            }`}
+          >
+            Markets 🎯
           </Link>
           <Link
             href="/dashboard"
