@@ -1,0 +1,182 @@
+{
+  "phase": "A - Economic Attacks",
+  "timestamp": "2025-10-30T01:58:48.591Z",
+  "results": {
+    "phase": "A - Economic Attacks",
+    "totalTests": 15,
+    "passed": 7,
+    "failed": 8,
+    "critical": [
+      {
+        "category": "Sandwich",
+        "name": "Category error",
+        "status": "FAIL",
+        "severity": "CRITICAL",
+        "details": "Error: VM Exception while processing transaction: reverted with custom error 'BetTooLarge()'"
+      },
+      {
+        "category": "Wash Trading",
+        "name": "Category error",
+        "status": "FAIL",
+        "severity": "CRITICAL",
+        "details": "Error: VM Exception while processing transaction: reverted with custom error 'BetTooLarge()'"
+      },
+      {
+        "category": "Timing",
+        "name": "Category error",
+        "status": "FAIL",
+        "severity": "CRITICAL",
+        "details": "Error: VM Exception while processing transaction: reverted with custom error 'InvalidMarketConfig()'"
+      },
+      {
+        "category": "Economics",
+        "name": "Resolver bribery risk",
+        "status": "FAIL",
+        "severity": "CRITICAL",
+        "details": "Potential bribe: 49.5 ETH - Need multi-sig or DAO"
+      }
+    ],
+    "high": [
+      {
+        "category": "Sybil",
+        "name": "Sybil attack successful",
+        "status": "FAIL",
+        "severity": "HIGH",
+        "details": "Per-address limits can be bypassed"
+      }
+    ],
+    "medium": [
+      {
+        "category": "Sybil",
+        "name": "Sybil attack economic viability",
+        "status": "FAIL",
+        "severity": "MEDIUM",
+        "details": "Cost: 5.05 ETH, Profitable: true"
+      },
+      {
+        "category": "Griefing",
+        "name": "No resolution timeout",
+        "status": "FAIL",
+        "severity": "MEDIUM",
+        "details": "Funds locked if resolver doesn't act"
+      }
+    ],
+    "low": [
+      {
+        "category": "Griefing",
+        "name": "Tiny bet griefing possible",
+        "status": "FAIL",
+        "severity": "LOW",
+        "details": "1/5 tiny bets accepted"
+      }
+    ],
+    "tests": [
+      {
+        "category": "Sandwich",
+        "name": "Front-run blocked by whale protection",
+        "status": "PASS",
+        "severity": "HIGH",
+        "details": ""
+      },
+      {
+        "category": "Sandwich",
+        "name": "Slippage protection working",
+        "status": "PASS",
+        "severity": "HIGH",
+        "details": ""
+      },
+      {
+        "category": "Sandwich",
+        "name": "Category error",
+        "status": "FAIL",
+        "severity": "CRITICAL",
+        "details": "Error: VM Exception while processing transaction: reverted with custom error 'BetTooLarge()'"
+      },
+      {
+        "category": "Wash Trading",
+        "name": "Category error",
+        "status": "FAIL",
+        "severity": "CRITICAL",
+        "details": "Error: VM Exception while processing transaction: reverted with custom error 'BetTooLarge()'"
+      },
+      {
+        "category": "Sybil",
+        "name": "Sybil attack successful",
+        "status": "FAIL",
+        "severity": "HIGH",
+        "details": "Per-address limits can be bypassed"
+      },
+      {
+        "category": "Sybil",
+        "name": "Distributed small bets",
+        "status": "PASS",
+        "severity": "MEDIUM",
+        "details": "6/8 succeeded"
+      },
+      {
+        "category": "Sybil",
+        "name": "Contract wallet sybil possible",
+        "status": "PASS",
+        "severity": "HIGH",
+        "details": "Per-address limits can't prevent Sybil attacks"
+      },
+      {
+        "category": "Sybil",
+        "name": "Sybil attack economic viability",
+        "status": "FAIL",
+        "severity": "MEDIUM",
+        "details": "Cost: 5.05 ETH, Profitable: true"
+      },
+      {
+        "category": "Griefing",
+        "name": "Tiny bet griefing possible",
+        "status": "FAIL",
+        "severity": "LOW",
+        "details": "1/5 tiny bets accepted"
+      },
+      {
+        "category": "Griefing",
+        "name": "Last-block grief blocked",
+        "status": "PASS",
+        "severity": "MEDIUM",
+        "details": "Whale protection"
+      },
+      {
+        "category": "Griefing",
+        "name": "No resolution timeout",
+        "status": "FAIL",
+        "severity": "MEDIUM",
+        "details": "Funds locked if resolver doesn't act"
+      },
+      {
+        "category": "Griefing",
+        "name": "Gas price priority",
+        "status": "PASS",
+        "severity": "LOW",
+        "details": "Network-level issue, slippage protection helps"
+      },
+      {
+        "category": "Timing",
+        "name": "Category error",
+        "status": "FAIL",
+        "severity": "CRITICAL",
+        "details": "Error: VM Exception while processing transaction: reverted with custom error 'InvalidMarketConfig()'"
+      },
+      {
+        "category": "Economics",
+        "name": "Minimum profitable bet size",
+        "status": "PASS",
+        "severity": "LOW",
+        "details": "Min profitable: 0.004545454545454545 ETH"
+      },
+      {
+        "category": "Economics",
+        "name": "Resolver bribery risk",
+        "status": "FAIL",
+        "severity": "CRITICAL",
+        "details": "Potential bribe: 49.5 ETH - Need multi-sig or DAO"
+      }
+    ]
+  },
+  "confidenceGain": -0.9333333333333332
+}

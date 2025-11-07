@@ -1,0 +1,162 @@
+
+> bmad-blockchain-dev@1.0.0 test
+> hardhat test --grep PredictionMarket
+
+
+
+ ·------------------------|--------------------------------|--------------------------------·
+ |  Solc version: 0.8.20  ·  Optimizer enabled: true       ·  Runs: 200                     │
+ ·························|································|·································
+ |  Contract Name         ·  Deployed size (KiB) (change)  ·  Initcode size (KiB) (change)  │
+ ·························|································|·································
+ |  AccessControlManager  ·                 3.823 (0.000)  ·                 4.487 (0.000)  │
+ ·························|································|·································
+ |  MasterRegistry        ·                 4.917 (0.000)  ·                 5.004 (0.000)  │
+ ·························|································|·································
+ |  ParameterStorage      ·                 5.138 (0.000)  ·                 5.470 (0.000)  │
+ ·------------------------|--------------------------------|--------------------------------·
+
+  PredictionMarket
+    Deployment & Initialization
+      ✔ Should deploy PredictionMarket contract (273ms)
+      ✔ Should initialize with correct market info (5ms)
+      ✔ Should set correct registry reference (1ms)
+      ✔ Should prevent re-initialization (6ms)
+      ✔ Should require valid resolution time (5ms)
+    Bet Placement
+      ✔ Should place bet on OUTCOME1 (3ms)
+      ✔ Should place bet on OUTCOME2 (1ms)
+      ✔ Should reject bet with zero amount (1ms)
+      ✔ Should reject bet on invalid outcome (1ms)
+      ✔ Should enforce minimum bet size (2ms)
+      ✔ Should enforce maximum bet size (2ms)
+      ✔ Should update total bets counter (2ms)
+      ✔ Should update total volume (3ms)
+      ✔ Should store bet info correctly (1ms)
+      ✔ Should allow same user to increase bet on same outcome (2ms)
+      ✔ Should prevent changing bet to different outcome (2ms)
+      ✔ Should prevent betting after resolution time (1ms)
+      ✔ Should prevent betting after market is resolved (16ms)
+      ✔ Should update liquidity pools correctly (2ms)
+    AMM & Odds Calculation
+      ✔ Should calculate odds correctly with balanced pools (2ms)
+      ✔ Should calculate odds correctly with imbalanced pools (2ms)
+      ✔ Should handle odds with only one side betting (1ms)
+      ✔ Should emit LiquidityUpdated event (2ms)
+    Market Resolution
+      ✔ Should allow resolver to resolve market (16ms)
+      ✔ Should update market state after resolution (16ms)
+      ✔ Should prevent non-resolver from resolving (0ms)
+      ✔ Should prevent resolution before resolution time (0ms)
+      ✔ Should prevent resolving with invalid outcome (1ms)
+      ✔ Should prevent double resolution (1ms)
+      ✔ Should check canResolve() correctly (1ms)
+    Claim Winnings
+
+      1) Should allow winner to claim winnings
+      ✔ Should transfer correct payout amount (2ms)
+      ✔ Should mark bet as claimed (1ms)
+      ✔ Should prevent claiming before resolution (0ms)
+      ✔ Should prevent loser from claiming (16ms)
+      ✔ Should prevent user with no bet from claiming (0ms)
+      ✔ Should prevent double claiming (2ms)
+      ✔ Should calculate payout correctly with fees (2ms)
+      ✔ Should check hasWinnings() correctly (14ms)
+    View Functions
+      ✔ Should return correct market info (41ms)
+      ✔ Should return correct bet info (0ms)
+      ✔ Should return zero for non-existent bet (1ms)
+      ✔ Should return liquidity pools (0ms)
+    Integration Tests
+      ✔ Should integrate with AccessControlManager for resolution (3ms)
+      ✔ Should integrate with ParameterStorage for fees (2ms)
+      ✔ Should integrate with MasterRegistry (1ms)
+    Edge Cases & Security
+      ✔ Should handle very small bets (1ms)
+      ✔ Should handle very large bets (2ms)
+      ✔ Should handle many bettors (3ms)
+      ✔ Should protect against reentrancy in claim (0ms)
+      ✔ Should handle zero liquidity edge case (0ms)
+    Gas Usage
+placeBet gas used: 185032
+
+      2) Should meet placeBet gas target (<100k)
+resolveMarket gas used: 103149
+      ✔ Should meet resolveMarket gas target (<150k) (14ms)
+claimWinnings gas used: 93505
+
+      3) Should meet claimWinnings gas target (<80k)
+
+·-------------------------------------------------------------------------------------|---------------------------|-------------|-----------------------------·
+|                                [90mSolc version: 0.8.20[39m                                 ·  [90mOptimizer enabled: true[39m  ·  [90mRuns: 200[39m  ·  [90mBlock limit: 30000000 gas[39m  │
+······················································································|···························|·············|······························
+|  [32m[1mMethods[22m[39m                                                                                                                                                    │
+·························|····························································|·············|·············|·············|···············|··············
+|  [1mContract[22m              ·  [1mMethod[22m                                                    ·  [32mMin[39m        ·  [32mMax[39m        ·  [32mAvg[39m        ·  [1m# calls[22m      ·  [1musd (avg)[22m  │
+·························|····························································|·············|·············|·············|···············|··············
+|  [90mAccessControlManager[39m  ·  grantRole(bytes32,address)                                ·     [36m120752[39m  ·     [31m120764[39m  ·     120760  ·           [90m30[39m  ·          [32m[90m-[32m[39m  │
+·························|····························································|·············|·············|·············|···············|··············
+|  [90mMasterRegistry[39m        ·  setContract(bytes32,address)                              ·     [36m104624[39m  ·     [31m121736[39m  ·     113183  ·           [90m20[39m  ·          [32m[90m-[32m[39m  │
+·························|····························································|·············|·············|·············|···············|··············
+|  [90mParameterStorage[39m      ·  setParameter(bytes32,uint256)                             ·      [36m41638[39m  ·     [31m123125[39m  ·     114236  ·           [90m13[39m  ·          [32m[90m-[32m[39m  │
+·························|····························································|·············|·············|·············|···············|··············
+|  [90mPredictionMarket[39m      ·  claimWinnings()                                           ·          -  ·          -  ·      93505  ·            [90m8[39m  ·          [32m[90m-[32m[39m  │
+·························|····························································|·············|·············|·············|···············|··············
+|  [90mPredictionMarket[39m      ·  initialize(address,string,string,string,address,uint256)  ·          -  ·          -  ·     207530  ·           [90m10[39m  ·          [32m[90m-[32m[39m  │
+·························|····························································|·············|·············|·············|···············|··············
+|  [90mPredictionMarket[39m      ·  placeBet(uint8)                                           ·      [36m69432[39m  ·     [31m185032[39m  ·     170637  ·           [90m52[39m  ·          [32m[90m-[32m[39m  │
+·························|····························································|·············|·············|·············|···············|··············
+|  [90mPredictionMarket[39m      ·  resolveMarket(uint8)                                      ·          -  ·          -  ·     103149  ·           [90m14[39m  ·          [32m[90m-[32m[39m  │
+·························|····························································|·············|·············|·············|···············|··············
+|  [32m[1mDeployments[22m[39m                                                                        ·                                         ·  [1m% of limit[22m   ·             │
+······················································································|·············|·············|·············|···············|··············
+|  AccessControlManager                                                               ·          -  ·          -  ·    1002956  ·        [90m3.3 %[39m  ·          [32m[90m-[32m[39m  │
+······················································································|·············|·············|·············|···············|··············
+|  MasterRegistry                                                                     ·          -  ·          -  ·    1186338  ·          [90m4 %[39m  ·          [32m[90m-[32m[39m  │
+······················································································|·············|·············|·············|···············|··············
+|  ParameterStorage                                                                   ·          -  ·          -  ·    1192402  ·          [90m4 %[39m  ·          [32m[90m-[32m[39m  │
+······················································································|·············|·············|·············|···············|··············
+|  PredictionMarket                                                                   ·          -  ·          -  ·    1698928  ·        [90m5.7 %[39m  ·          [32m[90m-[32m[39m  │
+·-------------------------------------------------------------------------------------|-------------|-------------|-------------|---------------|-------------·
+
+  51 passing (527ms)
+  3 failing
+
+  1) PredictionMarket
+       Claim Winnings
+         Should allow winner to claim winnings:
+
+      AssertionError: Error in "WinningsClaimed" event: Error in the 3rd argument assertion: expected 1761789052 to equal 1761789053.
+      + expected - actual
+
+      -1761789052
+      +1761789053
+      
+      at Context.<anonymous> (test/hardhat/PredictionMarket.test.js:433:7)
+
+  2) PredictionMarket
+       Gas Usage
+         Should meet placeBet gas target (<100k):
+
+      AssertionError: expected 185032 to be below 100000.
+      + expected - actual
+
+      -185032
+      +100000
+      
+      at Context.<anonymous> (test/hardhat/PredictionMarket.test.js:657:37)
+
+  3) PredictionMarket
+       Gas Usage
+         Should meet claimWinnings gas target (<80k):
+
+      AssertionError: expected 93505 to be below 80000.
+      + expected - actual
+
+      -93505
+      +80000
+      
+      at Context.<anonymous> (test/hardhat/PredictionMarket.test.js:679:37)
+
+
+

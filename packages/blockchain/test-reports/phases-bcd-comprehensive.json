@@ -1,0 +1,397 @@
+{
+  "timestamp": "2025-10-30T09:20:30.198Z",
+  "phases": {
+    "B": {
+      "total": 20,
+      "passed": 18,
+      "failed": 2,
+      "tests": [
+        {
+          "category": "Gas",
+          "name": "Single claim gas reasonable",
+          "status": "PASS",
+          "severity": "HIGH",
+          "details": "200 claims can fit in one block"
+        },
+        {
+          "category": "Gas",
+          "name": "Batch claims feasible",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "50 claims = 7.500.000 gas"
+        },
+        {
+          "category": "Gas",
+          "name": "Resolution gas under 500k",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "200.000 gas"
+        },
+        {
+          "category": "Gas",
+          "name": "Market creation gas reasonable",
+          "status": "PASS",
+          "severity": "LOW",
+          "details": "300.000 gas"
+        },
+        {
+          "category": "Gas",
+          "name": "Dispute gas efficient",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "100.000 gas"
+        },
+        {
+          "category": "DoS",
+          "name": "Claim griefing impossible",
+          "status": "PASS",
+          "severity": "HIGH",
+          "details": "Per-user claims prevent griefing"
+        },
+        {
+          "category": "DoS",
+          "name": "Resolution DoS prevented",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "Role-based access prevents DoS"
+        },
+        {
+          "category": "DoS",
+          "name": "Market spam expensive",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "10 ETH to spam 1000 markets"
+        },
+        {
+          "category": "DoS",
+          "name": "Unbounded storage risk",
+          "status": "FAIL",
+          "severity": "MEDIUM",
+          "details": "Check for unbounded arrays"
+        },
+        {
+          "category": "DoS",
+          "name": "Bet spam costly",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "1 ETH for 1000 tiny bets"
+        },
+        {
+          "category": "Optimization",
+          "name": "Bet gas over target",
+          "status": "FAIL",
+          "severity": "LOW",
+          "details": "100.000 vs 100k target"
+        },
+        {
+          "category": "Optimization",
+          "name": "Claim gas efficient",
+          "status": "PASS",
+          "severity": "LOW",
+          "details": "150.000 gas per claim"
+        },
+        {
+          "category": "Optimization",
+          "name": "Loops are bounded",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "No unbounded iterations found"
+        },
+        {
+          "category": "Optimization",
+          "name": "Storage optimized",
+          "status": "PASS",
+          "severity": "LOW",
+          "details": "Structs use efficient packing"
+        },
+        {
+          "category": "Optimization",
+          "name": "External calls minimized",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "Registry lookups cached"
+        },
+        {
+          "category": "Scalability",
+          "name": "Handles 1000 users",
+          "status": "PASS",
+          "severity": "HIGH",
+          "details": "No iteration over user arrays"
+        },
+        {
+          "category": "Scalability",
+          "name": "Handles 100 markets",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "Markets operate independently"
+        },
+        {
+          "category": "Scalability",
+          "name": "Network congestion handling",
+          "status": "PASS",
+          "severity": "LOW",
+          "details": "Slippage protection helps"
+        },
+        {
+          "category": "Scalability",
+          "name": "High gas price resilient",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "No hardcoded gas assumptions"
+        },
+        {
+          "category": "Scalability",
+          "name": "Mass claims feasible",
+          "status": "PASS",
+          "severity": "HIGH",
+          "details": "Users claim individually"
+        }
+      ]
+    },
+    "C": {
+      "total": 20,
+      "passed": 19,
+      "failed": 1,
+      "tests": [
+        {
+          "category": "Extreme",
+          "name": "Overflow protection built-in",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "Solidity 0.8+ prevents overflows"
+        },
+        {
+          "category": "Extreme",
+          "name": "Zero bet prevented",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "Minimum bet requirement"
+        },
+        {
+          "category": "Extreme",
+          "name": "1 wei bet rejected",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "Prevents dust attacks"
+        },
+        {
+          "category": "Extreme",
+          "name": "Large amounts supported",
+          "status": "PASS",
+          "severity": "LOW",
+          "details": "No artificial caps"
+        },
+        {
+          "category": "Extreme",
+          "name": "Year 2038 safe",
+          "status": "PASS",
+          "severity": "LOW",
+          "details": "Uses uint256 for timestamps"
+        },
+        {
+          "category": "Recovery",
+          "name": "ETH transfer failure recovery",
+          "status": "FAIL",
+          "severity": "CRITICAL",
+          "details": "Need withdrawal pattern for failed transfers"
+        },
+        {
+          "category": "Recovery",
+          "name": "State updates atomic",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "Solidity guarantees atomicity"
+        },
+        {
+          "category": "Recovery",
+          "name": "Reentrancy protected",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "OpenZeppelin ReentrancyGuard used"
+        },
+        {
+          "category": "Recovery",
+          "name": "Emergency pause available",
+          "status": "PASS",
+          "severity": "HIGH",
+          "details": "Admin can pause operations"
+        },
+        {
+          "category": "Recovery",
+          "name": "Stuck funds recoverable",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "Timeout refund mechanism ✅"
+        },
+        {
+          "category": "State",
+          "name": "Invalid transitions prevented",
+          "status": "PASS",
+          "severity": "HIGH",
+          "details": "State validation in place"
+        },
+        {
+          "category": "State",
+          "name": "Race conditions prevented",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "Atomic transactions + guards"
+        },
+        {
+          "category": "State",
+          "name": "Concurrent ops handled",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "Block sequential nature"
+        },
+        {
+          "category": "State",
+          "name": "Failed tx rollback correct",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "EVM guarantees state consistency"
+        },
+        {
+          "category": "State",
+          "name": "Registry consistency maintained",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "Reads registry at tx execution"
+        },
+        {
+          "category": "Interaction",
+          "name": "Contract bettors supported",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "No EOA-only restrictions"
+        },
+        {
+          "category": "Interaction",
+          "name": "Multisig compatible",
+          "status": "PASS",
+          "severity": "LOW",
+          "details": "Standard transfer mechanisms"
+        },
+        {
+          "category": "Interaction",
+          "name": "Proxy interaction safe",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "msg.sender tracking correct"
+        },
+        {
+          "category": "Interaction",
+          "name": "Flash loans handled",
+          "status": "PASS",
+          "severity": "HIGH",
+          "details": "Whale protection prevents abuse"
+        },
+        {
+          "category": "Interaction",
+          "name": "Cross-contract reentrancy blocked",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "ReentrancyGuard protects"
+        }
+      ]
+    },
+    "D": {
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "Invariant",
+          "name": "Pool balance correct",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "Accounting always matches"
+        },
+        {
+          "category": "Invariant",
+          "name": "Payouts bounded by pool",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "Cannot pay out more than available"
+        },
+        {
+          "category": "Invariant",
+          "name": "Fee calculation accurate",
+          "status": "PASS",
+          "severity": "HIGH",
+          "details": "Math always correct"
+        },
+        {
+          "category": "Invariant",
+          "name": "Contract solvent",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "Always has funds to pay"
+        },
+        {
+          "category": "Invariant",
+          "name": "No negative balances",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "Solidity 0.8+ prevents underflow"
+        },
+        {
+          "category": "Invariant",
+          "name": "Claim once enforced",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "Double claim impossible"
+        },
+        {
+          "category": "Invariant",
+          "name": "Resolution immutable",
+          "status": "PASS",
+          "severity": "CRITICAL",
+          "details": "Outcome cannot change once finalized"
+        },
+        {
+          "category": "Invariant",
+          "name": "Deadline enforced",
+          "status": "PASS",
+          "severity": "HIGH",
+          "details": "Late bets impossible"
+        },
+        {
+          "category": "Invariant",
+          "name": "Whale limit enforced",
+          "status": "PASS",
+          "severity": "HIGH",
+          "details": "20% limit maintained"
+        },
+        {
+          "category": "Invariant",
+          "name": "Dust accumulation minimal",
+          "status": "PASS",
+          "severity": "MEDIUM",
+          "details": "Rounding errors < 0.01 ETH over 1000 operations"
+        }
+      ]
+    }
+  },
+  "overall": {
+    "total": 50,
+    "passed": 47,
+    "failed": 3
+  },
+  "confidence": {
+    "starting": 95.4,
+    "gains": {
+      "B": 1.8,
+      "C": 1.4249999999999998,
+      "D": 1
+    },
+    "total": 4.225,
+    "final": 99.625
+  },
+  "issues": {
+    "critical": 1,
+    "high": 0,
+    "medium": 1,
+    "total": 3
+  }
+}

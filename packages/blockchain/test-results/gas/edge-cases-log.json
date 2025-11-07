@@ -1,0 +1,152 @@
+{
+  "startTime": "2025-11-06T21:59:56.905Z",
+  "tests": [
+    {
+      "timestamp": "2025-11-06T22:00:01.048Z",
+      "test": "C.1: Minimum bet",
+      "status": "FAIL",
+      "error": "transaction execution reverted (action=\"sendTransaction\", data=null, reason=null, invocation=null, revert=null, transaction={ \"data\": \"\", \"from\": \"0x25fD72154857Bd204345808a690d51a61A81EB0b\", \"to\": \"0x31d2BC49A6FD4a066F5f8AC61Acd0E6c9105DD84\" }, receipt={ \"_type\": \"TransactionReceipt\", \"blobGasPrice\": null, \"blobGasUsed\": null, \"blockHash\": \"0xfdcf506c2ec9c2d188989b66d8a0e3e455c74e06c827c8bcc2356e2db5bee0bf\", \"blockNumber\": 2588697, \"contractAddress\": null, \"cumulativeGasUsed\": \"756982\", \"from\": \"0x25fD72154857Bd204345808a690d51a61A81EB0b\", \"gasPrice\": \"9000000000\", \"gasUsed\": \"756982\", \"hash\": \"0xf7df713ff903fd671cff52ea6483149b26c3ff11b231f74e140f7717228328e7\", \"index\": 0, \"logs\": [  ], \"logsBloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\", \"root\": null, \"status\": 0, \"to\": \"0x31d2BC49A6FD4a066F5f8AC61Acd0E6c9105DD84\" }, code=CALL_EXCEPTION, version=6.15.0)",
+      "expected": "Bet accepted"
+    },
+    {
+      "timestamp": "2025-11-06T22:00:11.191Z",
+      "test": "C.2: Maximum bet stress test",
+      "status": "PASS",
+      "amount": "1000 BASED",
+      "txHash": "0x7c1c74416eaa55454fb8c6c9f645f124f6b5c0f40a06151fd4a7aebd5ac6e1d8",
+      "gasUsed": "826796",
+      "oddsShift": 0
+    },
+    {
+      "timestamp": "2025-11-06T22:02:11.004Z",
+      "test": "C.3: Rapid betting sequence",
+      "status": "PARTIAL",
+      "attempted": 10,
+      "succeeded": 5,
+      "failed": 5,
+      "duration": "119.81s",
+      "totalGas": "4276962"
+    },
+    {
+      "timestamp": "2025-11-06T22:02:21.059Z",
+      "test": "C.4: Slippage protection",
+      "status": "FAIL",
+      "expected": "Transaction should revert",
+      "actual": "Transaction succeeded unexpectedly"
+    },
+    {
+      "timestamp": "2025-11-06T22:02:31.145Z",
+      "test": "C.5: Zero shares prevention working",
+      "status": "PASS",
+      "expected": "Revert on zero shares",
+      "actual": "Reverted correctly",
+      "error": "transaction execution reverted (action=\"sendTransaction\", data=null, reason=null, invocation=null, r"
+    },
+    {
+      "timestamp": "2025-11-06T22:02:31.145Z",
+      "test": "C.6: Market rejection flow",
+      "status": "SKIPPED",
+      "reason": "Requires creating new market",
+      "implementation": "Manual test recommended"
+    },
+    {
+      "timestamp": "2025-11-06T22:02:31.145Z",
+      "test": "C.7: Bet wrong state",
+      "status": "SKIPPED",
+      "reason": "Market is ACTIVE, cannot test wrong state",
+      "recommendation": "Test after market finalized"
+    },
+    {
+      "timestamp": "2025-11-06T22:02:31.145Z",
+      "test": "C.8: Double claim prevention",
+      "status": "SKIPPED",
+      "reason": "Market not FINALIZED (ACTIVE)"
+    },
+    {
+      "timestamp": "2025-11-06T22:02:50.505Z",
+      "test": "C.9: Access control test",
+      "status": "PARTIAL",
+      "expected": "Unauthorized error",
+      "actual": "Reverted but for different reason",
+      "error": "transaction execution reverted (action=\"sendTransaction\", data=null, reason=null, invocation=null, r"
+    },
+    {
+      "timestamp": "2025-11-06T22:02:50.506Z",
+      "test": "C.10: State machine enforcement",
+      "status": "PASS",
+      "validation": "Enforced through other tests",
+      "currentState": "ACTIVE"
+    }
+  ],
+  "totalGasUsed": 826796,
+  "totalCost": "0.007441164",
+  "edgeCaseResults": [
+    {
+      "name": "C.1: Minimum bet",
+      "status": "FAIL",
+      "error": "transaction execution reverted (action=\"sendTransaction\", data=null, reason=null, invocation=null, revert=null, transaction={ \"data\": \"\", \"from\": \"0x25fD72154857Bd204345808a690d51a61A81EB0b\", \"to\": \"0x31d2BC49A6FD4a066F5f8AC61Acd0E6c9105DD84\" }, receipt={ \"_type\": \"TransactionReceipt\", \"blobGasPrice\": null, \"blobGasUsed\": null, \"blockHash\": \"0xfdcf506c2ec9c2d188989b66d8a0e3e455c74e06c827c8bcc2356e2db5bee0bf\", \"blockNumber\": 2588697, \"contractAddress\": null, \"cumulativeGasUsed\": \"756982\", \"from\": \"0x25fD72154857Bd204345808a690d51a61A81EB0b\", \"gasPrice\": \"9000000000\", \"gasUsed\": \"756982\", \"hash\": \"0xf7df713ff903fd671cff52ea6483149b26c3ff11b231f74e140f7717228328e7\", \"index\": 0, \"logs\": [  ], \"logsBloom\": \"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\", \"root\": null, \"status\": 0, \"to\": \"0x31d2BC49A6FD4a066F5f8AC61Acd0E6c9105DD84\" }, code=CALL_EXCEPTION, version=6.15.0)",
+      "expected": "Bet accepted"
+    },
+    {
+      "name": "C.2: Maximum bet stress test",
+      "status": "PASS",
+      "amount": "1000 BASED",
+      "txHash": "0x7c1c74416eaa55454fb8c6c9f645f124f6b5c0f40a06151fd4a7aebd5ac6e1d8",
+      "gasUsed": "826796",
+      "oddsShift": 0
+    },
+    {
+      "name": "C.3: Rapid betting sequence",
+      "status": "PARTIAL",
+      "attempted": 10,
+      "succeeded": 5,
+      "failed": 5,
+      "duration": "119.81s",
+      "totalGas": "4276962"
+    },
+    {
+      "name": "C.4: Slippage protection",
+      "status": "FAIL",
+      "expected": "Transaction should revert",
+      "actual": "Transaction succeeded unexpectedly"
+    },
+    {
+      "name": "C.5: Zero shares prevention working",
+      "status": "PASS",
+      "expected": "Revert on zero shares",
+      "actual": "Reverted correctly",
+      "error": "transaction execution reverted (action=\"sendTransaction\", data=null, reason=null, invocation=null, r"
+    },
+    {
+      "name": "C.6: Market rejection flow",
+      "status": "SKIPPED",
+      "reason": "Requires creating new market",
+      "implementation": "Manual test recommended"
+    },
+    {
+      "name": "C.7: Bet wrong state",
+      "status": "SKIPPED",
+      "reason": "Market is ACTIVE, cannot test wrong state",
+      "recommendation": "Test after market finalized"
+    },
+    {
+      "name": "C.8: Double claim prevention",
+      "status": "SKIPPED",
+      "reason": "Market not FINALIZED (ACTIVE)"
+    },
+    {
+      "name": "C.9: Access control test",
+      "status": "PARTIAL",
+      "expected": "Unauthorized error",
+      "actual": "Reverted but for different reason",
+      "error": "transaction execution reverted (action=\"sendTransaction\", data=null, reason=null, invocation=null, r"
+    },
+    {
+      "name": "C.10: State machine enforcement",
+      "status": "PASS",
+      "validation": "Enforced through other tests",
+      "currentState": "ACTIVE"
+    }
+  ],
+  "endTime": "2025-11-06T22:02:50.506Z"
+}

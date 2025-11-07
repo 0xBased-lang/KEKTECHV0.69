@@ -1,0 +1,72 @@
+# KEKTECH 3.0 - Git Ignore File
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output/
+test-results.xml
+
+# Build outputs
+artifacts/
+cache/
+dist/
+build/
+
+# Hardhat
+typechain/
+typechain-types/
+
+# Environment variables (NEVER commit these!)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Gas reports
+gas-report.txt
+
+# Deployment files (keep templates, ignore actual deployments with private data)
+deployments/*/
+!deployments/.gitkeep
+
+# Lock files (keep package-lock.json, ignore others)
+yarn.lock
+pnpm-lock.yaml
+
+# Foundry
+out/
+broadcast/

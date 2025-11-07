@@ -1,0 +1,9 @@
+{
+  "filter_paths": "contracts/__excluded__|node_modules|artifacts|cache",
+  "solc_remaps": [],
+  "compile_remappings": [],
+  "checklist": true,
+  "legacy_ast": false
+}
+
+

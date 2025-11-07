@@ -1,0 +1,47 @@
+
+    /**
+     * @notice Cancel market and allow refunds
+     * @dev SECURITY FIX (L-3): Only admin/resolver can cancel before resolution
+     *      Allows refunds for invalid or disputed markets
+     */
+    function cancelMarket() external nonReentrant {
+        if (isResolved) revert MarketAlreadyResolved();
+        
+        // Check admin permission
+        IAccessControlManager accessControl = _getAccessControlManager();
+        bool hasAdminRole = accessControl.hasRole(keccak256("ADMIN_ROLE"), msg.sender);
+        bool hasResolverRole = accessControl.hasRole(keccak256("RESOLVER_ROLE"), msg.sender);
+        
+        if (!hasAdminRole && !hasResolverRole) {
+            revert UnauthorizedResolver();
+        }
+        
+        result = Outcome.CANCELLED;
+        isResolved = true;
+        
+        emit MarketResolved(result, msg.sender, block.timestamp);
+    }
+
+    /**
+     * @notice Claim refund for cancelled market
+     * @dev SECURITY FIX (L-3): Returns original bet amount minus platform fee
+     */
+    function claimRefund() external nonReentrant {
+        if (!isResolved || result != Outcome.CANCELLED) revert MarketNotCancelled();
+        
+        BetInfo storage bet = _bets[msg.sender];
+        if (bet.amount == 0) revert NoBetFound();
+        if (bet.claimed) revert AlreadyClaimed();
+        
+        // Mark as claimed first (checks-effects-interactions)
+        bet.claimed = true;
+        
+        // Refund original bet amount
+        uint256 refundAmount = bet.amount;
+        bet.payout = refundAmount;
+        
+        (bool success, ) = msg.sender.call{value: refundAmount}("");
+        if (!success) revert TransferFailed();
+        
+        emit WinningsClaimed(msg.sender, refundAmount, block.timestamp);
+    }

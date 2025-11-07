@@ -1,0 +1,343 @@
+workflow:
+  id: multi-network-testing
+  name: Progressive Multi-Network Testing Pipeline
+  description: >-
+    Comprehensive testing workflow that progressively validates contracts
+    across multiple networks from cheap testing to production deployment
+  type: testing
+  estimated_duration: 2-3 days
+
+# Network progression strategy
+network_progression:
+  - name: localhost
+    purpose: Initial development and unit testing
+    cost: $0
+    speed: Fast
+    confidence: 60%
+
+  - name: sepolia
+    purpose: Public testnet validation
+    cost: ~$0.01 per test
+    speed: Medium
+    confidence: 75%
+
+  - name: forkedBasedAI
+    purpose: Mainnet state simulation
+    cost: $0
+    speed: Fast
+    confidence: 90%
+
+  - name: basedai_testnet
+    purpose: Final testnet validation
+    cost: $0
+    speed: Medium
+    confidence: 95%
+
+  - name: basedai_mainnet
+    purpose: Production deployment
+    cost: Real $BASED
+    speed: Slow
+    confidence: 100%
+
+sequence:
+  # ============= PHASE 1: Local Development =============
+  - phase: local_development
+    network: localhost
+    duration: 2-4 hours
+    agent: solidity-developer
+    tasks:
+      - name: Unit Testing
+        description: Run all unit tests locally
+        commands:
+          - npm test
+          - npm run test:gas
+        success_criteria:
+          - All tests passing
+          - 95% coverage minimum
+          - Gas within targets
+
+      - name: Foundry Testing
+        description: Run fuzz and invariant tests
+        commands:
+          - forge test
+          - forge test --fuzz-runs 1000
+        success_criteria:
+          - No fuzz failures
+          - Invariants hold
+
+      - name: Local Deployment
+        description: Deploy to local network
+        commands:
+          - npm run node
+          - npm run deploy:local
+        validation:
+          - All contracts deployed
+          - Registry populated
+          - Parameters set
+
+  # ============= PHASE 2: Sepolia Testing =============
+  - phase: sepolia_validation
+    network: sepolia
+    duration: 4-6 hours
+    agent: deployment-orchestrator
+    prerequisites:
+      - local_development.completed
+      - sepolia_funds.available
+    tasks:
+      - name: Deploy to Sepolia
+        description: Deploy contracts to Ethereum Sepolia
+        commands:
+          - npm run deploy:sepolia
+        outputs:
+          - deployment-sepolia-latest.json
+        validation:
+          - Contracts verified on Etherscan
+          - Correct chain ID (11155111)
+
+      - name: Integration Testing
+        description: Run integration tests on Sepolia
+        commands:
+          - npm run test:sepolia
+        success_criteria:
+          - Cross-contract calls work
+          - Events emitted correctly
+          - Gas costs acceptable
+
+      - name: Performance Benchmarking
+        description: Measure real network performance
+        metrics:
+          - Transaction confirmation time
+          - Gas costs in USD
+          - Contract interaction latency
+
+  # ============= PHASE 3: Fork Testing =============
+  - phase: fork_simulation
+    network: forkedBasedAI
+    duration: 3-4 hours
+    agent: gas-optimizer
+    prerequisites:
+      - sepolia_validation.completed
+    tasks:
+      - name: Start Fork
+        description: Initialize BasedAI mainnet fork
+        commands:
+          - npm run node:fork
+        validation:
+          - Fork running on port 8545
+          - Mainnet state accessible
+
+      - name: Deploy to Fork
+        description: Deploy contracts to forked mainnet
+        commands:
+          - npm run deploy:fork
+        validation:
+          - Contracts interact with mainnet state
+          - $BASED token operations work
+
+      - name: Mainnet Simulation Tests
+        description: Test with real mainnet conditions
+        tests:
+          - Market creation with $BASED
+          - Fee distribution simulation
+          - Gas optimization validation
+        commands:
+          - npm run test:fork
+          - forge test --fork-url http://localhost:8545
+
+      - name: Stress Testing
+        description: Test under load conditions
+        scenarios:
+          - 100 simultaneous markets
+          - 1000 users betting
+          - Gas price spikes
+        validation:
+          - No failures under load
+          - Gas usage remains stable
+          - State consistency maintained
+
+  # ============= PHASE 4: TestNet Staging =============
+  - phase: testnet_staging
+    network: basedai_testnet
+    duration: 1-2 days
+    agent: security-auditor
+    prerequisites:
+      - fork_simulation.completed
+      - security_review.passed
+    tasks:
+      - name: Deploy to TestNet
+        description: Deploy to BasedAI testnet
+        commands:
+          - npm run deploy:testnet
+        validation:
+          - Chain ID 32324 confirmed
+          - All modules deployed
+
+      - name: Community Testing
+        description: Open for community testing
+        duration: 24-48 hours
+        activities:
+          - Bug bounty program
+          - User acceptance testing
+          - Performance monitoring
+        success_criteria:
+          - No critical issues found
+          - Performance meets targets
+          - Community approval
+
+      - name: Final Security Audit
+        description: Security verification before mainnet
+        checks:
+          - Access control validation
+          - Economic attack vectors
+          - Gas griefing protection
+          - Emergency pause testing
+        commands:
+          - npm run security:slither
+          - npm run security:mythril
+
+  # ============= PHASE 5: MainNet Preparation =============
+  - phase: mainnet_preparation
+    network: basedai_mainnet
+    duration: 1 day
+    agent: deployment-orchestrator
+    prerequisites:
+      - testnet_staging.completed
+      - audit.completed
+      - multisig.configured
+    tasks:
+      - name: Pre-Deployment Checklist
+        description: Final verification before mainnet
+        checklist:
+          - [ ] All tests passing
+          - [ ] Security audit complete
+          - [ ] Gas optimization done
+          - [ ] Multisig wallet ready
+          - [ ] Team approval received
+          - [ ] Documentation complete
+          - [ ] Monitoring setup
+
+      - name: Deployment Simulation
+        description: Practice deployment procedure
+        commands:
+          - Deploy to fork one more time
+          - Verify all steps
+          - Document any issues
+
+      - name: Go/No-Go Decision
+        description: Final team decision
+        participants:
+          - Technical lead
+          - Security auditor
+          - Product owner
+        criteria:
+          - All phases passed
+          - No blocking issues
+          - Risk assessment acceptable
+
+# Quality Gates
+quality_gates:
+  local:
+    coverage: ">= 95%"
+    tests: "100% passing"
+    gas: "within targets"
+
+  sepolia:
+    deployment: "successful"
+    verification: "complete"
+    integration: "passing"
+
+  fork:
+    mainnet_interaction: "working"
+    gas_optimization: "validated"
+    stress_test: "passed"
+
+  testnet:
+    community_testing: "no critical issues"
+    security_audit: "passed"
+    performance: "meets targets"
+
+  mainnet:
+    all_gates: "passed"
+    multisig: "configured"
+    documentation: "complete"
+
+# Rollback Procedures
+rollback:
+  sepolia:
+    - Redeploy with fixes
+    - No permanent impact
+
+  fork:
+    - Restart fork
+    - No cost or impact
+
+  testnet:
+    - Deploy new version
+    - Inform community
+
+  mainnet:
+    - Use emergency pause
+    - Deploy fix via registry
+    - Multisig approval required
+
+# Monitoring & Alerts
+monitoring:
+  metrics:
+    - Contract deployment status
+    - Gas usage per operation
+    - Test pass rate
+    - Network latency
+    - Error rates
+
+  alerts:
+    - Deployment failure
+    - Test failure > 5%
+    - Gas spike > 150%
+    - Security issue detected
+    - Network timeout
+
+# Cost Optimization
+cost_optimization:
+  sepolia_strategy:
+    - Batch operations
+    - Use test faucets
+    - Minimize contract size
+
+  fork_strategy:
+    - Unlimited free testing
+    - Simulate gas prices
+    - Test edge cases
+
+  mainnet_strategy:
+    - Deploy during low gas
+    - Optimize before deploy
+    - Use multisig efficiently
+
+# Success Criteria
+success_criteria:
+  overall:
+    - All networks tested
+    - No critical issues
+    - Performance validated
+    - Security verified
+    - Documentation complete
+    - Team consensus achieved
+
+# Documentation Requirements
+documentation:
+  required:
+    - Deployment addresses per network
+    - Gas costs analysis
+    - Test results summary
+    - Security audit report
+    - Performance benchmarks
+    - Rollback procedures
+    - Monitoring setup guide
+
+# Next Steps
+post_deployment:
+  - Enable monitoring dashboards
+  - Activate bug bounty program
+  - Begin community onboarding
+  - Plan first upgrade cycle
+  - Establish support channels

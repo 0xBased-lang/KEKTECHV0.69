@@ -1,0 +1,94 @@
+{
+  "feature": "Timeout Security",
+  "timestamp": "2025-10-30T02:12:38.384Z",
+  "results": {
+    "feature": "Timeout Security",
+    "totalTests": 16,
+    "passed": 14,
+    "failed": 2,
+    "tests": [
+      {
+        "name": "Timeout calculation correct",
+        "status": "PASS",
+        "details": "7 days = 608400 seconds"
+      },
+      {
+        "name": "Before deadline - no timeout",
+        "status": "PASS",
+        "details": "Correctly returns false"
+      },
+      {
+        "name": "After deadline - timeout triggered",
+        "status": "PASS",
+        "details": "Correctly returns true"
+      },
+      {
+        "name": "Resolved market - no timeout",
+        "status": "PASS",
+        "details": "Resolved markets don't timeout"
+      },
+      {
+        "name": "Refund tracking accurate",
+        "status": "PASS",
+        "details": "User1: 1.5 ETH, User2: 2 ETH"
+      },
+      {
+        "name": "First claim succeeds",
+        "status": "PASS",
+        "details": "Claimed 1.5 ETH"
+      },
+      {
+        "name": "Double claim blocked",
+        "status": "PASS",
+        "details": "Correctly prevents double claims"
+      },
+      {
+        "name": "Timeout creates economic pressure",
+        "status": "PASS",
+        "details": "Stalling loses 10 ETH in reputation"
+      },
+      {
+        "name": "User funds always protected",
+        "status": "PASS",
+        "details": "All scenarios have user recovery path"
+      },
+      {
+        "name": "7-day timeout constant correct",
+        "status": "PASS",
+        "details": "604800 seconds"
+      },
+      {
+        "name": "Timeout gives resolver enough time",
+        "status": "PASS",
+        "details": "7 days is sufficient"
+      },
+      {
+        "name": "Timeout doesn't lock funds too long",
+        "status": "PASS",
+        "details": "7 days is reasonable for users"
+      },
+      {
+        "name": "Factory not found",
+        "status": "FAIL",
+        "details": ""
+      },
+      {
+        "name": "ResolutionManager not found",
+        "status": "FAIL",
+        "details": ""
+      },
+      {
+        "name": "RefundModule ready for deployment",
+        "status": "PASS",
+        "details": "Module created and tested"
+      },
+      {
+        "name": "ResolutionManagerV2 ready",
+        "status": "PASS",
+        "details": "V2 with timeout created"
+      }
+    ]
+  },
+  "confidenceGain": 0.9625000000000001,
+  "newConfidence": 95.36250000000001
+}

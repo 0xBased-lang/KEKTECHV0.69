@@ -1,0 +1,29 @@
+{
+  "network": "localhost",
+  "passed": [
+    "Empty question (should fail)",
+    "Past resolution time (should fail)",
+    "Resolution time >1 year (should fail)",
+    "Zero category (should fail)",
+    "Insufficient creator bond (should fail)",
+    "Zero value sent (should fail)",
+    "Extremely long question (should succeed)",
+    "SQL injection attempt (should succeed)",
+    "XSS attempt (should succeed)",
+    "Exact minimum bond (should succeed)",
+    "Resolution time = now + 1 second (should succeed)"
+  ],
+  "failed": [
+    "Resolution time = exactly 1 year (should succeed)"
+  ],
+  "errors": [
+    "Resolution time = exactly 1 year (should succeed): Error: VM Exception while processing transaction: reverted with an unrecognized custom error (return data: 0x10549aa0)"
+  ],
+  "gasUsed": {
+    "Extremely long question (should succeed)": "3365784",
+    "SQL injection attempt (should succeed)": "2611957",
+    "XSS attempt (should succeed)": "2612005",
+    "Exact minimum bond (should succeed)": "2612005",
+    "Resolution time = now + 1 second (should succeed)": "2612029"
+  }
+}

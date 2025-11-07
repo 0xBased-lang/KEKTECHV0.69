@@ -1,0 +1,93 @@
+{
+  "timestamp": "2025-10-30T00:53:31.404Z",
+  "network": "localhost",
+  "totalTests": 12,
+  "passed": 11,
+  "failed": 1,
+  "tests": [
+    {
+      "category": "Basic Lifecycle",
+      "name": "Create Market",
+      "status": "PASS",
+      "details": "Market: 0x8aCd85898458400f7Db866d53FCFF6f0D49741FF",
+      "timestamp": "2025-10-30T00:53:31.524Z"
+    },
+    {
+      "category": "Basic Lifecycle",
+      "name": "User1 Bet (1 ETH on YES)",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-10-30T00:53:31.529Z"
+    },
+    {
+      "category": "Basic Lifecycle",
+      "name": "User2 Bet (0.19 ETH on NO)",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-10-30T00:53:31.530Z"
+    },
+    {
+      "category": "Basic Lifecycle",
+      "name": "User3 Bet (0.22 ETH on YES)",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-10-30T00:53:31.532Z"
+    },
+    {
+      "category": "Basic Lifecycle",
+      "name": "Pool State Correct",
+      "status": "PASS",
+      "details": "Pool: 1.41 ETH, YES: 1.22 ETH, NO: 0.19 ETH, Bettors: 3",
+      "timestamp": "2025-10-30T00:53:31.533Z"
+    },
+    {
+      "category": "Basic Lifecycle",
+      "name": "Resolve Market (YES wins)",
+      "status": "PASS",
+      "details": "",
+      "timestamp": "2025-10-30T00:53:31.536Z"
+    },
+    {
+      "category": "Basic Lifecycle",
+      "name": "Claim Winnings",
+      "status": "PASS",
+      "details": "User1 won 1.040163934426229508 ETH (gas: 0.000069265 ETH)",
+      "timestamp": "2025-10-30T00:53:31.538Z"
+    },
+    {
+      "category": "Fee Collection Resilience",
+      "name": "Suite Failed",
+      "status": "FAIL",
+      "details": "Error: VM Exception while processing transaction: reverted with custom error 'ZeroAddress()'",
+      "timestamp": "2025-10-30T00:53:31.557Z"
+    },
+    {
+      "category": "Gas Griefing Protection",
+      "name": "Claim Completes with Gas Limit",
+      "status": "PASS",
+      "details": "Gas used: 69265",
+      "timestamp": "2025-10-30T00:53:31.569Z"
+    },
+    {
+      "category": "Gas Griefing Protection",
+      "name": "Pull Pattern Available",
+      "status": "PASS",
+      "details": "withdrawUnclaimed() function exists for fallback",
+      "timestamp": "2025-10-30T00:53:31.569Z"
+    },
+    {
+      "category": "Front-Running Protection",
+      "name": "Slippage Protection Rejects Bad Odds",
+      "status": "PASS",
+      "details": "SlippageTooHigh error thrown correctly",
+      "timestamp": "2025-10-30T00:53:31.578Z"
+    },
+    {
+      "category": "Front-Running Protection",
+      "name": "Deadline Protection Rejects Expired Tx",
+      "status": "PASS",
+      "details": "DeadlineExpired error thrown correctly",
+      "timestamp": "2025-10-30T00:53:31.580Z"
+    }
+  ]
+}

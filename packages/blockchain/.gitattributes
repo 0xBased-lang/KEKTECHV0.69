@@ -1,0 +1,27 @@
+# .gitattributes
+# Git attributes for KEKTECH 3.0 project
+
+# Don't show diffs for deprecated files (they shouldn't change)
+contracts/deprecated/** -diff linguist-generated=true
+scripts/deploy/archive/** -diff linguist-generated=true
+
+# Mark deprecated files as archived
+contracts/deprecated/** linguist-documentation=true
+scripts/deploy/archive/** linguist-documentation=true
+
+# Ensure consistent line endings
+*.sol text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary

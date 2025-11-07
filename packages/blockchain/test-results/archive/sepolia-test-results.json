@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-11-04T21:09:43.894Z",
+  "results": {
+    "passed": [
+      "MasterRegistry connection",
+      "ACM connection",
+      "Admin role verification",
+      "ParameterStorage connection",
+      "FlexibleMarketFactoryCore connection",
+      "FlexibleMarketFactoryExtensions connection",
+      "Factory state check",
+      "Balance check",
+      "ResolutionManager connection",
+      "RewardDistributor connection",
+      "ProposalManager connection"
+    ],
+    "failed": [],
+    "skipped": [
+      "Parameter reading (not initialized)"
+    ]
+  },
+  "successRate": 91.7
+}

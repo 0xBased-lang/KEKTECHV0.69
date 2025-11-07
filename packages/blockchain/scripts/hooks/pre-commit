@@ -1,0 +1,106 @@
+#!/bin/bash
+
+# pre-commit hook
+# Blocks commits modifying deprecated files
+# Warns about non-target file modifications
+#
+# Installation:
+#   cp scripts/hooks/pre-commit .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+echo ""
+echo -e "${GREEN}🔍 Running pre-commit validation...${NC}"
+echo ""
+
+# Get list of modified Solidity files
+MODIFIED_SOL_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep "\.sol$" || true)
+
+if [ -z "$MODIFIED_SOL_FILES" ]; then
+    echo -e "${GREEN}✅ No Solidity files modified${NC}"
+    echo ""
+    exit 0
+fi
+
+echo -e "${YELLOW}Modified Solidity files:${NC}"
+echo "$MODIFIED_SOL_FILES" | while read file; do
+    echo "  • $file"
+done
+echo ""
+
+BLOCKED=false
+WARNINGS=false
+
+# Check each modified file
+echo "$MODIFIED_SOL_FILES" | while read file; do
+    # Check if file is in deprecated directory
+    if [[ "$file" == *"deprecated"* ]]; then
+        echo -e "${RED}❌ BLOCKED: $file is in deprecated directory${NC}"
+        echo ""
+        echo "This file is archived and MUST NOT be modified."
+        echo ""
+        echo "To bypass this check (EMERGENCY ONLY):"
+        echo "  git commit --no-verify -m \"your message\""
+        echo ""
+        BLOCKED=true
+    fi
+
+    # Check if file is in archive directory
+    if [[ "$file" == *"archive"* ]]; then
+        echo -e "${RED}❌ BLOCKED: $file is in archive directory${NC}"
+        echo ""
+        echo "Archived files MUST NOT be modified."
+        echo "Create new files instead."
+        echo ""
+        BLOCKED=true
+    fi
+
+    # Skip checks for test files and docs
+    if [[ "$file" == *"test/"* ]] || [[ "$file" == *"docs/"* ]] || [[ "$file" == *"interfaces/"* ]]; then
+        continue
+    fi
+
+    # Target architecture files (from TARGET_ARCHITECTURE.md)
+    case "$file" in
+        *VersionedRegistry.sol|*FlexibleMarketFactoryUnified.sol|*PredictionMarket.sol|*ResolutionManager.sol|*ParameterStorage.sol|*RewardDistributor.sol|*AccessControlManager.sol|*CurveRegistry.sol|*MarketTemplateRegistry.sol|*CurveMarketLogic.sol|*TemplateMarketLogic.sol)
+            # File is in target architecture, all good
+            ;;
+        *)
+            # File not in target architecture, warn
+            echo -e "${YELLOW}⚠️  WARNING: $file not in target architecture${NC}"
+            echo ""
+            echo "Before committing, ensure:"
+            echo "  1. This file is part of current phase work"
+            echo "  2. File is documented in TARGET_ARCHITECTURE.md"
+            echo "  3. You've updated the migration checklist"
+            echo ""
+            WARNINGS=true
+            ;;
+    esac
+done
+
+# Exit if any files were blocked
+if [ "$BLOCKED" = true ]; then
+    echo -e "${RED}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}║  COMMIT BLOCKED - Fix issues above           ║${NC}"
+    echo -e "${RED}╚═══════════════════════════════════════════════╝${NC}"
+    echo ""
+    exit 1
+fi
+
+# Show warnings but allow commit
+if [ "$WARNINGS" = true ]; then
+    echo -e "${YELLOW}⚠️  Warnings detected but commit allowed${NC}"
+    echo ""
+    echo "Review warnings above before proceeding."
+    echo ""
+fi
+
+echo -e "${GREEN}✅ Pre-commit validation passed${NC}"
+echo ""
+exit 0

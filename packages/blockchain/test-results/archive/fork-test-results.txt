@@ -1,0 +1,224 @@
+
+> bmad-blockchain-dev@1.0.0 test:fork
+> hardhat test test/fork/comprehensive-market-test.js --network forkedBasedAI
+
+WARNING: You are currently using Node.js v23.11.0, which is not supported by Hardhat. This can lead to unexpected behavior. See https://hardhat.org/nodejs-versions
+
+
+ ·-------------------------------|--------------------------------|--------------------------------·
+ |  Solc version: 0.8.20         ·  Optimizer enabled: true       ·  Runs: 1                       │
+ ································|································|·································
+ |  Contract Name                ·  Deployed size (KiB) (change)  ·  Initcode size (KiB) (change)  │
+ ································|································|·································
+ |  AccessControlManager         ·                 4.378 (0.000)  ·                 5.532 (0.000)  │
+ ································|································|·································
+ |  MarketTemplateRegistry       ·                 4.699 (0.000)  ·                 5.186 (0.000)  │
+ ································|································|·································
+ |  MasterRegistry               ·                 5.858 (0.000)  ·                 6.263 (0.000)  │
+ ································|································|·································
+ |  ParameterStorage             ·                 5.695 (0.000)  ·                 6.195 (0.000)  │
+ ································|································|·································
+ |  ProposalManager              ·                 8.369 (0.000)  ·                 8.849 (0.000)  │
+ ································|································|·································
+ |  ProposalManagerV2            ·                 9.302 (0.000)  ·                 9.837 (0.000)  │
+ ································|································|·································
+ |  ResolutionManager            ·                11.495 (0.000)  ·                12.152 (0.000)  │
+ ································|································|·································
+ |  RewardDistributor            ·                 7.420 (0.000)  ·                 7.900 (0.000)  │
+ ································|································|·································
+ |  RewardDistributorToggleMock  ·                 0.646 (0.000)  ·                 0.894 (0.000)  │
+ ·-------------------------------|--------------------------------|--------------------------------·
+
+
+  🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+
+🚀 COMPREHENSIVE TEST SETUP - Loading deployed contracts...
+
+📋 Contract Addresses:
+   MasterRegistry: 0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1
+   MarketFactory: 0x09635F643e140090A9A8Dcd712eD6285858ceBef
+   ResolutionManager: 0xc5a5C42992dECbae36851359345FE25997F5C42d
+
+✅ All contracts connected successfully
+
+    📊 PHASE 1: Market Creation
+🎯 Creating prediction market...
+      1) ✅ Should create prediction market with correct parameters
+      2) ✅ Should connect to created market and verify state
+    💰 PHASE 2: Betting System
+      3) ✅ Should allow Bettor 1 to place YES bet
+💸 Bettor 3 betting 0.08 ETH on YES...
+      4) ✅ Should allow Bettor 3 to place YES bet
+💸 Bettor 2 betting 0.03 ETH on NO...
+      5) ✅ Should allow Bettor 2 to place NO bet
+      6) ✅ Should track pool totals correctly
+    ⏰ PHASE 3: Time-Based Resolution
+⏰ Testing resolution delay enforcement...
+      7) ✅ Should prevent early resolution (before delay)
+⏰ Advancing time past resolution delay...
+   ✅ Time advanced successfully
+
+      ✔ ✅ Should allow resolution after time delay
+    🏆 PHASE 4: Market Resolution
+🏆 Resolving market with YES outcome...
+      8) ✅ Should resolve market with YES outcome
+💰 Calculating payouts...
+      9) ✅ Should calculate correct payout amounts
+    💸 PHASE 5: Withdrawals
+💸 Bettor 1 claiming winnings...
+      10) ✅ Should allow Bettor 1 (winner) to claim rewards
+💸 Bettor 3 claiming winnings...
+      11) ✅ Should allow Bettor 3 (winner) to claim rewards
+🚫 Testing loser claim prevention...
+      12) ✅ Should prevent Bettor 2 (loser) from claiming
+🚫 Testing double claim prevention...
+      13) ✅ Should prevent double claims
+    📈 PHASE 6: System Integrity
+📈 Verifying fund distribution...
+      14) ✅ Should have minimal remaining market balance
+      15) ✅ Should maintain accurate final state
+════════════════════════════════════════════════════════════
+🎉 100% COMPREHENSIVE VALIDATION COMPLETE!
+════════════════════════════════════════════════════════════
+
+✅ All phases tested and validated:
+   ✅ Market Creation
+   ✅ Betting System
+   ✅ Time-Based Resolution
+   ✅ Market Resolution
+   ✅ Withdrawal System
+   ✅ System Integrity
+
+🏆 KEKTECH 3.0 Platform: 100% Operational!
+
+
+
+  1 passing (369ms)
+  15 failing
+
+  1) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       📊 PHASE 1: Market Creation
+         ✅ Should create prediction market with correct parameters:
+     AssertionError: MarketCreated event not found: expected undefined not to be undefined
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:81:69)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+  2) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       📊 PHASE 1: Market Creation
+         ✅ Should connect to created market and verify state:
+     AssertionError: Market address must be set: expected undefined not to be undefined
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:94:74)
+      at processImmediate (node:internal/timers:505:21)
+
+  3) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       💰 PHASE 2: Betting System
+         ✅ Should allow Bettor 1 to place YES bet:
+     AssertionError: Market must be initialized: expected undefined not to be undefined
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:111:67)
+      at processImmediate (node:internal/timers:505:21)
+
+  4) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       💰 PHASE 2: Betting System
+         ✅ Should allow Bettor 3 to place YES bet:
+     TypeError: Cannot read properties of undefined (reading 'connect')
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:130:24)
+      at processImmediate (node:internal/timers:505:21)
+
+  5) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       💰 PHASE 2: Betting System
+         ✅ Should allow Bettor 2 to place NO bet:
+     TypeError: Cannot read properties of undefined (reading 'connect')
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:144:24)
+      at processImmediate (node:internal/timers:505:21)
+
+  6) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       💰 PHASE 2: Betting System
+         ✅ Should track pool totals correctly:
+     TypeError: Cannot read properties of undefined (reading 'getMarketInfo')
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:155:39)
+      at processImmediate (node:internal/timers:505:21)
+
+  7) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       ⏰ PHASE 3: Time-Based Resolution
+         ✅ Should prevent early resolution (before delay):
+     Error: could not decode result data (value="0x", info={ "method": "hasRole", "signature": "hasRole(bytes32,address)" }, code=BAD_DATA, version=6.15.0)
+      at makeError (node_modules/ethers/src.ts/utils/errors.ts:698:21)
+      at assert (node_modules/ethers/src.ts/utils/errors.ts:719:25)
+      at Interface.decodeFunctionResult (node_modules/ethers/src.ts/abi/interface.ts:916:15)
+      at staticCallResult (node_modules/ethers/src.ts/contract/contract.ts:346:35)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at staticCall (node_modules/ethers/src.ts/contract/contract.ts:303:24)
+      at Proxy.hasRole (node_modules/ethers/src.ts/contract/contract.ts:351:41)
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:175:29)
+
+  8) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       🏆 PHASE 4: Market Resolution
+         ✅ Should resolve market with YES outcome:
+     TypeError: unsupported addressable value (argument="target", value=null, code=INVALID_ARGUMENT, version=6.15.0)
+      at makeError (node_modules/ethers/src.ts/utils/errors.ts:691:21)
+      at assert (node_modules/ethers/src.ts/utils/errors.ts:719:25)
+      at assertArgument (node_modules/ethers/src.ts/utils/errors.ts:731:5)
+      at resolveAddress (node_modules/ethers/src.ts/address/checks.ts:122:19)
+      at /Users/seman/Desktop/kektechbmad100/expansion-packs/bmad-blockchain-dev/node_modules/ethers/src.ts/contract/contract.ts:172:60
+      at ParamType.#walkAsync (node_modules/ethers/src.ts/abi/fragments.ts:779:24)
+      at ParamType.walkAsync (node_modules/ethers/src.ts/abi/fragments.ts:797:24)
+      at /Users/seman/Desktop/kektechbmad100/expansion-packs/bmad-blockchain-dev/node_modules/ethers/src.ts/contract/contract.ts:170:22
+      at Array.map (<anonymous>)
+      at resolveArgs (node_modules/ethers/src.ts/contract/contract.ts:169:37)
+
+  9) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       🏆 PHASE 4: Market Resolution
+         ✅ Should calculate correct payout amounts:
+     TypeError: Cannot read properties of undefined (reading 'getMarketInfo')
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:229:39)
+      at processImmediate (node:internal/timers:505:21)
+
+  10) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       💸 PHASE 5: Withdrawals
+         ✅ Should allow Bettor 1 (winner) to claim rewards:
+     TypeError: Cannot read properties of undefined (reading 'connect')
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:251:24)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+  11) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       💸 PHASE 5: Withdrawals
+         ✅ Should allow Bettor 3 (winner) to claim rewards:
+     TypeError: Cannot read properties of undefined (reading 'connect')
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:268:24)
+      at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+  12) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       💸 PHASE 5: Withdrawals
+         ✅ Should prevent Bettor 2 (loser) from claiming:
+     TypeError: Cannot read properties of undefined (reading 'connect')
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:283:24)
+      at processImmediate (node:internal/timers:505:21)
+
+  13) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       💸 PHASE 5: Withdrawals
+         ✅ Should prevent double claims:
+     TypeError: Cannot read properties of undefined (reading 'connect')
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:293:24)
+      at processImmediate (node:internal/timers:505:21)
+
+  14) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       📈 PHASE 6: System Integrity
+         ✅ Should have minimal remaining market balance:
+     TypeError: unsupported addressable value (argument="target", value=null, code=INVALID_ARGUMENT, version=6.15.0)
+      at makeError (node_modules/ethers/src.ts/utils/errors.ts:691:21)
+      at assert (node_modules/ethers/src.ts/utils/errors.ts:719:25)
+      at assertArgument (node_modules/ethers/src.ts/utils/errors.ts:731:5)
+      at resolveAddress (node_modules/ethers/src.ts/address/checks.ts:122:19)
+      at HardhatEthersProvider._getAddress (node_modules/@nomicfoundation/hardhat-ethers/src/internal/hardhat-ethers-provider.ts:576:26)
+      at HardhatEthersProvider.getBalance (node_modules/@nomicfoundation/hardhat-ethers/src/internal/hardhat-ethers-provider.ts:176:40)
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:304:57)
+
+  15) 🎯 KEKTECH 3.0 - Complete Market Lifecycle Validation
+       📈 PHASE 6: System Integrity
+         ✅ Should maintain accurate final state:
+     TypeError: Cannot read properties of undefined (reading 'getMarketInfo')
+      at Context.<anonymous> (test/fork/comprehensive-market-test.js:315:39)
+      at processImmediate (node:internal/timers:505:21)
+
+
+

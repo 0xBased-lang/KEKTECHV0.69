@@ -1,0 +1,158 @@
+2025-11-04T17:42:19.248Z: 
+[1m[36m🚀 ========================================
+2025-11-04T17:42:19.249Z: 🚀 IMPROVED SEPOLIA DEPLOYMENT - DAY 7
+2025-11-04T17:42:19.249Z: 🚀 ========================================[0m
+
+2025-11-04T17:42:19.654Z: [36m📋 Deployment Configuration:[0m
+2025-11-04T17:42:19.655Z:    Network: sepolia
+2025-11-04T17:42:19.713Z:    Chain ID: 11155111
+2025-11-04T17:42:19.714Z:    Deployer: 0x25fD72154857Bd204345808a690d51a61A81EB0b
+2025-11-04T17:42:19.715Z:    Current Nonce: 146
+2025-11-04T17:42:19.715Z:    Pending Nonce: 146
+2025-11-04T17:42:19.763Z:    Balance: 0.814532106815384341 ETH
+2025-11-04T17:42:19.764Z:    Gas Multiplier: 15x
+2025-11-04T17:42:19.764Z:    Max Retries: 5
+
+2025-11-04T17:42:19.764Z: 
+[36m📦 [1/8] Deploying MasterRegistry...[0m
+2025-11-04T17:42:19.764Z: [36m   🔄 Attempt 1/5 for MasterRegistry...[0m
+2025-11-04T17:42:24.400Z: [31m   ❌ Attempt 1 failed: Do not know how to serialize a BigInt[0m
+2025-11-04T17:42:24.401Z: [33m   ⏳ Waiting 30 seconds before retry...[0m
+2025-11-04T17:42:54.403Z: [36m   🔄 Attempt 2/5 for MasterRegistry...[0m
+2025-11-04T17:43:01.116Z: [31m   ❌ Attempt 2 failed: Do not know how to serialize a BigInt[0m
+2025-11-04T17:43:01.116Z: [33m   ⏳ Waiting 60 seconds before retry...[0m
+2025-11-04T17:44:01.118Z: [36m   🔄 Attempt 3/5 for MasterRegistry...[0m
+2025-11-04T17:44:12.900Z: [31m   ❌ Attempt 3 failed: Do not know how to serialize a BigInt[0m
+2025-11-04T17:44:12.901Z: [33m   ⏳ Waiting 90 seconds before retry...[0m
+2025-11-04T17:45:35.439Z: 
+[1m[36m🚀 ========================================
+2025-11-04T17:45:35.440Z: 🚀 IMPROVED SEPOLIA DEPLOYMENT - DAY 7
+2025-11-04T17:45:35.440Z: 🚀 ========================================[0m
+
+2025-11-04T17:45:35.874Z: [36m📋 Deployment Configuration:[0m
+2025-11-04T17:45:35.874Z:    Network: sepolia
+2025-11-04T17:45:35.920Z:    Chain ID: 11155111
+2025-11-04T17:45:35.920Z:    Deployer: 0x25fD72154857Bd204345808a690d51a61A81EB0b
+2025-11-04T17:45:35.920Z:    Current Nonce: 149
+2025-11-04T17:45:35.920Z:    Pending Nonce: 149
+2025-11-04T17:45:35.963Z:    Balance: 0.812426849447395253 ETH
+2025-11-04T17:45:35.965Z:    Gas Multiplier: 15x
+2025-11-04T17:45:35.966Z:    Max Retries: 5
+
+2025-11-04T17:45:35.966Z: 
+[36m📦 [1/8] Deploying MasterRegistry...[0m
+2025-11-04T17:45:35.966Z: [36m   🔄 Attempt 1/5 for MasterRegistry...[0m
+2025-11-04T17:45:48.687Z: [32m   ✅ MasterRegistry: 0xcc1e022Ab00321f2D8905dD7D053A591B3f1a273[0m
+2025-11-04T17:45:48.689Z: 
+[36m📦 [2/8] Deploying AccessControlManager...[0m
+2025-11-04T17:45:48.689Z: [36m   🔄 Attempt 1/5 for AccessControlManager...[0m
+2025-11-04T17:46:01.321Z:    ✅ Registered in MasterRegistry
+2025-11-04T17:46:01.322Z: [32m   ✅ AccessControlManager: 0x98a5cf5993D9348c89Dd58d806B437454eED3513[0m
+2025-11-04T17:46:01.323Z: 
+[36m📦 [3/8] Deploying ParameterStorage...[0m
+2025-11-04T17:46:01.323Z: [36m   🔄 Attempt 1/5 for ParameterStorage...[0m
+2025-11-04T17:46:01.811Z: [31m   ❌ Attempt 1 failed: replacement transaction underpriced[0m
+2025-11-04T17:46:01.811Z: [33m   ⏳ Waiting 30 seconds before retry...[0m
+2025-11-04T17:46:31.813Z: [36m   🔄 Attempt 2/5 for ParameterStorage...[0m
+2025-11-04T17:46:36.654Z:    ✅ Registered in MasterRegistry
+2025-11-04T17:46:36.654Z: [32m   ✅ ParameterStorage: 0xeed9A50b64AC70e2DAE9EF21d3FF5c5a8396C340[0m
+2025-11-04T17:46:36.655Z: 
+[36m📦 [4/8] Deploying RewardDistributor...[0m
+2025-11-04T17:46:36.655Z: [36m   🔄 Attempt 1/5 for RewardDistributor...[0m
+2025-11-04T17:46:36.897Z: [31m   ❌ Attempt 1 failed: replacement transaction underpriced[0m
+2025-11-04T17:46:36.897Z: [33m   ⏳ Waiting 30 seconds before retry...[0m
+2025-11-04T17:47:06.898Z: [36m   🔄 Attempt 2/5 for RewardDistributor...[0m
+2025-11-04T17:47:14.039Z:    ✅ Registered in MasterRegistry
+2025-11-04T17:47:14.040Z: [32m   ✅ RewardDistributor: 0xcbC389a39185E2760d44f465e600afa26DA62f06[0m
+2025-11-04T17:47:14.040Z: 
+[36m📦 [5/8] Deploying ResolutionManager...[0m
+2025-11-04T17:47:14.040Z: [36m   🔄 Attempt 1/5 for ResolutionManager...[0m
+2025-11-04T17:47:14.043Z: [31m   ❌ Attempt 1 failed: incorrect number of arguments to constructor[0m
+2025-11-04T17:47:14.043Z: [33m   ⏳ Waiting 30 seconds before retry...[0m
+2025-11-04T17:47:44.044Z: [36m   🔄 Attempt 2/5 for ResolutionManager...[0m
+2025-11-04T17:47:44.049Z: [31m   ❌ Attempt 2 failed: incorrect number of arguments to constructor[0m
+2025-11-04T17:47:44.049Z: [33m   ⏳ Waiting 60 seconds before retry...[0m
+2025-11-04T17:48:44.051Z: [36m   🔄 Attempt 3/5 for ResolutionManager...[0m
+2025-11-04T17:48:44.055Z: [31m   ❌ Attempt 3 failed: incorrect number of arguments to constructor[0m
+2025-11-04T17:48:44.055Z: [33m   ⏳ Waiting 90 seconds before retry...[0m
+2025-11-04T17:50:14.057Z: [36m   🔄 Attempt 4/5 for ResolutionManager...[0m
+2025-11-04T17:50:14.060Z: [31m   ❌ Attempt 4 failed: incorrect number of arguments to constructor[0m
+2025-11-04T17:50:14.060Z: [33m   ⏳ Waiting 120 seconds before retry...[0m
+2025-11-04T17:52:04.896Z: 
+[1m[36m🚀 ========================================
+2025-11-04T17:52:04.897Z: 🚀 IMPROVED SEPOLIA DEPLOYMENT - DAY 7
+2025-11-04T17:52:04.897Z: 🚀 ========================================[0m
+
+2025-11-04T17:52:05.427Z: [36m📋 Deployment Configuration:[0m
+2025-11-04T17:52:05.427Z:    Network: sepolia
+2025-11-04T17:52:05.467Z:    Chain ID: 11155111
+2025-11-04T17:52:05.467Z:    Deployer: 0x25fD72154857Bd204345808a690d51a61A81EB0b
+2025-11-04T17:52:05.467Z:    Current Nonce: 156
+2025-11-04T17:52:05.467Z:    Pending Nonce: 156
+2025-11-04T17:52:05.520Z:    Balance: 0.810815576919186797 ETH
+2025-11-04T17:52:05.520Z:    Gas Multiplier: 15x
+2025-11-04T17:52:05.520Z:    Max Retries: 5
+
+2025-11-04T17:52:05.520Z: 
+[36m📦 [1/8] Deploying MasterRegistry...[0m
+2025-11-04T17:52:05.520Z: [32m   ✅ MasterRegistry already deployed at: 0xcc1e022Ab00321f2D8905dD7D053A591B3f1a273[0m
+2025-11-04T17:52:05.525Z: 
+[36m📦 [2/8] Deploying AccessControlManager...[0m
+2025-11-04T17:52:05.525Z: [32m   ✅ AccessControlManager already deployed at: 0x98a5cf5993D9348c89Dd58d806B437454eED3513[0m
+2025-11-04T17:52:05.526Z: 
+[36m📦 [3/8] Deploying ParameterStorage...[0m
+2025-11-04T17:52:05.526Z: [32m   ✅ ParameterStorage already deployed at: 0xeed9A50b64AC70e2DAE9EF21d3FF5c5a8396C340[0m
+2025-11-04T17:52:05.526Z: 
+[36m📦 [4/8] Deploying RewardDistributor...[0m
+2025-11-04T17:52:05.526Z: [32m   ✅ RewardDistributor already deployed at: 0xcbC389a39185E2760d44f465e600afa26DA62f06[0m
+2025-11-04T17:52:05.526Z: 
+[36m📦 [5/8] Deploying ResolutionManager...[0m
+2025-11-04T17:52:05.526Z: [36m   🔄 Attempt 1/5 for ResolutionManager...[0m
+2025-11-04T17:52:13.181Z:    ✅ Registered in MasterRegistry
+2025-11-04T17:52:13.181Z: [32m   ✅ ResolutionManager: 0x9A333Ce48c58efEdBe29CDa8E20a662F74ad3551[0m
+2025-11-04T17:52:13.181Z: 
+[36m📦 [6/8] Deploying FlexibleMarketFactory...[0m
+2025-11-04T17:52:13.181Z: [36m   🔄 Attempt 1/5 for FlexibleMarketFactory...[0m
+2025-11-04T17:52:13.184Z: [31m   ❌ Attempt 1 failed: incorrect number of arguments to constructor[0m
+2025-11-04T17:52:13.184Z: [33m   ⏳ Waiting 30 seconds before retry...[0m
+2025-11-04T17:52:43.187Z: [36m   🔄 Attempt 2/5 for FlexibleMarketFactory...[0m
+2025-11-04T17:52:43.191Z: [31m   ❌ Attempt 2 failed: incorrect number of arguments to constructor[0m
+2025-11-04T17:52:43.191Z: [33m   ⏳ Waiting 60 seconds before retry...[0m
+2025-11-04T17:54:16.839Z: 
+[1m[36m🚀 ========================================
+2025-11-04T17:54:16.840Z: 🚀 IMPROVED SEPOLIA DEPLOYMENT - DAY 7
+2025-11-04T17:54:16.840Z: 🚀 ========================================[0m
+
+2025-11-04T17:54:17.300Z: [36m📋 Deployment Configuration:[0m
+2025-11-04T17:54:17.301Z:    Network: sepolia
+2025-11-04T17:54:17.342Z:    Chain ID: 11155111
+2025-11-04T17:54:17.342Z:    Deployer: 0x25fD72154857Bd204345808a690d51a61A81EB0b
+2025-11-04T17:54:17.342Z:    Current Nonce: 158
+2025-11-04T17:54:17.342Z:    Pending Nonce: 158
+2025-11-04T17:54:17.394Z:    Balance: 0.810812771735517373 ETH
+2025-11-04T17:54:17.394Z:    Gas Multiplier: 15x
+2025-11-04T17:54:17.394Z:    Max Retries: 5
+
+2025-11-04T17:54:17.395Z: 
+[36m📦 [1/8] Deploying MasterRegistry...[0m
+2025-11-04T17:54:17.395Z: [32m   ✅ MasterRegistry already deployed at: 0xcc1e022Ab00321f2D8905dD7D053A591B3f1a273[0m
+2025-11-04T17:54:17.400Z: 
+[36m📦 [2/8] Deploying AccessControlManager...[0m
+2025-11-04T17:54:17.400Z: [32m   ✅ AccessControlManager already deployed at: 0x98a5cf5993D9348c89Dd58d806B437454eED3513[0m
+2025-11-04T17:54:17.400Z: 
+[36m📦 [3/8] Deploying ParameterStorage...[0m
+2025-11-04T17:54:17.400Z: [32m   ✅ ParameterStorage already deployed at: 0xeed9A50b64AC70e2DAE9EF21d3FF5c5a8396C340[0m
+2025-11-04T17:54:17.400Z: 
+[36m📦 [4/8] Deploying RewardDistributor...[0m
+2025-11-04T17:54:17.400Z: [32m   ✅ RewardDistributor already deployed at: 0xcbC389a39185E2760d44f465e600afa26DA62f06[0m
+2025-11-04T17:54:17.401Z: 
+[36m📦 [5/8] Deploying ResolutionManager...[0m
+2025-11-04T17:54:17.401Z: [32m   ✅ ResolutionManager already deployed at: 0x9A333Ce48c58efEdBe29CDa8E20a662F74ad3551[0m
+2025-11-04T17:54:17.401Z: 
+[36m📦 [6/8] Deploying FlexibleMarketFactory...[0m
+2025-11-04T17:54:17.401Z: [36m   🔄 Attempt 1/5 for FlexibleMarketFactory...[0m
+2025-11-04T17:54:17.595Z: [31m   ❌ Attempt 1 failed: max code size exceeded[0m
+2025-11-04T17:54:17.596Z: [33m   ⏳ Waiting 30 seconds before retry...[0m
+2025-11-04T17:54:47.597Z: [36m   🔄 Attempt 2/5 for FlexibleMarketFactory...[0m
+2025-11-04T17:54:47.948Z: [31m   ❌ Attempt 2 failed: max code size exceeded[0m
+2025-11-04T17:54:47.948Z: [33m   ⏳ Waiting 60 seconds before retry...[0m

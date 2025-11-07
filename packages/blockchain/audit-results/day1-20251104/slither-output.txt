@@ -1,0 +1,664 @@
+INFO:Slither:slither.config.json has an unknown key: compile_remappings : []
+INFO:Slither:slither.config.json has an unknown key: checklist : True
+'npx hardhat clean' running (wd: /Users/seman/Desktop/kektechbmad100/expansion-packs/bmad-blockchain-dev)
+'npx hardhat clean --global' running (wd: /Users/seman/Desktop/kektechbmad100/expansion-packs/bmad-blockchain-dev)
+Problem executing hardhat: WARNING: You are currently using Node.js v23.11.0, which is not supported by Hardhat. This can lead to unexpected behavior. See https://hardhat.org/nodejs-versions
+
+'npx hardhat compile --force' running (wd: /Users/seman/Desktop/kektechbmad100/expansion-packs/bmad-blockchain-dev)
+
+ResolutionManager.withdrawHeldBonds(address) (contracts/core/ResolutionManager.sol#378-396) sends eth to arbitrary user
+	Dangerous calls:
+	- (success,None) = address(msg.sender).call{value: amount}() (contracts/core/ResolutionManager.sol#392)
+RewardDistributor.claimCreatorFees(address) (contracts/core/RewardDistributor.sol#146-156) sends eth to arbitrary user
+	Dangerous calls:
+	- (success,None) = msg.sender.call{value: amount}() (contracts/core/RewardDistributor.sol#152)
+RewardDistributor.distributeStakerRewards(address,uint256) (contracts/core/RewardDistributor.sol#163-178) sends eth to arbitrary user
+	Dangerous calls:
+	- (success,None) = staker.call{value: amount}() (contracts/core/RewardDistributor.sol#174)
+RewardDistributor.withdrawTreasury(address,uint256) (contracts/core/RewardDistributor.sol#185-200) sends eth to arbitrary user
+	Dangerous calls:
+	- (success,None) = recipient.call{value: amount}() (contracts/core/RewardDistributor.sol#196)
+ParimutuelMarket.withdrawAccumulatedFees() (contracts/markets/ParimutuelMarket.sol#328-356) sends eth to arbitrary user
+	Dangerous calls:
+	- rewardDist.collectFees{value: amount}(address(this),amount) (contracts/markets/ParimutuelMarket.sol#348-355)
+	- (success,None) = address(msg.sender).call{value: amount}() (contracts/markets/ParimutuelMarket.sol#352)
+ParimutuelMarket.emergencyWithdraw() (contracts/markets/ParimutuelMarket.sol#554-580) sends eth to arbitrary user
+	Dangerous calls:
+	- (success,None) = msg.sender.call{value: balance}() (contracts/markets/ParimutuelMarket.sol#576)
+FrontRunningBot.sandwichAttack(uint8,uint256,uint8,uint256) (contracts/test/MaliciousContracts.sol#146-177) sends eth to arbitrary user
+	Dangerous calls:
+	- (success1,None) = market.call{value: amount1}(abi.encodeWithSignature(placeBet(uint8,bytes,uint256,uint256),outcome1,,0,0)) (contracts/test/MaliciousContracts.sol#153-161)
+	- (success2,None) = market.call{value: amount2}(abi.encodeWithSignature(placeBet(uint8,bytes,uint256,uint256),outcome2,,0,0)) (contracts/test/MaliciousContracts.sol#167-175)
+OddManipulator.manipulateOdds(uint8,uint256,uint256) (contracts/test/MaliciousContracts.sol#227-255) sends eth to arbitrary user
+	Dangerous calls:
+	- (success,None) = market.call{value: largeAmount}(abi.encodeWithSignature(placeBet(uint8,bytes,uint256,uint256),outcome,,0,0)) (contracts/test/MaliciousContracts.sol#233-241)
+	- (success2,None) = market.call{value: victimAmount}(abi.encodeWithSignature(placeBet(uint8,bytes,uint256,uint256),2,,0,0)) (contracts/test/MaliciousContracts.sol#245-253)
+	- (success2,None) = market.call{value: victimAmount}(abi.encodeWithSignature(placeBet(uint8,bytes,uint256,uint256),1,,0,0)) (contracts/test/MaliciousContracts.sol#245-253)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+
+Reentrancy in ResolutionManager.resolveDispute(address,bool,uint8) (contracts/core/ResolutionManager.sol#326-371):
+	External calls:
+	- (success,None) = dispute.disputer.call{value: dispute.bondAmount}() (contracts/core/ResolutionManager.sol#344)
+	- rewardDist.collectFees{value: dispute.bondAmount}(marketAddress,dispute.bondAmount) (contracts/core/ResolutionManager.sol#355-365)
+	State variables written after the call(s):
+	- dispute.status = DisputeStatus.RESOLVED (contracts/core/ResolutionManager.sol#368)
+	ResolutionManager._disputes (contracts/core/ResolutionManager.sol#55) can be used in cross function reentrancies:
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.getDisputeData(address) (contracts/core/ResolutionManager.sol#473-479)
+	- ResolutionManager.investigateDispute(address,string) (contracts/core/ResolutionManager.sol#300-317)
+Reentrancy in ParimutuelMarket.withdrawUnclaimed() (contracts/markets/ParimutuelMarket.sol#397-416):
+	External calls:
+	- (success,None) = address(msg.sender).call{gas: CLAIM_GAS_LIMIT,value: amount}() (contracts/markets/ParimutuelMarket.sol#404-407)
+	State variables written after the call(s):
+	- unclaimedWinnings[msg.sender] = amount (contracts/markets/ParimutuelMarket.sol#411)
+	ParimutuelMarket.unclaimedWinnings (contracts/markets/ParimutuelMarket.sol#104) can be used in cross function reentrancies:
+	- ParimutuelMarket.unclaimedWinnings (contracts/markets/ParimutuelMarket.sol#104)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+
+ExponentialCurve.calculateCost(uint256,uint256,uint256,bool,uint256) (contracts/curves/ExponentialCurve.sol#65-110) performs a multiplication on the result of a division:
+	- segmentPrice = (basePrice * priceMultiplier) / BASIS_POINTS (contracts/curves/ExponentialCurve.sol#101)
+	- segmentCost = (segmentPrice * segmentShares) / 1000000000000000000 (contracts/curves/ExponentialCurve.sol#102)
+ExponentialCurve.calculateRefund(uint256,uint256,uint256,bool,uint256) (contracts/curves/ExponentialCurve.sol#116-165) performs a multiplication on the result of a division:
+	- segmentPrice = (basePrice * priceMultiplier) / BASIS_POINTS (contracts/curves/ExponentialCurve.sol#153)
+	- segmentRefund = (segmentPrice * segmentShares) / 1000000000000000000 (contracts/curves/ExponentialCurve.sol#154)
+LinearCurve.calculateRefund(uint256,uint256,uint256,bool,uint256) (contracts/curves/LinearCurve.sol#88-118) performs a multiplication on the result of a division:
+	- refund = (shares * (startPrice + endPrice)) / (2000000000000000000) (contracts/curves/LinearCurve.sol#112)
+	- refund = (refund * 99) / 100 (contracts/curves/LinearCurve.sol#115)
+SigmoidCurve.calculateCost(uint256,uint256,uint256,bool,uint256) (contracts/curves/SigmoidCurve.sol#69-116) performs a multiplication on the result of a division:
+	- segmentSize = shares / segments (contracts/curves/SigmoidCurve.sol#96)
+	- segmentStart = currentSupply + (i * segmentSize) (contracts/curves/SigmoidCurve.sol#100)
+SigmoidCurve.calculateCost(uint256,uint256,uint256,bool,uint256) (contracts/curves/SigmoidCurve.sol#69-116) performs a multiplication on the result of a division:
+	- avgPrice = (startPrice + endPrice) / 2 (contracts/curves/SigmoidCurve.sol#109)
+	- segmentCost = (avgPrice * segmentShares) / PRECISION (contracts/curves/SigmoidCurve.sol#110)
+SigmoidCurve.calculateRefund(uint256,uint256,uint256,bool,uint256) (contracts/curves/SigmoidCurve.sol#122-173) performs a multiplication on the result of a division:
+	- segmentSize = shares / segments (contracts/curves/SigmoidCurve.sol#150)
+	- segmentEnd = currentSupply - (i * segmentSize) (contracts/curves/SigmoidCurve.sol#154)
+SigmoidCurve.calculateRefund(uint256,uint256,uint256,bool,uint256) (contracts/curves/SigmoidCurve.sol#122-173) performs a multiplication on the result of a division:
+	- avgPrice = (startPrice + endPrice) / 2 (contracts/curves/SigmoidCurve.sol#163)
+	- segmentRefund = (avgPrice * segmentShares) / PRECISION (contracts/curves/SigmoidCurve.sol#164)
+SigmoidCurve._calculateSigmoidPrice(uint256,uint256,uint256,uint256,uint256) (contracts/curves/SigmoidCurve.sol#269-305) performs a multiplication on the result of a division:
+	- x = (int256(supply) - int256(inflection)) * 1000 / int256(inflection) (contracts/curves/SigmoidCurve.sol#278)
+	- sx = (x * int256(steepness)) / 10 (contracts/curves/SigmoidCurve.sol#281)
+SigmoidCurve._calculateSigmoidPrice(uint256,uint256,uint256,uint256,uint256) (contracts/curves/SigmoidCurve.sol#269-305) performs a multiplication on the result of a division:
+	- sx = (x * int256(steepness)) / 10 (contracts/curves/SigmoidCurve.sol#281)
+	- sigmoidValue = uint256(int256(PRECISION / 2) + (sx * int256(PRECISION)) / 10000) (contracts/curves/SigmoidCurve.sol#297)
+LMSRMath.priceYes(uint256,uint256,uint256) (contracts/libraries/LMSRMath.sol#121-154) performs a multiplication on the result of a division:
+	- price = ABDKMath64x64.div(expYes,sum) (contracts/libraries/LMSRMath.sol#147)
+	- priceBasisPoints = ABDKMath64x64.mul(price,fpPrecision) (contracts/libraries/LMSRMath.sol#151)
+LMSRMath.priceNo(uint256,uint256,uint256) (contracts/libraries/LMSRMath.sol#164-197) performs a multiplication on the result of a division:
+	- price = ABDKMath64x64.div(expNo,sum) (contracts/libraries/LMSRMath.sol#190)
+	- priceBasisPoints = ABDKMath64x64.mul(price,fpPrecision) (contracts/libraries/LMSRMath.sol#194)
+LMSRMath.getPrices(uint256,uint256,uint256) (contracts/libraries/LMSRMath.sol#207-243) performs a multiplication on the result of a division:
+	- yesRatio = ABDKMath64x64.div(expYes,sum) (contracts/libraries/LMSRMath.sol#233)
+	- yesBasisPoints = ABDKMath64x64.mul(yesRatio,fpPrecision) (contracts/libraries/LMSRMath.sol#238)
+LMSRMath.getPrices(uint256,uint256,uint256) (contracts/libraries/LMSRMath.sol#207-243) performs a multiplication on the result of a division:
+	- noRatio = ABDKMath64x64.div(expNo,sum) (contracts/libraries/LMSRMath.sol#234)
+	- noBasisPoints = ABDKMath64x64.mul(noRatio,fpPrecision) (contracts/libraries/LMSRMath.sol#239)
+LMSRMarket._findSharesForAmount(uint256,uint256,uint256,uint256,bool) (contracts/markets/LMSRMarket.sol#183-240) performs a multiplication on the result of a division:
+	- high = high * 2 (contracts/markets/LMSRMarket.sol#221)
+	- mid = (low + high) / 2 (contracts/markets/LMSRMarket.sol#228)
+	- high = mid (contracts/markets/LMSRMarket.sol#234)
+MockBondingCurve.calculateRefund(uint256,uint256,uint256,bool,uint256) (contracts/mocks/MockBondingCurve.sol#60-75) performs a multiplication on the result of a division:
+	- cost = (shares * curveParams) / 1000000000000000000 (contracts/mocks/MockBondingCurve.sol#71)
+	- refund = (cost * 90) / 100 (contracts/mocks/MockBondingCurve.sol#72)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+ProposalManagerV2.isProposalApproved(uint256) (contracts/core/ProposalManagerV2.sol#407-417) uses a dangerous strict equality:
+	- _proposals[proposalId].state == ProposalState.Approved || _proposals[proposalId].state == ProposalState.MarketCreated (contracts/core/ProposalManagerV2.sol#415-416)
+ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503) uses a dangerous strict equality:
+	- resolution.resolvedAt == 0 (contracts/core/ResolutionManager.sol#498)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+
+Contract locking ether found:
+	Contract GreedyReceiver (contracts/test/GreedyReceiver.sol#8-34) has payable functions:
+	 - GreedyReceiver.receive() (contracts/test/GreedyReceiver.sol#17-29)
+	But does not have a function to withdraw the ether
+Contract locking ether found:
+	Contract MaliciousRewardDistributor (contracts/test/MaliciousContracts.sol#14-24) has payable functions:
+	 - MaliciousRewardDistributor.collectFees(address,uint256) (contracts/test/MaliciousContracts.sol#17-19)
+	But does not have a function to withdraw the ether
+Contract locking ether found:
+	Contract GasWastingRecipient (contracts/test/MaliciousContracts.sol#30-46) has payable functions:
+	 - GasWastingRecipient.receive() (contracts/test/MaliciousContracts.sol#33-38)
+	 - GasWastingRecipient.fallback() (contracts/test/MaliciousContracts.sol#40-45)
+	But does not have a function to withdraw the ether
+Contract locking ether found:
+	Contract RevertingRecipient (contracts/test/MaliciousContracts.sol#52-62) has payable functions:
+	 - RevertingRecipient.receive() (contracts/test/MaliciousContracts.sol#55-57)
+	 - RevertingRecipient.fallback() (contracts/test/MaliciousContracts.sol#59-61)
+	But does not have a function to withdraw the ether
+Contract locking ether found:
+	Contract GasLimitChecker (contracts/test/MaliciousContracts.sol#68-87) has payable functions:
+	 - GasLimitChecker.receive() (contracts/test/MaliciousContracts.sol#76-82)
+	But does not have a function to withdraw the ether
+Contract locking ether found:
+	Contract ConditionalReverter (contracts/test/MaliciousContracts.sol#184-198) has payable functions:
+	 - ConditionalReverter.collectFees(address,uint256) (contracts/test/MaliciousContracts.sol#192-197)
+	But does not have a function to withdraw the ether
+Contract locking ether found:
+	Contract SlowRecipient (contracts/test/MaliciousContracts.sol#204-214) has payable functions:
+	 - SlowRecipient.receive() (contracts/test/MaliciousContracts.sol#208-213)
+	But does not have a function to withdraw the ether
+Contract locking ether found:
+	Contract MockRewardDistributor (contracts/test/MaliciousContracts.sol#262-282) has payable functions:
+	 - MockRewardDistributor.collectFees(address,uint256) (contracts/test/MaliciousContracts.sol#270-275)
+	 - MockRewardDistributor.receive() (contracts/test/MaliciousContracts.sol#281)
+	But does not have a function to withdraw the ether
+Contract locking ether found:
+	Contract RewardDistributorToggleMock (contracts/test/MockRewardDistributor.sol#8-27) has payable functions:
+	 - IRewardDistributorLike.collectFees(address,uint256) (contracts/test/MockRewardDistributor.sol#5)
+	 - RewardDistributorToggleMock.collectFees(address,uint256) (contracts/test/MockRewardDistributor.sol#21-26)
+	But does not have a function to withdraw the ether
+Contract locking ether found:
+	Contract ReentrantClaimer (contracts/test/ReentrantClaimer.sol#8-26) has payable functions:
+	 - ReentrantClaimer.receive() (contracts/test/ReentrantClaimer.sol#18-25)
+	But does not have a function to withdraw the ether
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether
+
+Reentrancy in ResolutionManager.batchResolveMarkets(address[],uint8[],string[]) (contracts/core/ResolutionManager.sol#188-240):
+	External calls:
+	- IMarket(marketAddresses[i]).resolveMarket(IMarket.Outcome(outcomes[i])) (contracts/core/ResolutionManager.sol#209-219)
+	- IPredictionMarket(marketAddresses[i]).resolveMarket(IPredictionMarket.Outcome(outcomes[i])) (contracts/core/ResolutionManager.sol#212-218)
+	State variables written after the call(s):
+	- _removeFromPending(marketAddresses[i]) (contracts/core/ResolutionManager.sol#230)
+		- _pendingMarkets[index - 1] = lastMarket (contracts/core/ResolutionManager.sol#617)
+		- _pendingMarkets.pop() (contracts/core/ResolutionManager.sol#622)
+	ResolutionManager._pendingMarkets (contracts/core/ResolutionManager.sol#58) can be used in cross function reentrancies:
+	- ResolutionManager.getPendingResolutions() (contracts/core/ResolutionManager.sol#527-529)
+	- resolution.marketAddress = marketAddresses[i] (contracts/core/ResolutionManager.sol#222)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+	- resolution.outcome = outcomes[i] (contracts/core/ResolutionManager.sol#223)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+	- resolution.resolver = msg.sender (contracts/core/ResolutionManager.sol#224)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+	- resolution.resolvedAt = block.timestamp (contracts/core/ResolutionManager.sol#225)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+	- resolution.status = ResolutionStatus.RESOLVED (contracts/core/ResolutionManager.sol#226)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+	- resolution.evidence = evidences[i] (contracts/core/ResolutionManager.sol#227)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+	- _resolverHistory[msg.sender].push(marketAddresses[i]) (contracts/core/ResolutionManager.sol#229)
+	ResolutionManager._resolverHistory (contracts/core/ResolutionManager.sol#67) can be used in cross function reentrancies:
+	- ResolutionManager.getResolverHistory(address) (contracts/core/ResolutionManager.sol#544-550)
+Reentrancy in ResolutionManager.resolveMarket(address,uint8,string) (contracts/core/ResolutionManager.sol#125-180):
+	External calls:
+	- IMarket(marketAddress).resolveMarket(IMarket.Outcome(outcome)) (contracts/core/ResolutionManager.sol#144-159)
+	- IPredictionMarket(marketAddress).resolveMarket(IPredictionMarket.Outcome(outcome)) (contracts/core/ResolutionManager.sol#148-158)
+	State variables written after the call(s):
+	- resolution.marketAddress = marketAddress (contracts/core/ResolutionManager.sol#163)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+	- resolution.outcome = outcome (contracts/core/ResolutionManager.sol#164)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+	- resolution.resolver = msg.sender (contracts/core/ResolutionManager.sol#165)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+	- resolution.resolvedAt = block.timestamp (contracts/core/ResolutionManager.sol#166)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+	- resolution.status = ResolutionStatus.RESOLVED (contracts/core/ResolutionManager.sol#167)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+	- resolution.evidence = evidence (contracts/core/ResolutionManager.sol#168)
+	ResolutionManager._resolutions (contracts/core/ResolutionManager.sol#52) can be used in cross function reentrancies:
+	- ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451)
+	- ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503)
+	- ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426)
+	- ResolutionManager.getResolutionData(address) (contracts/core/ResolutionManager.sol#460-466)
+	- ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-1
+
+FlexibleMarketFactory._validateCurveConfig(IFlexibleMarketFactory.CurveType,uint256).curveName (contracts/core/FlexibleMarketFactory.sol#806) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+
+CurveRegistry.registerCurve(address,string,string) (contracts/core/CurveRegistry.sol#123-156) ignores return value by registeredCurves.add(curveAddress) (contracts/core/CurveRegistry.sol#146)
+CurveRegistry.removeCurve(address) (contracts/core/CurveRegistry.sol#189-203) ignores return value by registeredCurves.remove(curveAddress) (contracts/core/CurveRegistry.sol#198)
+MarketTemplateRegistry.registerTemplate(bytes32,address) (contracts/core/MarketTemplateRegistry.sol#132-165) ignores return value by IMarket(implementation).feePercent() (contracts/core/MarketTemplateRegistry.sol#152-156)
+LMSRCurve.getPrices(uint256,uint256,uint256) (contracts/curves/LMSRCurve.sol#124-138) ignores return value by LMSRMath.getPrices(b,yesSupply,noSupply) (contracts/curves/LMSRCurve.sol#137)
+LMSRMarket.getPrices() (contracts/markets/LMSRMarket.sol#541-543) ignores return value by LMSRMath.getPrices(b,totalYes,totalNo) (contracts/markets/LMSRMarket.sol#542)
+LMSRMathTester.getPrices(uint256,uint256,uint256) (contracts/test/LMSRMathTester.sol#56-62) ignores return value by LMSRMath.getPrices(b,qYes,qNo) (contracts/test/LMSRMathTester.sol#61)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+
+IMarket.placeBet(uint8,bytes,uint256,uint256).deadline (contracts/interfaces/IMarket.sol#166) shadows:
+	- IMarket.deadline() (contracts/interfaces/IMarket.sol#208) (function)
+IMarket.resolveMarket(IMarket.Outcome).result (contracts/interfaces/IMarket.sol#174) shadows:
+	- IMarket.result() (contracts/interfaces/IMarket.sol#214) (function)
+IPredictionMarket.resolveMarket(IPredictionMarket.Outcome).result (contracts/interfaces/IPredictionMarket.sol#107) shadows:
+	- IPredictionMarket.result() (contracts/interfaces/IPredictionMarket.sol#144) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing
+
+LMSRMarket.initialize(address,bytes)._registry (contracts/markets/LMSRMarket.sol#144) lacks a zero-check on :
+		- registry = _registry (contracts/markets/LMSRMarket.sol#157)
+ReentrancyAttacker.constructor(address)._target (contracts/test/MaliciousContracts.sol#97) lacks a zero-check on :
+		- target = _target (contracts/test/MaliciousContracts.sol#98)
+FrontRunningBot.constructor(address)._market (contracts/test/MaliciousContracts.sol#128) lacks a zero-check on :
+		- market = _market (contracts/test/MaliciousContracts.sol#129)
+OddManipulator.constructor(address)._market (contracts/test/MaliciousContracts.sol#223) lacks a zero-check on :
+		- market = _market (contracts/test/MaliciousContracts.sol#224)
+ReentrantClaimer.constructor(address,bool)._market (contracts/test/ReentrantClaimer.sol#13) lacks a zero-check on :
+		- market = _market (contracts/test/ReentrantClaimer.sol#14)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+
+PredictionMarket._calculateSharesFromEth(uint256,bool) (contracts/core/PredictionMarket.sol#692-739) has external calls inside a loop: cost = IBondingCurve(_bondingCurve).calculateCost(_curveParams,_yesShares,_noShares,isYes,mid) (contracts/core/PredictionMarket.sol#713-719)
+	Calls stack containing the loop:
+		PredictionMarket.placeBet(uint8,uint256)
+PredictionMarket.estimateShares(uint256,uint8) (contracts/core/PredictionMarket.sol#614-654) has external calls inside a loop: cost = IBondingCurve(_bondingCurve).calculateCost(_curveParams,_yesShares,_noShares,isYes,mid) (contracts/core/PredictionMarket.sol#632-638)
+ProposalManager._getParameterStorage() (contracts/core/ProposalManager.sol#376-379) has external calls inside a loop: paramStorage = _registry.getContract(keccak256(bytes)(ParameterStorage)) (contracts/core/ProposalManager.sol#377)
+	Calls stack containing the loop:
+		ProposalManager.getActiveProposals()
+		ProposalManager.state(uint256)
+		ProposalManager.quorum()
+ProposalManager.quorum() (contracts/core/ProposalManager.sol#285-288) has external calls inside a loop: params.getParameter(keccak256(bytes)(quorumBps)) (contracts/core/ProposalManager.sol#287)
+	Calls stack containing the loop:
+		ProposalManager.getActiveProposals()
+		ProposalManager.state(uint256)
+ProposalManager._getParameterStorage() (contracts/core/ProposalManager.sol#376-379) has external calls inside a loop: paramStorage = _registry.getContract(keccak256(bytes)(ParameterStorage)) (contracts/core/ProposalManager.sol#377)
+	Calls stack containing the loop:
+		ProposalManager.getProposalsByState(IProposalManager.ProposalState)
+		ProposalManager.state(uint256)
+		ProposalManager.quorum()
+ProposalManager.quorum() (contracts/core/ProposalManager.sol#285-288) has external calls inside a loop: params.getParameter(keccak256(bytes)(quorumBps)) (contracts/core/ProposalManager.sol#287)
+	Calls stack containing the loop:
+		ProposalManager.getProposalsByState(IProposalManager.ProposalState)
+		ProposalManager.state(uint256)
+ResolutionManager.batchResolveMarkets(address[],uint8[],string[]) (contracts/core/ResolutionManager.sol#188-240) has external calls inside a loop: IMarket(marketAddresses[i]).resolveMarket(IMarket.Outcome(outcomes[i])) (contracts/core/ResolutionManager.sol#209-219)
+ResolutionManager.batchResolveMarkets(address[],uint8[],string[]) (contracts/core/ResolutionManager.sol#188-240) has external calls inside a loop: IPredictionMarket(marketAddresses[i]).resolveMarket(IPredictionMarket.Outcome(outcomes[i])) (contracts/core/ResolutionManager.sol#212-218)
+RewardDistributor.batchProcessRewards(address[],address[],uint256[],uint8[]) (contracts/core/RewardDistributor.sol#211-232) has external calls inside a loop: this.processRewardClaim(markets[i],claimers[i],amounts[i],outcomes[i]) (contracts/core/RewardDistributor.sol#226-230)
+RewardDistributor.batchCollectFees(address[],uint256[]) (contracts/core/RewardDistributor.sol#239-252) has external calls inside a loop: this.collectFees{value: fees[i]}(markets[i],fees[i]) (contracts/core/RewardDistributor.sol#246-250)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation/#calls-inside-a-loop
+
+Reentrancy in ParimutuelMarket.claimWinnings() (contracts/markets/ParimutuelMarket.sol#366-390):
+	External calls:
+	- (success,None) = address(msg.sender).call{gas: CLAIM_GAS_LIMIT,value: payout}() (contracts/markets/ParimutuelMarket.sol#376-379)
+	State variables written after the call(s):
+	- unclaimedWinnings[msg.sender] = payout (contracts/markets/ParimutuelMarket.sol#383)
+Reentrancy in FlexibleMarketFactory.createMarket(IFlexibleMarketFactory.MarketConfig) (contracts/core/FlexibleMarketFactory.sol#137-208):
+	External calls:
+	- market.initialize(registry,config.question,config.outcome1,config.outcome2,msg.sender,config.resolutionTime,lmsrCurve,defaultParams) (contracts/core/FlexibleMarketFactory.sol#161-170)
+	State variables written after the call(s):
+	- _activeMarketCount ++ (contracts/core/FlexibleMarketFactory.sol#195)
+	- _marketData[marketAddress] = MarketData({creator:msg.sender,createdAt:block.timestamp,resolutionTime:config.resolutionTime,category:config.category,isActive:true,exists:true,creatorBond:msg.value,curveType:CurveType.LMSR,curveParams:100 * 1e18}) (contracts/core/FlexibleMarketFactory.sol#179-189)
+	- _markets.push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#192)
+	- _marketsByCategory[config.category].push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#194)
+	- _marketsByCreator[msg.sender].push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#193)
+	- _totalHeldBonds += msg.value (contracts/core/FlexibleMarketFactory.sol#176)
+	- heldBonds[marketAddress] = msg.value (contracts/core/FlexibleMarketFactory.sol#175)
+Reentrancy in FlexibleMarketFactory.createMarketFromTemplate(bytes32,string,uint256) (contracts/core/FlexibleMarketFactory.sol#217-305):
+	External calls:
+	- market.initialize(registry,config.question,config.outcome1,config.outcome2,msg.sender,config.resolutionTime,lmsrCurve,defaultParams) (contracts/core/FlexibleMarketFactory.sol#258-267)
+	State variables written after the call(s):
+	- _activeMarketCount ++ (contracts/core/FlexibleMarketFactory.sol#292)
+	- _marketData[marketAddress] = MarketData({creator:msg.sender,createdAt:block.timestamp,resolutionTime:resolutionTime,category:template.category,isActive:true,exists:true,creatorBond:msg.value,curveType:CurveType.LMSR,curveParams:100 * 1e18}) (contracts/core/FlexibleMarketFactory.sol#276-286)
+	- _markets.push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#289)
+	- _marketsByCategory[template.category].push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#291)
+	- _marketsByCreator[msg.sender].push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#290)
+	- _totalHeldBonds += msg.value (contracts/core/FlexibleMarketFactory.sol#273)
+	- heldBonds[marketAddress] = msg.value (contracts/core/FlexibleMarketFactory.sol#272)
+Reentrancy in FlexibleMarketFactory.createMarketFromTemplateRegistry(bytes32,string,string,string,uint256,uint256) (contracts/core/FlexibleMarketFactory.sol#318-396):
+	External calls:
+	- IMarket(marketAddress).initialize(registry,initData) (contracts/core/FlexibleMarketFactory.sol#360)
+	State variables written after the call(s):
+	- _activeMarketCount ++ (contracts/core/FlexibleMarketFactory.sol#383)
+	- _marketData[marketAddress] = MarketData({creator:msg.sender,createdAt:block.timestamp,resolutionTime:resolutionTime,category:templateId,isActive:true,exists:true,creatorBond:msg.value,curveType:CurveType.LMSR,curveParams:100 * 1e18}) (contracts/core/FlexibleMarketFactory.sol#367-377)
+	- _markets.push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#380)
+	- _marketsByCategory[templateId].push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#382)
+	- _marketsByCreator[msg.sender].push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#381)
+	- _totalHeldBonds += msg.value (contracts/core/FlexibleMarketFactory.sol#364)
+	- heldBonds[marketAddress] = msg.value (contracts/core/FlexibleMarketFactory.sol#363)
+Reentrancy in FlexibleMarketFactory.createMarketWithCurve(IFlexibleMarketFactory.MarketConfig,IFlexibleMarketFactory.CurveType,uint256) (contracts/core/FlexibleMarketFactory.sol#850-925):
+	External calls:
+	- market.initialize(registry,config.question,config.outcome1,config.outcome2,msg.sender,config.resolutionTime,curveAddress,curveParams) (contracts/core/FlexibleMarketFactory.sol#876-885)
+	State variables written after the call(s):
+	- _activeMarketCount ++ (contracts/core/FlexibleMarketFactory.sol#910)
+	- _marketData[marketAddress] = MarketData({creator:msg.sender,createdAt:block.timestamp,resolutionTime:config.resolutionTime,category:config.category,isActive:true,exists:true,creatorBond:msg.value,curveType:curveType,curveParams:curveParams}) (contracts/core/FlexibleMarketFactory.sol#894-904)
+	- _markets.push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#907)
+	- _marketsByCategory[config.category].push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#909)
+	- _marketsByCreator[msg.sender].push(marketAddress) (contracts/core/FlexibleMarketFactory.sol#908)
+	- _totalHeldBonds += msg.value (contracts/core/FlexibleMarketFactory.sol#891)
+	- heldBonds[marketAddress] = msg.value (contracts/core/FlexibleMarketFactory.sol#890)
+Reentrancy in ResolutionManager.resolveDispute(address,bool,uint8) (contracts/core/ResolutionManager.sol#326-371):
+	External calls:
+	- rewardDist.collectFees{value: dispute.bondAmount}(marketAddress,dispute.bondAmount) (contracts/core/ResolutionManager.sol#355-365)
+	State variables written after the call(s):
+	- heldBonds[marketAddress] += dispute.bondAmount (contracts/core/ResolutionManager.sol#363)
+Reentrancy in ResolutionManager.resolveMarket(address,uint8,string) (contracts/core/ResolutionManager.sol#125-180):
+	External calls:
+	- IMarket(marketAddress).resolveMarket(IMarket.Outcome(outcome)) (contracts/core/ResolutionManager.sol#144-159)
+	- IPredictionMarket(marketAddress).resolveMarket(IPredictionMarket.Outcome(outcome)) (contracts/core/ResolutionManager.sol#148-158)
+	State variables written after the call(s):
+	- _removeFromPending(marketAddress) (contracts/core/ResolutionManager.sol#174)
+		- _pendingMarkets[index - 1] = lastMarket (contracts/core/ResolutionManager.sol#617)
+		- _pendingMarkets.pop() (contracts/core/ResolutionManager.sol#622)
+	- _removeFromPending(marketAddress) (contracts/core/ResolutionManager.sol#174)
+		- _pendingMarketsIndex[lastMarket] = index (contracts/core/ResolutionManager.sol#618)
+		- delete _pendingMarketsIndex[marketAddress] (contracts/core/ResolutionManager.sol#623)
+	- _resolverHistory[msg.sender].push(marketAddress) (contracts/core/ResolutionManager.sol#171)
+Reentrancy in ParimutuelMarket.resolveMarket(IMarket.Outcome) (contracts/markets/ParimutuelMarket.sol#271-321):
+	External calls:
+	- rewardDist.collectFees{value: fees}(address(this),fees) (contracts/markets/ParimutuelMarket.sol#305-316)
+	State variables written after the call(s):
+	- accumulatedFees += fees (contracts/markets/ParimutuelMarket.sol#310)
+	- accumulatedFees += fees (contracts/markets/ParimutuelMarket.sol#314)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2
+
+Reentrancy in RewardDistributor.updateFeeDistribution(uint256,uint256,uint256,uint256) (contracts/core/RewardDistributor.sol#342-366):
+	External calls:
+	- params.setParameter(keccak256(bytes)(protocolFeeBps),protocolFeeBps) (contracts/core/RewardDistributor.sol#355)
+	- params.setParameter(keccak256(bytes)(creatorFeeBps),creatorFeeBps) (contracts/core/RewardDistributor.sol#356)
+	- params.setParameter(keccak256(bytes)(stakerIncentiveBps),stakerIncentiveBps) (contracts/core/RewardDistributor.sol#357)
+	- params.setParameter(keccak256(bytes)(treasuryFeeBps),treasuryFeeBps) (contracts/core/RewardDistributor.sol#358)
+	Event emitted after the call(s):
+	- FeeDistributionUpdated(protocolFeeBps,creatorFeeBps,stakerIncentiveBps,treasuryFeeBps) (contracts/core/RewardDistributor.sol#360-365)
+Reentrancy in ProposalManager.updateQuorum(uint256) (contracts/core/ProposalManager.sol#169-179):
+	External calls:
+	- params.setParameter(keccak256(bytes)(quorumBps),newQuorum) (contracts/core/ProposalManager.sol#176)
+	Event emitted after the call(s):
+	- QuorumUpdated(oldQuorum,newQuorum) (contracts/core/ProposalManager.sol#178)
+Reentrancy in ProposalManager.updateVotingPeriod(uint256) (contracts/core/ProposalManager.sol#185-195):
+	External calls:
+	- params.setParameter(keccak256(bytes)(votingPeriod),newPeriod) (contracts/core/ProposalManager.sol#192)
+	Event emitted after the call(s):
+	- VotingPeriodUpdated(oldPeriod,newPeriod) (contracts/core/ProposalManager.sol#194)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+
+ParimutuelMarket.claimWinnings() (contracts/markets/ParimutuelMarket.sol#366-390) tries to limit the gas of an external call that controls implicit decoding
+	(success,None) = address(msg.sender).call{gas: CLAIM_GAS_LIMIT,value: payout}() (contracts/markets/ParimutuelMarket.sol#376-379)
+ParimutuelMarket.withdrawUnclaimed() (contracts/markets/ParimutuelMarket.sol#397-416) tries to limit the gas of an external call that controls implicit decoding
+	(success,None) = address(msg.sender).call{gas: CLAIM_GAS_LIMIT,value: amount}() (contracts/markets/ParimutuelMarket.sol#404-407)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#return-bomb
+
+CurveRegistry.isCurveActive(address) (contracts/core/CurveRegistry.sol#215-222) uses timestamp for comparisons
+	Dangerous comparisons:
+	- isActive = isRegistered && curveInfo[curveAddress].isActive (contracts/core/CurveRegistry.sol#221)
+FlexibleMarketFactory.createMarketFromTemplateRegistry(bytes32,string,string,string,uint256,uint256) (contracts/core/FlexibleMarketFactory.sol#318-396) uses timestamp for comparisons
+	Dangerous comparisons:
+	- resolutionTime <= block.timestamp (contracts/core/FlexibleMarketFactory.sol#333)
+FlexibleMarketFactory._validateMarketConfig(IFlexibleMarketFactory.MarketConfig) (contracts/core/FlexibleMarketFactory.sol#752-765) uses timestamp for comparisons
+	Dangerous comparisons:
+	- config.resolutionTime <= block.timestamp (contracts/core/FlexibleMarketFactory.sol#754)
+	- config.resolutionTime > block.timestamp + MAX_RESOLUTION_PERIOD (contracts/core/FlexibleMarketFactory.sol#759)
+PredictionMarket.initialize(address,string,string,string,address,uint256,address,uint256) (contracts/core/PredictionMarket.sol#127-174) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _resolutionTime <= block.timestamp (contracts/core/PredictionMarket.sol#143)
+	- _resolutionTime > block.timestamp + 63072000 (contracts/core/PredictionMarket.sol#147)
+PredictionMarket.placeBet(uint8,uint256) (contracts/core/PredictionMarket.sol#187-280) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= resolutionTime (contracts/core/PredictionMarket.sol#194)
+PredictionMarket.resolveMarket(IPredictionMarket.Outcome) (contracts/core/PredictionMarket.sol#287-321) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < resolutionTime (contracts/core/PredictionMarket.sol#289)
+PredictionMarket.canResolve() (contracts/core/PredictionMarket.sol#557-559) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= resolutionTime && ! isResolved (contracts/core/PredictionMarket.sol#558)
+ProposalManager.execute(uint256) (contracts/core/ProposalManager.sol#124-146) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < proposal.votingEnd + proposal.executionDelay (contracts/core/ProposalManager.sol#138)
+ProposalManager.state(uint256) (contracts/core/ProposalManager.sol#223-252) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp <= proposal.votingEnd (contracts/core/ProposalManager.sol#233)
+ProposalManagerV2.submitVotingResults(uint256,uint256,uint256) (contracts/core/ProposalManagerV2.sol#146-181) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > proposal.votingEnd (contracts/core/ProposalManagerV2.sol#169)
+ProposalManagerV2.expireProposal(uint256) (contracts/core/ProposalManagerV2.sol#351-374) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp <= proposal.votingEnd (contracts/core/ProposalManagerV2.sol#360)
+ProposalManagerV2.isProposalApproved(uint256) (contracts/core/ProposalManagerV2.sol#407-417) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _proposals[proposalId].state == ProposalState.Approved || _proposals[proposalId].state == ProposalState.MarketCreated (contracts/core/ProposalManagerV2.sol#415-416)
+ProposalManagerV2.isProposalExpired(uint256) (contracts/core/ProposalManagerV2.sol#450-460) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > proposal.votingEnd (contracts/core/ProposalManagerV2.sol#459)
+ResolutionManager.finalizeResolution(address) (contracts/core/ResolutionManager.sol#404-426) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < resolution.resolvedAt + _disputeWindow (contracts/core/ResolutionManager.sol#410)
+ResolutionManager.batchFinalizeResolutions(address[]) (contracts/core/ResolutionManager.sol#432-451) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < resolution.resolvedAt + _disputeWindow (contracts/core/ResolutionManager.sol#440)
+ResolutionManager.isResolved(address) (contracts/core/ResolutionManager.sol#486-488) uses timestamp for comparisons
+	Dangerous comparisons:
+	- _resolutions[marketAddress].resolvedAt > 0 (contracts/core/ResolutionManager.sol#487)
+ResolutionManager.canDispute(address) (contracts/core/ResolutionManager.sol#495-503) uses timestamp for comparisons
+	Dangerous comparisons:
+	- resolution.resolvedAt == 0 (contracts/core/ResolutionManager.sol#498)
+	- resolution.status != ResolutionStatus.RESOLVED (contracts/core/ResolutionManager.sol#499)
+	- _disputes[marketAddress].disputedAt > 0 (contracts/core/ResolutionManager.sol#500)
+	- block.timestamp <= resolution.resolvedAt + _disputeWindow (contracts/core/ResolutionManager.sol#502)
+LMSRMarket.placeBet(uint8,bytes,uint256,uint256) (contracts/markets/LMSRMarket.sol#249-312) uses timestamp for comparisons
+	Dangerous comparisons:
+	- txDeadline != 0 && block.timestamp > txDeadline (contracts/markets/LMSRMarket.sol#257)
+LMSRMarket.canResolve() (contracts/markets/LMSRMarket.sol#459-461) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= _deadline && ! _isResolved (contracts/markets/LMSRMarket.sol#460)
+ParimutuelMarket.initialize(address,bytes) (contracts/markets/ParimutuelMarket.sol#155-185) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(_deadline > block.timestamp,Invalid deadline) (contracts/markets/ParimutuelMarket.sol#172)
+ParimutuelMarket.placeBet(uint8,bytes,uint256,uint256) (contracts/markets/ParimutuelMarket.sol#199-260) uses timestamp for comparisons
+	Dangerous comparisons:
+	- transactionDeadline > 0 && block.timestamp > transactionDeadline (contracts/markets/ParimutuelMarket.sol#206)
+	- block.timestamp >= deadline (contracts/markets/ParimutuelMarket.sol#211)
+ParimutuelMarket.resolveMarket(IMarket.Outcome) (contracts/markets/ParimutuelMarket.sol#271-321) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp < deadline (contracts/markets/ParimutuelMarket.sol#275)
+ParimutuelMarket.canResolve() (contracts/markets/ParimutuelMarket.sol#432-434) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp >= deadline && result == Outcome.UNRESOLVED (contracts/markets/ParimutuelMarket.sol#433)
+ParimutuelMarket.emergencyWithdraw() (contracts/markets/ParimutuelMarket.sol#554-580) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp > deadline + 7776000,Too early for emergency withdrawal) (contracts/markets/ParimutuelMarket.sol#568-571)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+
+MarketTemplateRegistry.registerTemplate(bytes32,address) (contracts/core/MarketTemplateRegistry.sol#132-165) uses assembly
+	- INLINE ASM (contracts/core/MarketTemplateRegistry.sol#145-147)
+ResolutionManager.resolveMarket(address,uint8,string) (contracts/core/ResolutionManager.sol#125-180) uses assembly
+	- INLINE ASM (contracts/core/ResolutionManager.sol#153-155)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+
+MasterRegistry.batchSetContracts(bytes32[],address[]) (contracts/core/MasterRegistry.sol#183-215) has costly operations inside a loop:
+	- totalContracts ++ (contracts/core/MasterRegistry.sol#202)
+ResolutionManager._removeFromPending(address) (contracts/core/ResolutionManager.sol#606-624) has costly operations inside a loop:
+	- _pendingMarkets.pop() (contracts/core/ResolutionManager.sol#622)
+	Calls stack containing the loop:
+		ResolutionManager.batchResolveMarkets(address[],uint8[],string[])
+ResolutionManager._removeFromPending(address) (contracts/core/ResolutionManager.sol#606-624) has costly operations inside a loop:
+	- delete _pendingMarketsIndex[marketAddress] (contracts/core/ResolutionManager.sol#623)
+	Calls stack containing the loop:
+		ResolutionManager.batchResolveMarkets(address[],uint8[],string[])
+GasWastingRecipient.receive() (contracts/test/MaliciousContracts.sol#33-38) has costly operations inside a loop:
+	- counter ++ (contracts/test/MaliciousContracts.sol#36)
+GasWastingRecipient.fallback() (contracts/test/MaliciousContracts.sol#40-45) has costly operations inside a loop:
+	- counter ++ (contracts/test/MaliciousContracts.sol#43)
+SlowRecipient.receive() (contracts/test/MaliciousContracts.sol#208-213) has costly operations inside a loop:
+	- data[writeCount ++] = block.timestamp (contracts/test/MaliciousContracts.sol#211)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#costly-operations-inside-a-loop
+
+PredictionMarket.placeBet(uint8,uint256) (contracts/core/PredictionMarket.sol#187-280) has a high cyclomatic complexity (22).
+ParimutuelMarket.placeBet(uint8,bytes,uint256,uint256) (contracts/markets/ParimutuelMarket.sol#199-260) has a high cyclomatic complexity (14).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+
+RefundModule._recordRefundableAmount(address,uint256) (contracts/security/RefundModule.sol#89-93) is never used and should be removed
+RefundModule._setResolutionManager(address) (contracts/security/RefundModule.sol#64-67) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+
+Version constraint ^0.8.19 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.19 (contracts/core/CurveRegistry.sol#2)
+	- ^0.8.19 (contracts/core/MarketTemplateRegistry.sol#2)
+	- ^0.8.19 (contracts/curves/ExponentialCurve.sol#2)
+	- ^0.8.19 (contracts/curves/LinearCurve.sol#2)
+	- ^0.8.19 (contracts/curves/SigmoidCurve.sol#2)
+	- ^0.8.19 (contracts/interfaces/IBondingCurve.sol#2)
+	- ^0.8.19 (contracts/interfaces/IMarket.sol#2)
+	- ^0.8.19 (contracts/libraries/LMSRMath.sol#2)
+	- ^0.8.19 (contracts/markets/LMSRMarket.sol#2)
+	- ^0.8.19 (contracts/markets/ParimutuelMarket.sol#2)
+	- ^0.8.19 (contracts/mocks/MockBondingCurve.sol#2)
+	- ^0.8.19 (contracts/test/LMSRMathTester.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+
+Low level call in FlexibleMarketFactory.refundCreatorBond(address) (contracts/core/FlexibleMarketFactory.sol#444-465):
+	- (success,None) = creator.call{value: bondAmount}() (contracts/core/FlexibleMarketFactory.sol#461)
+Low level call in PredictionMarket.placeBet(uint8,uint256) (contracts/core/PredictionMarket.sol#187-280):
+	- (success,None) = msg.sender.call{value: refundAmount}() (contracts/core/PredictionMarket.sol#272)
+Low level call in PredictionMarket.claimWinnings() (contracts/core/PredictionMarket.sol#327-356):
+	- (success,None) = msg.sender.call{value: payout}() (contracts/core/PredictionMarket.sol#352)
+Low level call in PredictionMarket.claimRefund() (contracts/core/PredictionMarket.sol#385-403):
+	- (success,None) = msg.sender.call{value: refundAmount}() (contracts/core/PredictionMarket.sol#399)
+Low level call in ProposalManagerV2.refundBond(uint256) (contracts/core/ProposalManagerV2.sol#311-345):
+	- (success,None) = address(proposal.creator).call{value: refundAmount}() (contracts/core/ProposalManagerV2.sol#341)
+Low level call in ResolutionManager.resolveDispute(address,bool,uint8) (contracts/core/ResolutionManager.sol#326-371):
+	- (success,None) = dispute.disputer.call{value: dispute.bondAmount}() (contracts/core/ResolutionManager.sol#344)
+Low level call in ResolutionManager.withdrawHeldBonds(address) (contracts/core/ResolutionManager.sol#378-396):
+	- (success,None) = address(msg.sender).call{value: amount}() (contracts/core/ResolutionManager.sol#392)
+Low level call in RewardDistributor.claimCreatorFees(address) (contracts/core/RewardDistributor.sol#146-156):
+	- (success,None) = msg.sender.call{value: amount}() (contracts/core/RewardDistributor.sol#152)
+Low level call in RewardDistributor.distributeStakerRewards(address,uint256) (contracts/core/RewardDistributor.sol#163-178):
+	- (success,None) = staker.call{value: amount}() (contracts/core/RewardDistributor.sol#174)
+Low level call in RewardDistributor.withdrawTreasury(address,uint256) (contracts/core/RewardDistributor.sol#185-200):
+	- (success,None) = recipient.call{value: amount}() (contracts/core/RewardDistributor.sol#196)
+Low level call in ParimutuelMarket.withdrawAccumulatedFees() (contracts/markets/ParimutuelMarket.sol#328-356):
+	- (success,None) = address(msg.sender).call{value: amount}() (contracts/markets/ParimutuelMarket.sol#352)
+Low level call in ParimutuelMarket.claimWinnings() (contracts/markets/ParimutuelMarket.sol#366-390):
+	- (success,None) = address(msg.sender).call{gas: CLAIM_GAS_LIMIT,value: payout}() (contracts/markets/ParimutuelMarket.sol#376-379)
+Low level call in ParimutuelMarket.withdrawUnclaimed() (contracts/markets/ParimutuelMarket.sol#397-416):
+	- (success,None) = address(msg.sender).call{gas: CLAIM_GAS_LIMIT,value: amount}() (contracts/markets/ParimutuelMarket.sol#404-407)
+Low level call in ParimutuelMarket.emergencyWithdraw() (contracts/markets/ParimutuelMarket.sol#554-580):
+	- (success,None) = msg.sender.call{value: balance}() (contracts/markets/ParimutuelMarket.sol#576)
+Low level call in RefundModule.claimRefund() (contracts/security/RefundModule.sol#104-120):
+	- (success,None) = address(msg.sender).call{value: refundAmount}() (contracts/security/RefundModule.sol#116)
+Low level call in ReentrancyAttacker.receive() (contracts/test/MaliciousContracts.sol#101-110):
+	- (success,None) = target.call(abi.encodeWithSignature(claimWinnings())) (contracts/test/MaliciousContracts.sol#105-107)
+Low level call in ReentrancyAttacker.attack() (contracts/test/MaliciousContracts.sol#112-118):
+	- (success,None) = target.call{value: msg.value}(abi.encodeWithSignature(claimWinnings())) (contracts/test/MaliciousContracts.sol#114-116)
+Low level call in FrontRunningBot.frontRun(uint8) (contracts/test/MaliciousContracts.sol#132-144):
+	- (success,None) = market.call{value: msg.value}(abi.encodeWithSignature(placeBet(uint8,bytes,uint256,uint256),outcome,,0,0)) (contracts/test/MaliciousContracts.sol#134-142)
+Low level call in FrontRunningBot.sandwichAttack(uint8,uint256,uint8,uint256) (contracts/test/MaliciousContracts.sol#146-177):
+	- (success1,None) = market.call{value: amount1}(abi.encodeWithSignature(placeBet(uint8,bytes,uint256,uint256),outcome1,,0,0)) (contracts/test/MaliciousContracts.sol#153-161)
+	- (success2,None) = market.call{value: amount2}(abi.encodeWithSignature(placeBet(uint8,bytes,uint256,uint256),outcome2,,0,0)) (contracts/test/MaliciousContracts.sol#167-175)
+Low level call in OddManipulator.manipulateOdds(uint8,uint256,uint256) (contracts/test/MaliciousContracts.sol#227-255):
+	- (success,None) = market.call{value: largeAmount}(abi.encodeWithSignature(placeBet(uint8,bytes,uint256,uint256),outcome,,0,0)) (contracts/test/MaliciousContracts.sol#233-241)
+	- (success2,None) = market.call{value: victimAmount}(abi.encodeWithSignature(placeBet(uint8,bytes,uint256,uint256),2,,0,0)) (contracts/test/MaliciousContracts.sol#245-253)
+	- (success2,None) = market.call{value: victimAmount}(abi.encodeWithSignature(placeBet(uint8,bytes,uint256,uint256),1,,0,0)) (contracts/test/MaliciousContracts.sol#245-253)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+
+ParimutuelMarket (contracts/markets/ParimutuelMarket.sol#37-581) should inherit from IParimutuelLike (contracts/test/TogglePlayer.sol#4-8)
+MaliciousRewardDistributor (contracts/test/MaliciousContracts.sol#14-24) should inherit from IRewardDistributorLike (contracts/test/MockRewardDistributor.sol#4-6)
+ConditionalReverter (contracts/test/MaliciousContracts.sol#184-198) should inherit from IRewardDistributorLike (contracts/test/MockRewardDistributor.sol#4-6)
+MockRewardDistributor (contracts/test/MaliciousContracts.sol#262-282) should inherit from IRewardDistributorLike (contracts/test/MockRewardDistributor.sol#4-6)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-inheritance
+
+Parameter PredictionMarket.initialize(address,string,string,string,address,uint256,address,uint256)._registry (contracts/core/PredictionMarket.sol#128) is not in mixedCase
+Parameter PredictionMarket.initialize(address,string,string,string,address,uint256,address,uint256)._questionText (contracts/core/PredictionMarket.sol#129) is not in mixedCase
+Parameter PredictionMarket.initialize(address,string,string,string,address,uint256,address,uint256)._outcome1 (contracts/core/PredictionMarket.sol#130) is not in mixedCase
+Parameter PredictionMarket.initialize(address,string,string,string,address,uint256,address,uint256)._outcome2 (contracts/core/PredictionMarket.sol#131) is not in mixedCase
+Parameter PredictionMarket.initialize(address,string,string,string,address,uint256,address,uint256)._creator (contracts/core/PredictionMarket.sol#132) is not in mixedCase
+Parameter PredictionMarket.initialize(address,string,string,string,address,uint256,address,uint256)._resolutionTime (contracts/core/PredictionMarket.sol#133) is not in mixedCase
+Parameter PredictionMarket.placeBet(uint8,uint256)._outcome (contracts/core/PredictionMarket.sol#187) is not in mixedCase
+Parameter PredictionMarket.placeBet(uint8,uint256)._minExpectedOdds (contracts/core/PredictionMarket.sol#187) is not in mixedCase
+Parameter PredictionMarket.resolveMarket(IPredictionMarket.Outcome)._result (contracts/core/PredictionMarket.sol#287) is not in mixedCase
+Parameter ProposalManager.getProposalsByState(IProposalManager.ProposalState)._state (contracts/core/ProposalManager.sol#335) is not in mixedCase
+Parameter LMSRMarket.initialize(address,bytes)._registry (contracts/markets/LMSRMarket.sol#144) is not in mixedCase
+Parameter ParimutuelMarket.initialize(address,bytes)._registry (contracts/markets/ParimutuelMarket.sol#156) is not in mixedCase
+Parameter ParimutuelMarket.resolveMarket(IMarket.Outcome)._result (contracts/markets/ParimutuelMarket.sol#272) is not in mixedCase
+Parameter MockRewardDistributor.setShouldRevert(bool)._shouldRevert (contracts/test/MaliciousContracts.sol#266) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+
+Reentrancy in LMSRMarket.claimWinnings() (contracts/markets/LMSRMarket.sol#392-408):
+	External calls:
+	- address(msg.sender).transfer(payout) (contracts/markets/LMSRMarket.sol#404)
+	Event emitted after the call(s):
+	- PoolBalanceUpdated(poolBalance,- int256(payout)) (contracts/markets/LMSRMarket.sol#407)
+	- WinningsClaimed(msg.sender,payout) (contracts/markets/LMSRMarket.sol#406)
+Reentrancy in LMSRMarket.sell(uint8,uint256,uint256) (contracts/markets/LMSRMarket.sol#320-364):
+	External calls:
+	- address(msg.sender).transfer(refund) (contracts/markets/LMSRMarket.sol#356)
+	Event emitted after the call(s):
+	- PoolBalanceUpdated(poolBalance,- int256(refund)) (contracts/markets/LMSRMarket.sol#363)
+	- SharesSold(msg.sender,isYes,shares,refund,newPrice) (contracts/markets/LMSRMarket.sol#362)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+
+PredictionMarket.getOdds() (contracts/core/PredictionMarket.sol#444-478) uses literals with too many digits:
+	- odds1 = 1000000 (contracts/core/PredictionMarket.sol#462)
+PredictionMarket.getOdds() (contracts/core/PredictionMarket.sol#444-478) uses literals with too many digits:
+	- odds1 = (100000000) / price1 (contracts/core/PredictionMarket.sol#464)
+PredictionMarket.getOdds() (contracts/core/PredictionMarket.sol#444-478) uses literals with too many digits:
+	- odds1 > 1000000 (contracts/core/PredictionMarket.sol#465)
+PredictionMarket.getOdds() (contracts/core/PredictionMarket.sol#444-478) uses literals with too many digits:
+	- odds1 = 1000000 (contracts/core/PredictionMarket.sol#465)
+PredictionMarket.getOdds() (contracts/core/PredictionMarket.sol#444-478) uses literals with too many digits:
+	- odds2 = 1000000 (contracts/core/PredictionMarket.sol#469)
+PredictionMarket.getOdds() (contracts/core/PredictionMarket.sol#444-478) uses literals with too many digits:
+	- odds2 = (100000000) / price2 (contracts/core/PredictionMarket.sol#471)
+PredictionMarket.getOdds() (contracts/core/PredictionMarket.sol#444-478) uses literals with too many digits:
+	- odds2 > 1000000 (contracts/core/PredictionMarket.sol#472)
+PredictionMarket.getOdds() (contracts/core/PredictionMarket.sol#444-478) uses literals with too many digits:
+	- odds2 = 1000000 (contracts/core/PredictionMarket.sol#472)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+
+Loop condition i < _allTemplateIds.length (contracts/core/MarketTemplateRegistry.sol#321) should use cached array length instead of referencing `length` member of the storage array.
+ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cache-array-length
+
+ConditionalReverter.revertAfterCalls (contracts/test/MaliciousContracts.sol#185) should be immutable 
+FrontRunningBot.market (contracts/test/MaliciousContracts.sol#126) should be immutable 
+GasLimitChecker.shouldRevert (contracts/test/MaliciousContracts.sol#70) should be immutable 
+GreedyReceiver.doRevert (contracts/test/GreedyReceiver.sol#11) should be immutable 
+MasterRegistry.version (contracts/core/MasterRegistry.sol#16) should be immutable 
+OddManipulator.market (contracts/test/MaliciousContracts.sol#221) should be immutable 
+ReentrancyAttacker.target (contracts/test/MaliciousContracts.sol#94) should be immutable 
+ReentrantClaimer.market (contracts/test/ReentrantClaimer.sol#9) should be immutable 
+ReentrantClaimer.tryReenter (contracts/test/ReentrantClaimer.sol#10) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+. analyzed (64 contracts with 100 detectors), 172 result(s) found

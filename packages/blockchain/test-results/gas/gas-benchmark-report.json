@@ -1,0 +1,81 @@
+{
+  "timestamp": "2025-11-06T21:35:23.804Z",
+  "network": "BasedAI Mainnet",
+  "chainId": 32323,
+  "measurements": [
+    {
+      "operation": "Create Market",
+      "gasUsed": "685839",
+      "txHash": "0xc6c509d6f94cd75c0ab30dd65124cb91c9235265a0601b98291200b68237e1fe",
+      "costs": {
+        "standard": {
+          "gasPrice": 9000000000,
+          "costBASED": "0.006172551",
+          "costUSD": "$0.00000062"
+        },
+        "fast": {
+          "gasPrice": 12000000000,
+          "costBASED": "0.008230068",
+          "costUSD": "$0.00000082"
+        },
+        "instant": {
+          "gasPrice": 15000000000,
+          "costBASED": "0.010287585",
+          "costUSD": "$0.00000103"
+        }
+      },
+      "expected": 731426
+    },
+    {
+      "operation": "Get Odds (View)",
+      "gasUsed": "0",
+      "txHash": null,
+      "costs": {
+        "standard": {
+          "gasPrice": 9000000000,
+          "costBASED": "0.0",
+          "costUSD": "$0.00000000"
+        },
+        "fast": {
+          "gasPrice": 12000000000,
+          "costBASED": "0.0",
+          "costUSD": "$0.00000000"
+        },
+        "instant": {
+          "gasPrice": 15000000000,
+          "costBASED": "0.0",
+          "costUSD": "$0.00000000"
+        }
+      },
+      "note": "View function, no gas cost"
+    },
+    {
+      "operation": "Calculate Payout (View)",
+      "gasUsed": "0",
+      "txHash": null,
+      "costs": {
+        "standard": {
+          "gasPrice": 9000000000,
+          "costBASED": "0.0",
+          "costUSD": "$0.00000000"
+        },
+        "fast": {
+          "gasPrice": 12000000000,
+          "costBASED": "0.0",
+          "costUSD": "$0.00000000"
+        },
+        "instant": {
+          "gasPrice": 15000000000,
+          "costBASED": "0.0",
+          "costUSD": "$0.00000000"
+        }
+      },
+      "note": "View function, no gas cost"
+    }
+  ],
+  "gasPriceSettings": {
+    "standard": 9000000000,
+    "fast": 12000000000,
+    "instant": 15000000000
+  }
+}

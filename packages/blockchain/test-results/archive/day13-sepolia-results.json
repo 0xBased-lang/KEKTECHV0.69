@@ -1,0 +1,29 @@
+{
+  "network": "sepolia",
+  "passed": [
+    "Empty question (should fail)",
+    "Past resolution time (should fail)",
+    "Resolution time >1 year (should fail)",
+    "Zero category (should fail)",
+    "Insufficient creator bond (should fail)",
+    "Zero value sent (should fail)",
+    "Extremely long question (should succeed)",
+    "SQL injection attempt (should succeed)",
+    "XSS attempt (should succeed)",
+    "Exact minimum bond (should succeed)",
+    "Resolution time = exactly 1 year (should succeed)"
+  ],
+  "failed": [
+    "Resolution time = now + 1 second (should succeed)"
+  ],
+  "errors": [
+    "Resolution time = now + 1 second (should succeed): execution reverted"
+  ],
+  "gasUsed": {
+    "Extremely long question (should succeed)": "3366422",
+    "SQL injection attempt (should succeed)": "2612595",
+    "XSS attempt (should succeed)": "2612643",
+    "Exact minimum bond (should succeed)": "2612643",
+    "Resolution time = exactly 1 year (should succeed)": "2612655"
+  }
+}
