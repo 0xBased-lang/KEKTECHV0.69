@@ -94,6 +94,11 @@ describe("PredictionMarket", function () {
     const marketAddr = parsedEvent.args[0]; // First argument is market address
     const market = await ethers.getContractAt("PredictionMarket", marketAddr);
 
+    // FIX: Activate market so it's ready for betting (PROPOSED → APPROVED → ACTIVE)
+    await factory.adminApproveMarket(marketAddr);
+    await factory.refundCreatorBond(marketAddr, "Approved for testing");
+    await factory.connect(owner).activateMarket(marketAddr);
+
     return {
       registry,
       params,
@@ -117,14 +122,10 @@ describe("PredictionMarket", function () {
 
   async function deployWithBetsFixture() {
     const fixture = await deployFixture();
-    const { factory, market, marketAddr, user1, user2, owner } = fixture;
+    const { market, user1, user2 } = fixture;
 
-    // PHASE 5 FIX: Approve and activate market before betting
-    await factory.adminApproveMarket(marketAddr);
-    await factory.refundCreatorBond(marketAddr, "Approved for testing");
-    await factory.connect(owner).activateMarket(marketAddr); // owner has BACKEND_ROLE
-
-    // Now place initial bets (market is ACTIVE)
+    // Note: Market is already ACTIVE from deployFixture()
+    // Now place initial bets
     await market.connect(user1).placeBet(1, 0, { value: ethers.parseEther("10") }); // OUTCOME1
     await market.connect(user2).placeBet(2, 0, { value: ethers.parseEther("5") });  // OUTCOME2
 
@@ -138,9 +139,10 @@ describe("PredictionMarket", function () {
     // Fast forward past resolution time
     await time.increaseTo(resolutionTime + 1);
 
-    // PHASE 5 FIX: Use ResolutionManager to resolve market
-    await resolutionManager.connect(resolver).proposeOutcome(market.target, 1); // OUTCOME1 wins
-    await resolutionManager.connect(resolver).finalizeMarket(market.target, 1);
+    // FIX: Use correct function name - proposeResolution, not proposeOutcome
+    await resolutionManager.connect(resolver).proposeResolution(market.target, 1, "OUTCOME1 wins"); // OUTCOME1 wins
+    // Note: finalizeMarket doesn't exist - use finalizeResolution
+    await resolutionManager.finalizeResolution(market.target);
 
     return fixture;
   }
