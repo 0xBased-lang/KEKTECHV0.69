@@ -38,18 +38,17 @@ export function LiveBetFeed({
 
   // Watch for new bets
   const handleBet = useCallback((data: {
-    user: Address;
-    outcome: Outcome;
+    bettor: Address;
     amount: bigint;
-    shares: bigint;
-    timestamp?: number;
+    outcome: number;
+    sharesReceived: bigint;
   }) => {
     const newBet: BetEvent = {
-      user: data.user,
-      outcome: data.outcome,
+      user: data.bettor,
+      outcome: data.outcome as Outcome,
       amount: data.amount,
-      shares: data.shares,
-      timestamp: data.timestamp || Math.floor(Date.now() / 1000),
+      shares: data.sharesReceived,
+      timestamp: Math.floor(Date.now() / 1000),
     };
 
     setBets(prev => {
