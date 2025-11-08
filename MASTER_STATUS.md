@@ -1,5 +1,5 @@
 # KEKTECH 3.0 - MASTER STATUS CONTROL
-**Last Updated**: November 8, 2025 21:26 CET
+**Last Updated**: November 8, 2025 21:38 CET
 **Authority**: THIS FILE SUPERSEDES ALL OTHER DOCUMENTATION
 
 ---
@@ -9,10 +9,15 @@
 | Component | Documentation Says | REALITY | Evidence |
 |-----------|-------------------|---------|----------|
 | **Deployment** | "Ready to deploy" | ✅ **DEPLOYED TO MAINNET** | Nov 6, 2025 - All contracts live |
-| **Tests** | "326/326 passing" | ❌ **222/321 passing (69%)** | 99 tests failing |
+| **Tests** | "326/326 passing" | ⚠️ **231/326 passing (71%)** | 90 tests failing (↓9 from 99) |
 | **Frontend** | "Needs integration" | ✅ **FULLY INTEGRATED** | Addresses & ABIs configured |
 | **Mainnet** | "Pending" | ✅ **LIVE & WORKING** | Test market created |
 | **Migration** | "98% complete" | ⚠️ **~75% complete** | Phases 5-7 incomplete |
+
+**Recent Progress** (Last Hour):
+- ✅ Fixed ResolutionManager constructor issues
+- ✅ Added +9 passing tests (222→231)
+- ✅ Updated documentation with reality
 
 ---
 
@@ -72,30 +77,53 @@ This file (MASTER_STATUS.md) is the ONLY reliable source of truth as of Nov 8, 2
 
 ## 🧪 TEST STATUS SUMMARY
 
-### Current Test Results:
-- **Total Tests**: 321 (not 326 as docs claim)
-- **Passing**: 222 tests (69.2%)
-- **Failing**: 99 tests (30.8%)
-- **Coverage**: Unknown (needs recalculation)
+### Current Test Results (Updated Nov 8, 2025 21:38 CET):
+- **Total Tests**: 326 ✅
+- **Passing**: 231 tests (70.9%) - ↑ +9 from 222
+- **Failing**: 90 tests (27.6%) - ↓ -9 from 99
+- **Pending**: 5 tests (1.5%)
+- **Coverage**: ~68% (estimated)
 
-### Main Issues:
-1. **VirtualLiquidity tests**: 112 failures - architecture mismatch
-2. **ResolutionManager tests**: Constructor argument errors
-3. **Test fixtures**: Not aligned with deployed contracts
+### Fixed Issues ✅:
+1. **ResolutionManager constructor** - FIXED (Nov 8, 2025 21:30 CET)
+   - Added registry parameter to AccessControlManager
+   - Added registry parameter to ParameterStorage
+   - Deployed all required contracts
+   - Configured roles and permissions
+   - Result: +9 tests passing
+
+### Remaining Issues ❌:
+1. **Phase 6 Functions Missing** - ~40 failures
+   - Tests expect proposeResolution(), signalSupport()
+   - Need to check if Phase 6 is implemented
+2. **Market Activation** - ~20 failures
+   - Tests don't call adminApproveMarket() + activateMarket()
+3. **Bet Validation** - ~15 failures
+   - Min/max bet logic mismatch
+4. **Market Creation** - ~10 failures
+   - LMSRBondingCurve vs LMSRCurve naming
+5. **Other Edge Cases** - ~5 failures
 
 ---
 
 ## 📋 ACTUAL WORK NEEDED
 
 ### Critical Tasks (Fix Tests):
-1. Fix VirtualLiquidity test architecture mismatch
-2. Update ResolutionManager constructor arguments
-3. Align test fixtures with mainnet deployment
+1. ~~Update ResolutionManager constructor arguments~~ ✅ DONE (Nov 8)
+2. Investigate Phase 6 missing functions (40 test failures)
+   - Check if proposeResolution() is implemented
+   - Check if signalSupport() is implemented
+   - Decide: Skip tests or implement functions?
+3. Fix market activation flow in tests (20 failures)
+   - Add adminApproveMarket() + activateMarket() to fixtures
+4. Fix bet validation logic mismatch (15 failures)
+5. Fix LMSRBondingCurve vs LMSRCurve naming (10 failures)
 
 ### Important Tasks (Validate):
 1. Create more test markets on mainnet
 2. Test complete lifecycle (bet → resolve → claim)
-3. Document actual gas costs
+3. Document actual gas costs from real transactions
+4. Run full test suite after all fixes
 
 ### Nice to Have (Cleanup):
 1. Update migration documentation
