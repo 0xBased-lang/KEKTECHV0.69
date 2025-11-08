@@ -53,24 +53,15 @@ jobs:
             "projectName": "kektech-frontend"
           }' > ./packages/frontend/.vercel/project.json
 
-      - name: Pull Vercel Environment Information
-        working-directory: ./packages/frontend
-        run: |
-          vercel pull --yes \
-            --environment=${{ github.event.inputs.environment || 'production' }} \
-            --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
       - name: Deploy to Vercel
         working-directory: ./packages/frontend
         id: deploy
         run: |
-          # Deploy directly without pre-building
+          # Deploy directly - no pull needed!
           DEPLOYMENT_URL=$(vercel deploy \
             ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} \
-            --token=${{ secrets.VERCEL_TOKEN }})
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --yes)
           echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
