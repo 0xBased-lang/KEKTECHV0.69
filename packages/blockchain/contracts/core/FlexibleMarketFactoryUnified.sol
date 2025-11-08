@@ -520,8 +520,8 @@ contract FlexibleMarketFactoryUnified is ReentrancyGuard {
         // Reject market
         approval.rejected = true;
 
-        // Optionally call market.reject() if market implements it
-        // IPredictionMarket(market).reject();
+        // PHASE 5: Call market.reject() to transition state to FINALIZED
+        IPredictionMarket(market).reject(reason);
 
         emit MarketRejected(market, msg.sender, reason, block.timestamp);
     }

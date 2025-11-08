@@ -42,8 +42,8 @@ describe("PredictionMarket Lifecycle (Phase 5.2)", function () {
     await registry.setContract(ethers.id("ParameterStorage"), params.target, 1);
     await registry.setContract(ethers.id("AccessControlManager"), accessControl.target, 1);
     await registry.setContract(ethers.id("ResolutionManager"), resolutionManager.target, 1);
-    // FIX: Register PredictionMarket template in registry
-    await registry.setContract(ethers.id("PredictionMarket"), marketTemplate.target, 1);
+    // FIX: Register PredictionMarket template with correct key "PredictionMarketTemplate"
+    await registry.setContract(ethers.id("PredictionMarketTemplate"), marketTemplate.target, 1);
     // FIX: Register RewardDistributor in registry
     await registry.setContract(ethers.id("RewardDistributor"), rewardDistributor.target, 1);
     // FIX: Register LMSRCurve in registry
@@ -68,6 +68,9 @@ describe("PredictionMarket Lifecycle (Phase 5.2)", function () {
     // FIX: Grant factory the FACTORY_ROLE and OPERATOR_ROLE
     await accessControl.grantRole(ethers.id("FACTORY_ROLE"), factory.target);
     await accessControl.grantRole(ethers.id("OPERATOR_ROLE"), factory.target);
+
+    // FIX: Set default bonding curve so markets can calculate shares for betting
+    await factory.connect(owner).setDefaultCurve(lmsrCurve.target);
 
     return {
       registry,
@@ -195,10 +198,11 @@ describe("PredictionMarket Lifecycle (Phase 5.2)", function () {
       const currentState = await market.currentState();
       expect(currentState).to.equal(0); // 0 = PROPOSED
 
-      // FIX: Try to activate directly through factory (should fail)
+      // FIX: Try to activate directly through factory (should fail with MarketNotApproved)
+      // Factory checks approval.approved before calling market.activate()
       await expect(
         factory.connect(owner).activateMarket(marketAddress)
-      ).to.be.revertedWithCustomError(market, "InvalidStateTransition");
+      ).to.be.revertedWithCustomError(factory, "MarketNotApproved");
     });
 
     it("5.2.8: Should revert APPROVED → FINALIZED (invalid transition)", async function () {
@@ -211,13 +215,11 @@ describe("PredictionMarket Lifecycle (Phase 5.2)", function () {
       const currentState = await market.currentState();
       expect(currentState).to.equal(1); // 1 = APPROVED
 
-      // FIX: Try to reject through factory (should work) - APPROVED can transition to FINALIZED via reject
-      const tx = await factory.connect(owner).adminRejectMarket(marketAddress, "Testing rejection");
-      await tx.wait();
-
-      // Verify state is FINALIZED
-      const newState = await market.currentState();
-      expect(newState).to.equal(5); // 5 = FINALIZED
+      // FIX: Try to reject through factory (should FAIL - cannot reject approved markets)
+      // Factory prevents rejecting already approved markets
+      await expect(
+        factory.connect(owner).adminRejectMarket(marketAddress, "Testing rejection")
+      ).to.be.revertedWithCustomError(factory, "MarketAlreadyApproved");
     });
 
     it("5.2.9: Should revert ACTIVE → FINALIZED (must resolve first) - NOT YET IMPLEMENTED", async function () {
@@ -236,15 +238,17 @@ describe("PredictionMarket Lifecycle (Phase 5.2)", function () {
       const currentState = await market.currentState();
       expect(currentState).to.equal(5); // 5 = FINALIZED
 
-      // FIX: Try to approve through factory (should fail)
+      // FIX: Try to approve through factory (should fail with MarketAlreadyRejected)
+      // Factory checks approval.rejected before calling market.approve()
       await expect(
         factory.connect(owner).adminApproveMarket(marketAddress)
-      ).to.be.revertedWithCustomError(market, "InvalidStateTransition");
+      ).to.be.revertedWithCustomError(factory, "MarketAlreadyRejected");
 
-      // FIX: Try to activate through factory (should fail)
+      // FIX: Try to activate through factory (should fail with MarketNotApproved)
+      // Factory checks approval.approved before calling market.activate()
       await expect(
         factory.connect(owner).activateMarket(marketAddress)
-      ).to.be.revertedWithCustomError(market, "InvalidStateTransition");
+      ).to.be.revertedWithCustomError(factory, "MarketNotApproved");
     });
 
     it("5.2.11: Should revert backwards transitions", async function () {
@@ -261,10 +265,11 @@ describe("PredictionMarket Lifecycle (Phase 5.2)", function () {
       const currentState = await market.currentState();
       expect(currentState).to.equal(2); // 2 = ACTIVE
 
-      // FIX: Try to approve again through factory (should fail - can't go backwards)
+      // FIX: Try to approve again through factory (should fail - market already approved)
+      // Factory checks approval.approved before calling market.approve()
       await expect(
         factory.connect(owner).adminApproveMarket(marketAddress)
-      ).to.be.revertedWithCustomError(market, "InvalidStateTransition");
+      ).to.be.revertedWithCustomError(factory, "MarketAlreadyApproved");
     });
 
     it("5.2.12: Should revert unauthorized state changes", async function () {
