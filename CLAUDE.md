@@ -721,3 +721,4 @@ forge test --invariant   # Invariant testing
 🟢 DOCUMENT EVERYTHING
 🟢 TEST TWICE, DEPLOY ONCE
 ```
+- I want to memorize that for testing purposes before going Private public beta When creating our test test markets test, resolution test proposals, we need to figure out that the expiry, date, date, or the timeline. I don't know how to set the perimeter for the timing to end. All of these is Set very short as we need to resolve markets, then for testing reasons, the original real default times parameters for public beta Will be adjusted to the right moment when all the testing is done
