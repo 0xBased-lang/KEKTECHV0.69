@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import { MarketList } from '@/components/kektech/markets/MarketList';
 import { TrendingUp, Plus, Filter } from 'lucide-react';
-import Link from 'link';
+import Link from 'next/link';
 
 type MarketFilter = 'all' | 'active' | 'resolving' | 'finalized';
 
