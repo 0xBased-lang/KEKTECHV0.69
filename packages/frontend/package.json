@@ -39,6 +39,7 @@
     "@eslint/eslintrc": "^3",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@openzeppelin/contracts": "^5.4.0",
+    "@playwright/test": "^1.56.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24",
     "@types/react": "^19",
@@ -48,6 +49,7 @@
     "eslint-config-next": "15.5.5",
     "eslint-config-prettier": "^10.1.8",
     "hardhat": "^2.26.3",
+    "playwright": "^1.56.1",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5"
