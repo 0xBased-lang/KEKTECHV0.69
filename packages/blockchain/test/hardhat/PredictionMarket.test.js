@@ -389,9 +389,11 @@ describe("PredictionMarket", function () {
     it("Should prevent betting after market is resolved", async function () {
       const { market, user1 } = await loadFixture(deployResolvedMarketFixture);
 
+      // FIX: Market state changes to RESOLVING after resolution, not ACTIVE
+      // placeBet() checks onlyWhenActive modifier which reverts with MarketNotActive
       await expect(
         market.connect(user1).placeBet(1, 0, { value: ethers.parseEther("1") })
-      ).to.be.revertedWithCustomError(market, "BettingClosed");
+      ).to.be.revertedWithCustomError(market, "MarketNotActive");
     });
 
     it("Should update liquidity pools correctly", async function () {
@@ -520,9 +522,11 @@ describe("PredictionMarket", function () {
       await market.connect(resolver).resolveMarket(1);
 
       // Try to resolve again - should fail
+      // FIX: resolveMarket() checks onlyWhenActive modifier
+      // After first resolution, state is RESOLVING, not ACTIVE
       await expect(
         market.connect(resolver).resolveMarket(2)
-      ).to.be.revertedWithCustomError(market, "MarketAlreadyResolved");
+      ).to.be.revertedWithCustomError(market, "MarketNotActive");
     });
 
     it("Should check canResolve() correctly", async function () {
@@ -582,9 +586,11 @@ describe("PredictionMarket", function () {
     it("Should prevent claiming before resolution", async function () {
       const { market, user1 } = await loadFixture(deployWithBetsFixture);
 
+      // FIX: claimWinnings() uses onlyWhenFinalized modifier with require() string
+      // Not a custom error - it's a plain revert string
       await expect(
         market.connect(user1).claimWinnings()
-      ).to.be.revertedWithCustomError(market, "MarketNotResolved");
+      ).to.be.revertedWith("Market not finalized");
     });
 
     it("Should prevent loser from claiming", async function () {
