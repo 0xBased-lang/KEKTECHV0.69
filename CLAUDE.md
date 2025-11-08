@@ -175,6 +175,25 @@ When documentation conflicts, this is the priority order:
 
 ---
 
+## 📋 PROJECT NAVIGATION
+
+**Quick Index:** See [PROJECT_INDEX.md](/PROJECT_INDEX.md) for complete file navigation and organization
+
+**Most Important Files:**
+1. [MIGRATION_IMPLEMENTATION_CHECKLIST.md](/expansion-packs/bmad-blockchain-dev/docs/migration/MIGRATION_IMPLEMENTATION_CHECKLIST.md) - Current status
+2. [TARGET_ARCHITECTURE.md](/expansion-packs/bmad-blockchain-dev/docs/active/TARGET_ARCHITECTURE.md) - File whitelist
+3. [MINIMAL_MODULAR_MIGRATION_MASTER_PLAN.md](/expansion-packs/bmad-blockchain-dev/docs/migration/MINIMAL_MODULAR_MIGRATION_MASTER_PLAN.md) - Master plan
+
+**Project Structure:**
+- `/expansion-packs/bmad-blockchain-dev/` - Smart contracts (Solidity)
+- `/packages/frontend/` - Frontend (Next.js)
+- `/expansion-packs/bmad-blockchain-dev/deployments/` - Deployment artifacts
+- `/.github/workflows/` - CI/CD automation
+
+**For complete directory structure, file locations, and search commands, see PROJECT_INDEX.md**
+
+---
+
 ## 🚀 READY FOR MAINNET DEPLOYMENT
 
 **Status**: ✅ All validation complete, ready to deploy!
