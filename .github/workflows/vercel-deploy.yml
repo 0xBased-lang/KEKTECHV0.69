@@ -53,6 +53,7 @@ jobs:
         working-directory: ./packages/frontend
         run: |
           vercel pull --yes \
+            --root . \
             --environment=${{ github.event.inputs.environment || 'production' }} \
             --token=${{ secrets.VERCEL_TOKEN }}
         env:
@@ -63,6 +64,7 @@ jobs:
         working-directory: ./packages/frontend
         run: |
           vercel build \
+            --root . \
             ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} \
             --token=${{ secrets.VERCEL_TOKEN }}
         env:
@@ -74,6 +76,7 @@ jobs:
         id: deploy
         run: |
           DEPLOYMENT_URL=$(vercel deploy --prebuilt \
+            --root . \
             ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} \
             --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
