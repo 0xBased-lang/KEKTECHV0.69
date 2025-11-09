@@ -4,8 +4,13 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { useAccount } from 'wagmi'
+import { Shield } from 'lucide-react'
 import { ConnectButton } from '@/components/web3/ConnectButton'
 import { NetworkSwitcher } from '@/components/web3/NetworkSwitcher'
+
+// Admin wallet address
+const ADMIN_WALLET = '0x25fD72154857Bd204345808a690d51a61A81EB0b'
 
 /**
  * Header Component
@@ -16,6 +21,10 @@ import { NetworkSwitcher } from '@/components/web3/NetworkSwitcher'
 export function Header() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // Check if connected wallet is admin
+  const { address } = useAccount()
+  const isAdmin = address?.toLowerCase() === ADMIN_WALLET.toLowerCase()
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)
@@ -104,6 +113,19 @@ export function Header() {
           >
             About Us
           </Link>
+
+          {/* Admin Control Panel Link - Only visible to admin wallet */}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className={`font-fredoka text-sm font-medium transition-colors hover:text-blue-500 flex items-center gap-1.5 ${
+                pathname === '/admin' ? 'text-blue-600 font-bold' : 'text-blue-600'
+              }`}
+            >
+              <Shield className="h-4 w-4" />
+              Control Panel
+            </Link>
+          )}
         </nav>
 
         {/* Right Side: Wallet Connect & Mobile Menu Button */}
@@ -240,6 +262,22 @@ export function Header() {
           >
             About Us
           </Link>
+
+          {/* Admin Control Panel Link - Only visible to admin wallet */}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              onClick={closeMobileMenu}
+              className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation flex items-center gap-2 ${
+                pathname === '/admin'
+                  ? 'bg-blue-600/20 text-blue-500 font-bold'
+                  : 'text-blue-500 hover:bg-blue-600/10 hover:text-blue-400'
+              }`}
+            >
+              <Shield className="h-5 w-5" />
+              Control Panel
+            </Link>
+          )}
 
         </nav>
 
