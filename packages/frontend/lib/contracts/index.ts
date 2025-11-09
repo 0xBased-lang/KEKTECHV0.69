@@ -34,7 +34,7 @@ export function getContract(
 
   // Use provided provider or create default
   const contractProvider = provider || new ethers.JsonRpcProvider(
-    process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.basedai.network'
+    process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.basedai.com'
   );
 
   return new ethers.Contract(address, abi, contractProvider);

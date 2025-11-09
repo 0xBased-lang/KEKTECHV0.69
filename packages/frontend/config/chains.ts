@@ -17,13 +17,13 @@ export const basedChain = defineChain({
   rpcUrls: {
     default: {
       http: [
-        process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.basedai.network',
+        process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.basedai.com',
         'https://mainnet.basedaibridge.com/rpc/', // Fallback
       ],
     },
     public: {
       http: [
-        process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.basedai.network',
+        process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.basedai.com',
         'https://mainnet.basedaibridge.com/rpc/', // Fallback
       ],
     },
