@@ -248,6 +248,166 @@ forge test --invariant     # Invariant testing
 
 ---
 
+## 🎛️ PARAMETER MANAGEMENT SYSTEM
+
+### Master Configuration File
+**Location**: `/packages/blockchain/config/parameters.js`
+**Purpose**: Single source of truth for ALL 29 system parameters
+
+This file contains EVERY configurable parameter in the KEKTECH system. Update parameters here, then deploy to contracts.
+
+### Quick Parameter Reference
+
+```javascript
+const params = require('./packages/blockchain/config/parameters.js');
+
+// MARKET CREATION (3 parameters)
+params.market.minCreatorBond        // 0.1 BASED (refundable)
+params.market.minimumBet            // 0.01 BASED
+params.market.maximumBet            // 100 BASED
+
+// FEE DISTRIBUTION (7 parameters - all in Basis Points)
+params.fees.protocolFeeBps          // 250 (2.5%)
+params.fees.creatorFeeBps           // 150 (1.5%)
+params.fees.stakerIncentiveBps      // 50 (0.5%)
+params.fees.treasuryFeeBps          // 50 (0.5%)
+params.fees.totalFeeBps             // 500 (5% total)
+params.fees.platformFeePercent      // 500 (for contracts)
+params.fees.winnersShareBps         // 9500 (95%)
+
+// RESOLUTION - TESTING MODE (4 parameters)
+params.resolution.disputeWindow            // 15 minutes (TESTING)
+params.resolution.minDisputeBond           // 0.01 BASED
+params.resolution.agreementThreshold       // 75% (auto-finalize)
+params.resolution.disagreementThreshold    // 40% (flag dispute)
+
+// RESOLUTION - PRODUCTION MODE (4 parameters)
+params.resolutionProduction.disputeWindow  // 48 hours (PRODUCTION)
+params.resolutionProduction.minDisputeBond // 0.1 BASED
+// Same thresholds as testing
+
+// APPROVAL SYSTEM (2 parameters)
+params.approval.likesRequired       // 10 likes needed
+params.approval.approvalWindow      // 24 hours
+
+// LMSR BONDING CURVE (3 parameters)
+params.lmsr.minB                    // 1 BASED
+params.lmsr.maxB                    // 1000 BASED
+params.lmsr.defaultB                // 100 BASED
+
+// BOOLEAN FLAGS (3 parameters)
+params.flags.marketCreationActive
+params.flags.experimentalMarketsActive
+params.flags.emergencyPause
+```
+
+### Parameter Categories (29 Total)
+
+| Category | Count | Purpose |
+|----------|-------|---------|
+| Market Creation | 3 | Bonds, bet limits |
+| Fee Distribution | 7 | All fee splits (BPS) |
+| Resolution (Testing) | 4 | Short windows for rapid testing |
+| Resolution (Production) | 4 | Normal windows for live use |
+| Approval System | 2 | Like threshold, time limits |
+| LMSR Curve | 3 | Liquidity parameters |
+| Boolean Flags | 3 | System toggles |
+| Roles | 6 | Access control (in contracts) |
+
+### Admin Controls
+
+**Dashboard**: `/admin` route (frontend - to be implemented)
+**Access**: Admin panel → Config tab
+
+**Actions**:
+- View all current parameter values
+- Update any parameter on-chain
+- Toggle Testing ↔ Production mode (one click)
+- View parameter change history
+- Calculate impact of parameter changes
+
+**Override Powers**:
+- Admin can bypass ANY parameter restriction
+- Instant resolution (bypass dispute windows)
+- Force approve/reject markets
+- Emergency pause entire system
+
+### Current System Status
+
+**Mode**: TESTING
+- Dispute Window: 15 minutes (rapid iteration)
+- Market Duration: Flexible (set per market)
+- Approval Window: 24 hours
+
+**Mainnet**: Parameters need initialization (run `scripts/mainnet/init-parameters.js`)
+
+**Switch to Production**:
+1. Admin panel → Set `disputeWindow = 48 hours`
+2. OR run migration script to update all production parameters
+
+### Initialization Script
+
+**Location**: `/packages/blockchain/scripts/mainnet/init-parameters.js`
+**Run Once**: After deployment to initialize all parameters
+
+```bash
+cd packages/blockchain
+node scripts/mainnet/init-parameters.js
+```
+
+This sets:
+- All fee percentages in ParameterStorage
+- Resolution windows in ResolutionManager
+- Enables market creation
+- Sets testing mode (15-min disputes)
+
+### Common Parameter Updates
+
+**Update Fees**:
+```javascript
+const paramStorage = await ethers.getContractAt('ParameterStorage', ...);
+await paramStorage.setParameter(
+  ethers.id('creatorFeeBps'),
+  200  // Change from 150 (1.5%) to 200 (2%)
+);
+```
+
+**Switch to Production Mode**:
+```javascript
+const resolutionManager = await ethers.getContractAt('ResolutionManager', ...);
+await resolutionManager.setDisputeWindow(
+  48 * 60 * 60  // 48 hours instead of 15 minutes
+);
+```
+
+**Emergency Pause**:
+```javascript
+await paramStorage.setBoolParameter(
+  ethers.id('emergencyPause'),
+  true
+);
+```
+
+### Parameter Update Workflow
+
+1. **Update Config File**: Edit `config/parameters.js`
+2. **Document Change**: Add reason in comments
+3. **Test Locally**: Run tests with new values
+4. **Deploy to Testnet**: Verify behavior
+5. **Update Mainnet**: Call setter functions
+6. **Verify**: Check values on-chain
+7. **Monitor**: Watch for issues
+
+### Important Notes
+
+- ⚠️ **Always test parameter changes** on fork/testnet first
+- ✅ **Use testing mode** (15-min windows) for initial markets
+- 🔄 **Switch to production** after validating full lifecycle
+- 📊 **Track changes** - all parameter updates emit events
+- 🛡️ **Guardrails exist** - ParameterStorage has min/max validation
+
+---
+
 ## 📊 PERFORMANCE METRICS
 
 ### Gas Costs (Actual from Live System)

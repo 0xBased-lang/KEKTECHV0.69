@@ -42,3 +42,22 @@ export {
   useWatchWinningsClaimed,
   useWatchMarketStateChanged,
 } from './useMarketEvents';
+
+// Admin-only hooks
+export {
+  useAdminRole,
+  useRejectMarket,
+  useAdminResolveMarket,
+  useUpdateParameter,
+  useUpdateBoolParameter,
+  useGetParameter,
+  useGetBoolParameter,
+  useUpdateDisputeWindow,
+  useGetDisputeWindow,
+  useUpdateMinDisputeBond,
+  useGetMinDisputeBond,
+  useProposedMarkets,
+  useProposalVotes,
+  useResolutionVotes,
+  useBatchUpdateParameters,
+} from './useAdminActions';

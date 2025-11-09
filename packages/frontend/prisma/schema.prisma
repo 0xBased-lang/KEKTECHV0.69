@@ -1,0 +1,94 @@
+// KEKTECH 3.0 - Database Schema
+// Engagement System: Proposal Voting, Resolution Voting, Comments
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Proposal Votes (like/dislike for market proposals)
+model ProposalVote {
+  id            String   @id @default(uuid())
+  marketAddress String   // Market contract address
+  userId        String   // Wallet address
+  vote          String   // 'like' or 'dislike'
+  timestamp     DateTime @default(now())
+
+  @@unique([marketAddress, userId])
+  @@index([marketAddress])
+  @@index([userId])
+}
+
+// Resolution Votes (agree/disagree with proposed outcome)
+model ResolutionVote {
+  id            String   @id @default(uuid())
+  marketAddress String   // Market contract address
+  userId        String   // Wallet address
+  vote          String   // 'agree' or 'disagree'
+  comment       String   // Required comment (min 20 chars)
+  timestamp     DateTime @default(now())
+
+  @@unique([marketAddress, userId])
+  @@index([marketAddress])
+  @@index([userId])
+}
+
+// Comments on markets (general discussion)
+model Comment {
+  id            String   @id @default(uuid())
+  marketAddress String   // Market contract address
+  userId        String   // Wallet address
+  comment       String   // Comment text
+  upvotes       Int      @default(0)
+  downvotes     Int      @default(0)
+  type          String   @default("general") // 'general' or 'resolution_vote'
+  timestamp     DateTime @default(now())
+
+  @@index([marketAddress])
+  @@index([userId])
+  @@index([timestamp])
+}
+
+// Comment votes (upvote/downvote on comments)
+model CommentVote {
+  id        String   @id @default(uuid())
+  commentId String   // Comment ID
+  userId    String   // Wallet address
+  vote      String   // 'upvote' or 'downvote'
+  timestamp DateTime @default(now())
+
+  @@unique([commentId, userId])
+  @@index([commentId])
+}
+
+// Market metadata (cached from blockchain for quick access)
+model MarketMetadata {
+  id            String   @id // Market contract address
+  question      String
+  description   String?
+  creator       String   // Wallet address
+  state         Int      // Market state (0-5)
+  expiryTime    BigInt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([state])
+  @@index([creator])
+}
+
+// User activity tracking
+model UserActivity {
+  id            String   @id @default(uuid())
+  userId        String   // Wallet address
+  activityType  String   // 'vote', 'comment', 'bet', etc.
+  marketAddress String   // Related market
+  timestamp     DateTime @default(now())
+
+  @@index([userId])
+  @@index([marketAddress])
+  @@index([timestamp])
+}

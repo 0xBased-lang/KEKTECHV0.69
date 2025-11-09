@@ -20,6 +20,12 @@ const buttonVariants = cva(
         // Ghost: Minimal and subtle
         ghost:
           'bg-transparent text-gray-300 hover:bg-gray-800/30 hover:text-[#3fb8bd]',
+
+        // Shadcn-style variants for admin dashboard compatibility
+        default: 'bg-[#3fb8bd] text-white hover:bg-[#2fa8ad]',
+        destructive: 'bg-red-600 text-white hover:bg-red-700',
+        outline: 'border-2 border-gray-700 bg-transparent text-gray-300 hover:bg-gray-800 hover:text-white',
+        link: 'text-[#3fb8bd] underline-offset-4 hover:underline bg-transparent',
       },
       size: {
         sm: 'px-5 py-2.5 text-sm rounded-lg',

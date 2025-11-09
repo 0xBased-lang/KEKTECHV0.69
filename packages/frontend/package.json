@@ -19,6 +19,9 @@
     "test:contracts": "hardhat test"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tabs": "^1.1.13",
     "@reown/appkit": "^1.8.11",
     "@reown/appkit-adapter-wagmi": "^1.8.11",
     "@tanstack/react-query": "^5.90.5",
@@ -51,13 +54,14 @@
     "hardhat": "^2.26.3",
     "playwright": "^1.56.1",
     "prettier": "^3.6.2",
+    "prisma": "^6.19.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
   "optionalDependencies": {
-    "@tailwindcss/oxide-linux-x64-gnu": "4.1.16",
     "@tailwindcss/oxide-linux-arm64-gnu": "4.1.16",
-    "lightningcss-linux-x64-gnu": "^1.30.2",
-    "lightningcss-linux-arm64-gnu": "^1.30.2"
+    "@tailwindcss/oxide-linux-x64-gnu": "4.1.16",
+    "lightningcss-linux-arm64-gnu": "^1.30.2",
+    "lightningcss-linux-x64-gnu": "^1.30.2"
   }
 }
