@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { type ReactNode, useState, useEffect } from 'react'
 import { type State, WagmiProvider } from 'wagmi'
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit'
+import { Toaster } from 'sonner'
 import { config, checkWagmiConfig } from '@/config/wagmi'
 import { initializeEthereumProvider, waitForProvider } from '@/config/web3-provider-fix'
 
@@ -107,6 +108,19 @@ export function Providers({ children, initialState }: ProvidersProps) {
     <WagmiProvider config={config} initialState={initialState} reconnectOnMount={true}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={kektechTheme}>
+          <Toaster
+            position="top-right"
+            theme="dark"
+            toastOptions={{
+              style: {
+                background: '#1a1a1a',
+                color: '#fff',
+                border: '1px solid #3fb8bd',
+              },
+              className: 'sonner-toast',
+              duration: 4000,
+            }}
+          />
           {error && process.env.NODE_ENV === 'development' && (
             <div className="fixed top-0 left-0 right-0 bg-red-900/20 border-b border-red-500 p-2 text-center text-xs text-red-300">
               Web3 initialization warning: {error}
