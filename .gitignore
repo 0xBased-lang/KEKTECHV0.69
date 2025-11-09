@@ -69,3 +69,14 @@ test-results/logs/*
 test-results/gas/latest/*
 !**/.gitkeep
 .vercel
+
+# Archived documentation (in official KEKTECH_OFFICIALS archive)
+docs/archive/
+MASTER_STATUS.md
+TODO_TRACKER.md
+TEST_REALITY.md
+DEPLOYMENT_REALITY.md
+CURRENT_STATUS.md
+
+# Official archive location
+/Users/seman/KEKTECH_OFFICIALS/
