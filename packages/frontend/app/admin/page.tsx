@@ -14,7 +14,6 @@ export default function AdminDashboard() {
   const { address, isConnected } = useAccount();
   const { markets, isLoading } = useMarketList(true);
   const [selectedMarket, setSelectedMarket] = useState<Address | null>(null);
-  const [resolveOutcome, setResolveOutcome] = useState<0 | 1>(0);
 
   if (!isConnected) {
     return (
