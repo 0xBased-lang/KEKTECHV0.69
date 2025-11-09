@@ -119,7 +119,7 @@ export const config = createConfig({
   ssr: true,
   syncConnectedChain: true,
   transports: {
-    [basedChain.id]: http(),
+    [basedChain.id]: http('/api/rpc'), // Use proxy to avoid CORS issues
     [mainnet.id]: http(),
   },
 })
