@@ -62,23 +62,15 @@ export function Header() {
           />
         </Link>
 
-        {/* Desktop Navigation Links - Center/Right */}
+        {/* Desktop Navigation Links - Center/Right - Only 5 Links */}
         <nav className="hidden items-center space-x-4 md:flex lg:space-x-6">
           <Link
-            href="/marketplace"
+            href="/feels-good-markets"
             className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
-              pathname === '/marketplace' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
+              pathname?.startsWith('/feels-good-markets') ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
             }`}
           >
-            Marketplace
-          </Link>
-          <Link
-            href="/markets"
-            className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
-              pathname?.startsWith('/markets') ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
-            }`}
-          >
-            Markets 🎯
+            Feels Good Markets
           </Link>
           <Link
             href="/dashboard"
@@ -97,25 +89,17 @@ export function Header() {
             Gallery
           </Link>
           <Link
-            href="/rewards"
+            href="/staking"
             className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
-              pathname === '/rewards' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
+              pathname === '/staking' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
             }`}
           >
-            Rewards
+            Staking
           </Link>
           <Link
-            href="/#roadmap"
+            href="/about"
             className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
-              pathname === '/' && typeof window !== 'undefined' && window.location.hash === '#roadmap' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
-            }`}
-          >
-            Roadmap
-          </Link>
-          <Link
-            href="/#about"
-            className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
-              pathname === '/' && typeof window !== 'undefined' && window.location.hash === '#about' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
+              pathname === '/about' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
             }`}
           >
             About Us
@@ -192,7 +176,7 @@ export function Header() {
           </button>
         </div>
 
-        {/* Mobile Navigation Links - Scrollable content */}
+        {/* Mobile Navigation Links - Scrollable content - Only 5 Links */}
         <nav
           className="flex-1 flex flex-col px-5 py-5 space-y-4 overflow-y-auto overscroll-contain"
           style={{
@@ -202,26 +186,15 @@ export function Header() {
           }}
         >
           <Link
-            href="/marketplace"
+            href="/feels-good-markets"
             onClick={closeMobileMenu}
             className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
-              pathname === '/marketplace'
+              pathname?.startsWith('/feels-good-markets')
                 ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
                 : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
             }`}
           >
-            Marketplace
-          </Link>
-          <Link
-            href="/markets"
-            onClick={closeMobileMenu}
-            className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
-              pathname?.startsWith('/markets')
-                ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
-                : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
-            }`}
-          >
-            Markets 🎯
+            Feels Good Markets
           </Link>
           <Link
             href="/dashboard"
@@ -246,32 +219,21 @@ export function Header() {
             Gallery
           </Link>
           <Link
-            href="/rewards"
+            href="/staking"
             onClick={closeMobileMenu}
             className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
-              pathname === '/rewards'
+              pathname === '/staking'
                 ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
                 : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
             }`}
           >
-            Rewards
+            Staking
           </Link>
           <Link
-            href="/#roadmap"
+            href="/about"
             onClick={closeMobileMenu}
             className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
-              pathname === '/' && typeof window !== 'undefined' && window.location.hash === '#roadmap'
-                ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
-                : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
-            }`}
-          >
-            Roadmap
-          </Link>
-          <Link
-            href="/#about"
-            onClick={closeMobileMenu}
-            className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
-              pathname === '/' && typeof window !== 'undefined' && window.location.hash === '#about'
+              pathname === '/about'
                 ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
                 : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
             }`}

@@ -1,33 +1,22 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
+import { MintTab } from '@/components/marketplace/MintTab'
+import { TradeTab } from '@/components/marketplace/TradeTab'
+import { BlurredTitleSection } from '@/components/ui/BlurredTitleSection'
 
 /**
- * Marketplace Page - Redirect to new location
+ * Marketplace Page
  *
- * This page redirects to /feels-good-markets/nft-marketplace
- * to maintain backwards compatibility with existing links
+ * Unified marketplace with four tabs:
+ * - Mint: NFT minting interface
+ * - Surprise: Surprise mechanics (coming soon)
+ * - KEKTV: KEKTV voucher trading marketplace
+ * - Limited Edition: Special limited edition items
  */
 export default function MarketplacePage() {
-  const router = useRouter()
-
-  useEffect(() => {
-    router.replace('/feels-good-markets/nft-marketplace')
-  }, [router])
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-black">
-      <div className="text-center">
-        <div className="text-[#3fb8bd] text-6xl mb-4">⏳</div>
-        <p className="text-gray-400">Redirecting to NFT Marketplace...</p>
-      </div>
-    </div>
-  )
-}
-
-/* Original marketplace code moved to /feels-good-markets/nft-marketplace */
-function OriginalMarketplacePage() {
   const [activeTab, setActiveTab] = useState<'mint' | 'surprise' | 'kektv' | 'limited'>('mint')
 
   return (
