@@ -389,3 +389,31 @@ export function useVoteOnComment(commentId: string) {
     error,
   };
 }
+
+/**
+ * Hook to subscribe to real-time comment updates
+ * NOTE: Stub implementation - will be replaced with Supabase real-time when integrated
+ */
+export function useCommentSubscription(
+  marketAddress: Address,
+  onUpdate: () => void
+) {
+  useEffect(() => {
+    // TODO: Implement Supabase real-time subscription when integrated
+    // For now, this is a stub to prevent build errors
+
+    // Example implementation (when Supabase is ready):
+    // const subscription = supabase
+    //   .from('comments')
+    //   .on('INSERT', () => onUpdate())
+    //   .on('UPDATE', () => onUpdate())
+    //   .on('DELETE', () => onUpdate())
+    //   .subscribe()
+    //
+    // return () => {
+    //   subscription.unsubscribe()
+    // }
+
+    return () => {}
+  }, [marketAddress, onUpdate])
+}

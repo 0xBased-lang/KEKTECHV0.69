@@ -16,7 +16,7 @@
 
 import { useState } from 'react'
 import { useWalletAuth } from '@/lib/hooks/useWalletAuth'
-import { useCommentPost } from '@/lib/api/engagement'
+import { useSubmitComment } from '@/lib/api/engagement'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
@@ -30,8 +30,8 @@ interface CommentFormProps {
 
 export function CommentForm({ marketAddress, onCommentPosted }: CommentFormProps) {
   const [comment, setComment] = useState('')
-  const { isAuthenticated, authenticate } = useWalletAuth()
-  const { mutate: postComment, isPending, error } = useCommentPost()
+  const { isAuthenticated, authenticate, address } = useWalletAuth()
+  const { submitComment, isSubmitting, error } = useSubmitComment(marketAddress)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,22 +53,16 @@ export function CommentForm({ marketAddress, onCommentPosted }: CommentFormProps
     }
 
     // Post comment
-    postComment(
-      {
-        marketAddress,
-        comment: comment.trim(),
-      },
-      {
-        onSuccess: () => {
-          toast.success('Comment posted successfully!')
-          setComment('') // Clear form
-          onCommentPosted?.() // Callback for parent to refresh
-        },
-        onError: (err) => {
-          toast.error(err.message || 'Failed to post comment')
-        },
-      }
-    )
+    try {
+      const userId = address || 'unknown-user'
+      await submitComment(userId, comment.trim())
+      toast.success('Comment posted successfully!')
+      setComment('') // Clear form
+      onCommentPosted?.() // Callback for parent to refresh
+    } catch (err) {
+      // Error already set by hook
+      toast.error((err as Error).message || 'Failed to post comment')
+    }
   }
 
   const handleSignIn = async () => {
@@ -117,7 +111,7 @@ export function CommentForm({ marketAddress, onCommentPosted }: CommentFormProps
             onChange={(e) => setComment(e.target.value)}
             placeholder="Share your thoughts on this market..."
             rows={4}
-            disabled={isPending}
+            disabled={isSubmitting}
             className="resize-none"
           />
           <div className="flex justify-between items-center mt-2">
@@ -139,16 +133,16 @@ export function CommentForm({ marketAddress, onCommentPosted }: CommentFormProps
               type="button"
               variant="outline"
               onClick={() => setComment('')}
-              disabled={isPending}
+              disabled={isSubmitting}
             >
               Clear
             </Button>
           )}
           <Button
             type="submit"
-            disabled={isPending || !comment.trim() || isOverLimit}
+            disabled={isSubmitting || !comment.trim() || isOverLimit}
           >
-            {isPending ? 'Posting...' : 'Post Comment'}
+            {isSubmitting ? 'Posting...' : 'Post Comment'}
           </Button>
         </div>
       </form>

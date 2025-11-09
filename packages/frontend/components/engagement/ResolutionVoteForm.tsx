@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { useVoteOnResolution } from '@/lib/api/engagement'
+import { useSubmitResolutionVote } from '@/lib/api/engagement'
 import { useWalletAuth } from '@/lib/hooks/useWalletAuth'
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -22,12 +22,12 @@ interface ResolutionVoteFormProps {
 }
 
 export function ResolutionVoteForm({ marketAddress }: ResolutionVoteFormProps) {
-  const { isAuthenticated, authenticate } = useWalletAuth()
-  const { mutate: voteOnResolution, isPending } = useVoteOnResolution()
+  const { isAuthenticated, authenticate, address } = useWalletAuth()
+  const { submitVote, isSubmitting } = useSubmitResolutionVote(marketAddress)
   const [isAgree, setIsAgree] = useState<boolean | null>(null)
   const [comment, setComment] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!isAuthenticated) {
@@ -46,27 +46,19 @@ export function ResolutionVoteForm({ marketAddress }: ResolutionVoteFormProps) {
       return
     }
 
-    voteOnResolution(
-      {
-        marketAddress,
-        isAgree,
-        comment: comment.trim(),
-      },
-      {
-        onSuccess: () => {
-          toast.success('Resolution vote submitted!')
-          setIsAgree(null)
-          setComment('')
-        },
-        onError: (error: any) => {
-          if (error.message?.includes('already voted')) {
-            toast.error('You have already voted on this resolution')
-          } else {
-            toast.error(error.message || 'Failed to submit vote')
-          }
-        },
+    try {
+      const userId = address || 'unknown-user'
+      await submitVote(userId, isAgree ? 'agree' : 'disagree', comment.trim())
+      toast.success('Resolution vote submitted!')
+      setIsAgree(null)
+      setComment('')
+    } catch (error: any) {
+      if (error.message?.includes('already voted')) {
+        toast.error('You have already voted on this resolution')
+      } else {
+        toast.error(error.message || 'Failed to submit vote')
       }
-    )
+    }
   }
 
   return (
@@ -123,11 +115,11 @@ export function ResolutionVoteForm({ marketAddress }: ResolutionVoteFormProps) {
           {/* Submit Button */}
           <Button
             type="submit"
-            disabled={isPending || isAgree === null || comment.trim().length < 20}
+            disabled={isSubmitting || isAgree === null || comment.trim().length < 20}
             className="w-full"
             size="lg"
           >
-            {isPending ? (
+            {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Submitting Vote...
