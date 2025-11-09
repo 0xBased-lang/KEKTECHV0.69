@@ -19,8 +19,8 @@ export function OverviewTab({ address: _address, onTabChange }: OverviewTabProps
 
   // Calculate portfolio stats
   const nftCount = portfolio.nfts.all?.length || 0
-  const techBalance = portfolio.techBalance.data?.formatted || '0'
-  const voucherCount = portfolio.voucherBalance.data?.total || 0
+  const techBalance = portfolio.techBalance.balanceFormatted || '0'
+  const voucherCount = portfolio.voucherBalance.totalVouchers || 0
 
   return (
     <div>
@@ -33,7 +33,7 @@ export function OverviewTab({ address: _address, onTabChange }: OverviewTabProps
           icon="🖼️"
           gradient="from-purple-600 to-purple-800"
           onClick={() => onTabChange('portfolio')}
-          isLoading={portfolio.techBalance.isLoading || portfolio.nfts.isLoading}
+          isLoading={portfolio.isLoading}
         />
 
         <SummaryCard
