@@ -44,7 +44,7 @@ To run these checks locally:
 
 ```bash
 # Run tests
-cd expansion-packs/bmad-blockchain-dev
+cd packages/blockchain
 npm test
 
 # Check contract sizes

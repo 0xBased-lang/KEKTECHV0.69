@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./expansion-packs/bmad-blockchain-dev
+        working-directory: ./packages/blockchain
 
     steps:
       - name: Checkout code
@@ -34,7 +34,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: expansion-packs/bmad-blockchain-dev/package-lock.json
+          cache-dependency-path: packages/blockchain/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -45,11 +45,11 @@ jobs:
         continue-on-error: true
 
       - name: Upload Slither Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: slither-report
-          path: expansion-packs/bmad-blockchain-dev/slither-report.md
+          path: packages/blockchain/slither-report.md
 
   dependency-check:
     name: Dependency Security Check
@@ -60,7 +60,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run npm audit (Smart Contracts)
-        working-directory: ./expansion-packs/bmad-blockchain-dev
+        working-directory: ./packages/blockchain
         run: |
           npm audit --audit-level=moderate || true
         continue-on-error: true
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./expansion-packs/bmad-blockchain-dev
+        working-directory: ./packages/blockchain
 
     steps:
       - name: Checkout code
@@ -86,7 +86,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: expansion-packs/bmad-blockchain-dev/package-lock.json
+          cache-dependency-path: packages/blockchain/package-lock.json
 
       - name: Install dependencies
         run: npm ci
