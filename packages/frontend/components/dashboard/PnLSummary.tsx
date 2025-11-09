@@ -8,9 +8,9 @@ interface PnLSummaryProps {
  * Displays profit/loss breakdown for prediction markets
  * TODO: Integrate with real prediction market data
  */
-export function PnLSummary({ address }: PnLSummaryProps) {
+export function PnLSummary({ address: _address }: PnLSummaryProps) {
   // TODO: Add hooks to fetch real P&L data
-  // const { totalPnL, realizedPnL, unrealizedPnL } = useUserPnL(address)
+  // const { totalPnL, realizedPnL, unrealizedPnL } = useUserPnL(_address)
 
   const totalPnL = 0
   const realizedPnL = 0
