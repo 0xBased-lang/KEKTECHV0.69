@@ -47,7 +47,7 @@ export function CommentVoteButtons({
       toast.error('Please sign in to vote')
       try {
         await authenticate()
-      } catch (err) {
+      } catch (_err) {
         return
       }
     }
@@ -97,7 +97,7 @@ export function CommentVoteButtons({
         setDownvotes(result.downvotes)
       }
       onVote?.()
-    } catch (err) {
+    } catch (_err) {
       // Revert optimistic update
       setUpvotes(previousUpvotes)
       setDownvotes(previousDownvotes)

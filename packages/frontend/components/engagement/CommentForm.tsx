@@ -69,7 +69,7 @@ export function CommentForm({ marketAddress, onCommentPosted }: CommentFormProps
     try {
       await authenticate()
       toast.success('Successfully signed in!')
-    } catch (err) {
+    } catch (_err) {
       toast.error('Failed to sign in')
     }
   }

@@ -52,7 +52,7 @@ export function ResolutionVoteForm({ marketAddress }: ResolutionVoteFormProps) {
       toast.success('Resolution vote submitted!')
       setIsAgree(null)
       setComment('')
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error.message?.includes('already voted')) {
         toast.error('You have already voted on this resolution')
       } else {

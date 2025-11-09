@@ -40,7 +40,7 @@ export function ProposalVoteButtons({ marketAddress }: ProposalVoteButtonsProps)
       await submitVote(userId, isUpvote ? 'like' : 'dislike')
       toast.success(isUpvote ? 'Voted like!' : 'Voted dislike!')
       refetch()
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(error.message || 'Failed to vote')
     }
   }

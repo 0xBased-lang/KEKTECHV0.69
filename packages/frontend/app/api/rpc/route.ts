@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const PRIMARY_RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.basedai.com';
 const FALLBACK_RPC_URL = 'https://mainnet.basedaibridge.com/rpc/';
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const body = await request.json();
 
