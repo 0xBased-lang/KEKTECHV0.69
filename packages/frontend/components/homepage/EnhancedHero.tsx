@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { LinkButton } from '@/components/ui/Button'
+import { LinkButton } from '@/components/ui/button'
 
 /**
  * Simplified Hero Component

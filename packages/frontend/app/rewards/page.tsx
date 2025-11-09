@@ -3,7 +3,7 @@
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { BlurredTitleSection } from '@/components/ui/BlurredTitleSection'
-import { LinkButton } from '@/components/ui/Button'
+import { LinkButton } from '@/components/ui/button'
 
 /**
  * Rewards Page

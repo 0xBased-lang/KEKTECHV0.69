@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { LinkButton } from '@/components/ui/Button'
+import { LinkButton } from '@/components/ui/button'
 import { fetchRankingsWithFallback } from '@/lib/api/kektech-rankings'
 
 // Featured NFTs section with rotating images from live API

@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
-import { Button, LinkButton } from '@/components/ui/Button'
+import { Button, LinkButton } from '@/components/ui/button'
 
 /**
  * Button Design System Showcase
@@ -166,7 +166,7 @@ export default function ButtonsDemoPage() {
                 <div>
                   <h4 className="font-fredoka text-lg font-bold text-[#3fb8bd] mb-2">Import</h4>
                   <code className="block bg-black/50 p-4 rounded text-[#4ecca7] text-sm">
-                    {`import { Button, LinkButton } from '@/components/ui/Button'`}
+                    {`import { Button, LinkButton } from '@/components/ui/button'`}
                   </code>
                 </div>
 
