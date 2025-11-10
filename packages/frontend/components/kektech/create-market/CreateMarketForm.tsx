@@ -59,7 +59,7 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
     question: '',
     description: '',
     category: '',
-    endTime: 0,
+    endTime: Math.floor(Date.now() / 1000) + 86400, // Default: 24 hours from now
     creatorBond: '0.1', // Default 0.1 BASED
   });
 
@@ -154,13 +154,20 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
       return;
     }
 
+    // Validate endTime is valid before creating config
+    if (!formData.endTime || formData.endTime === 0) {
+      setErrors({ endTime: 'Invalid end time - please select a date' });
+      setCurrentStep('timing');
+      return;
+    }
+
     // Create market config
     const config = {
       question: formData.question,
       description: formData.description,
       category: formData.category,
       endTime: BigInt(formData.endTime),
-      resolutionTime: BigInt(formData.endTime + 3600), // 1 hour after end
+      resolutionTime: BigInt(formData.endTime) + BigInt(3600), // 1 hour after end (safer BigInt arithmetic)
       minBond: bondAmount,
       curveId: 0n, // Default LMSR curve
       curveParams: [], // Default params
@@ -318,7 +325,7 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
             </p>
             <input
               type="datetime-local"
-              value={formData.endTime ? new Date(formData.endTime * 1000).toISOString().slice(0, 16) : ''}
+              value={formData.endTime > 0 ? new Date(formData.endTime * 1000).toISOString().slice(0, 16) : ''}
               onChange={(e) => {
                 const timestamp = Math.floor(new Date(e.target.value).getTime() / 1000);
                 setFormData({ ...formData, endTime: timestamp });
