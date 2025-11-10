@@ -194,3 +194,4 @@ For issues and questions, please open an issue on GitHub.
 ---
 
 **Built with ❤️ by the KEKTECH Team**
+# WebSocket URL: wss://ws.kektech.xyz/ws
