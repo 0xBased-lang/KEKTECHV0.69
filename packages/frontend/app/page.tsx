@@ -97,6 +97,16 @@ export default function Homepage() {
                   </span>
                 </div>
               </Link>
+              <Link
+                href="/feels-good-markets/kek-futures"
+                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-[#3fb8bd] to-[#4ecca7] p-[2px] shadow-lg shadow-[#3fb8bd]/50 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-[#3fb8bd]/70"
+              >
+                <div className="relative rounded-[10px] bg-gray-900 px-8 py-4 transition-all group-hover:bg-transparent">
+                  <span className="text-lg font-bold text-[#3fb8bd] group-hover:text-black font-fredoka">
+                    🎲 Explore Markets
+                  </span>
+                </div>
+              </Link>
             </div>
           </div>
         </div>
