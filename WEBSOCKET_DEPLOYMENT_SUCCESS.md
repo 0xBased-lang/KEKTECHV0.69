@@ -8,7 +8,7 @@
 
 ## 🚀 What Was Deployed
 
-### 1. Backend Infrastructure (VPS: 185.202.236.71)
+### 1. Backend Infrastructure (VPS)
 - ✅ **Event Indexer**: Processes blockchain events from BasedAI mainnet
 - ✅ **WebSocket Server**: Real-time event broadcasting (Node.js + ws library)
 - ✅ **Redis Pub/Sub**: Message broker between indexer and WebSocket server
@@ -24,10 +24,10 @@
 
 ### 3. Security Configuration
 - ✅ **SSL/TLS**: All WebSocket traffic encrypted (wss://)
-- ✅ **DNS Configuration**: ws.kektech.xyz → 185.202.236.71 (Gray cloud/DNS only)
-- ✅ **Firewall**: Port 3180 blocked externally, only accessible via Nginx
+- ✅ **DNS Configuration**: ws.kektech.xyz properly configured
+- ✅ **Firewall**: WebSocket port blocked externally, only accessible via Nginx
 - ✅ **Rate Limiting**: 10 requests/second per IP via Nginx
-- ✅ **SSH Protection**: Port 22 remains secure, no lockouts
+- ✅ **SSH Protection**: Secure access configured
 
 ---
 
@@ -141,18 +141,21 @@ pm2 status
 
 ### Daily
 ```bash
-ssh kek "pm2 status"  # Check services running
+# On VPS: Check services running
+pm2 status
 ```
 
 ### Weekly
 ```bash
-ssh kek "sudo certbot renew --dry-run"  # Test SSL renewal
-ssh kek "pm2 logs --lines 100 | grep -i error"  # Check for errors
+# On VPS: Test SSL renewal
+sudo certbot renew --dry-run
+pm2 logs --lines 100 | grep -i error  # Check for errors
 ```
 
 ### Monthly
 ```bash
-ssh kek "sudo apt update && sudo apt upgrade"  # Security updates
+# On VPS: Security updates
+sudo apt update && sudo apt upgrade
 ```
 
 ### SSL Certificate Auto-Renewal
@@ -166,39 +169,39 @@ ssh kek "sudo apt update && sudo apt upgrade"  # Security updates
 
 ### Frontend shows "Disconnected"
 ```bash
-# Check WebSocket server running
-ssh kek "pm2 status | grep websocket"
+# On VPS: Check WebSocket server running
+pm2 status | grep websocket
 
 # Check Nginx running
-ssh kek "sudo systemctl status nginx"
+sudo systemctl status nginx
 
-# Test WebSocket directly
+# Test WebSocket directly (from local)
 wscat -c wss://ws.kektech.xyz/ws
 ```
 
 ### SSL certificate errors
 ```bash
-# Check certificate validity
-ssh kek "sudo certbot certificates"
+# On VPS: Check certificate validity
+sudo certbot certificates
 
 # Renew if needed
-ssh kek "sudo certbot renew --force-renewal"
-ssh kek "sudo systemctl reload nginx"
+sudo certbot renew --force-renewal
+sudo systemctl reload nginx
 ```
 
 ### Events not appearing
 ```bash
-# Check Event Indexer is running
-ssh kek "pm2 logs kektech-event-indexer --lines 50"
+# On VPS: Check Event Indexer is running
+pm2 logs kektech-event-indexer --lines 50
 
 # Check Redis is running
-ssh kek "redis-cli ping"  # Should return "PONG"
+redis-cli ping  # Should return "PONG"
 
 # Check WebSocket server logs
-ssh kek "pm2 logs kektech-websocket-server --lines 50"
+pm2 logs kektech-websocket-server --lines 50
 
-# Manually publish test event
-ssh kek "redis-cli PUBLISH 'events:market_created' '{\"type\":\"MarketCreated\",\"marketAddress\":\"0x123\",\"data\":{\"question\":\"Test\"},\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}'"
+# Manually publish test event (on VPS)
+redis-cli PUBLISH 'events:market_created' '{"type":"MarketCreated","marketAddress":"0x123","data":{"question":"Test"},"timestamp":"2025-11-10T12:00:00Z"}'
 ```
 
 ---

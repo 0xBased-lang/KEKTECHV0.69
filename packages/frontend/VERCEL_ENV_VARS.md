@@ -19,21 +19,21 @@ Copy and paste these into your Vercel Dashboard:
 
 ### 1. DATABASE_URL
 - **Name**: `DATABASE_URL`
-- **Value**: `postgresql://postgres:EzFYnauy1X44kXJW@db.cvablivsycsejtmlbheo.supabase.co:5432/postgres`
+- **Value**: `[REDACTED - Get from secure storage or team lead]`
 - **Environments**: ✅ Production, ✅ Preview, ❌ Development
 
 ---
 
 ### 2. NEXT_PUBLIC_SUPABASE_URL
 - **Name**: `NEXT_PUBLIC_SUPABASE_URL`
-- **Value**: `https://cvablivsycsejtmlbheo.supabase.co`
+- **Value**: `https://[your-project-id].supabase.co`
 - **Environments**: ✅ Production, ✅ Preview, ✅ Development
 
 ---
 
 ### 3. NEXT_PUBLIC_SUPABASE_ANON_KEY
 - **Name**: `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- **Value**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2YWJsaXZzeWNzZWp0bWxiaGVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MDc4NTAsImV4cCI6MjA3ODI4Mzg1MH0.bREvRYMDfRLgQbDkyG1-bvO8d30m3SMzAvS6KSyH8_c`
+- **Value**: `[Your Supabase anon key - safe to expose with RLS]`
 - **Environments**: ✅ Production, ✅ Preview, ✅ Development
 
 ---

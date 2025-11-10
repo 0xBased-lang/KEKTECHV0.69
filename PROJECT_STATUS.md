@@ -37,6 +37,33 @@ MarketTemplateRegistry:       0x420687494Dad8da9d058e9399cD401Deca17f6bd
 
 ---
 
+### Backend Infrastructure (100%) 🆕
+
+**Status**: ✅ **Production Operational** (Deployed November 10, 2025)
+
+**Architecture**: Real-time event indexing and WebSocket broadcasting
+- **VPS Services**: Ubuntu VPS with PM2 process management
+- **WebSocket Endpoint**: wss://ws.kektech.xyz/ws
+- **SSL/TLS**: Let's Encrypt (valid until February 8, 2026)
+
+**Services Running**:
+1. **Event Indexer** (PM2): Monitors BasedAI blockchain for smart contract events
+2. **WebSocket Server** (PM2): Real-time event broadcasting to frontend
+3. **Redis Pub/Sub**: Message broker between services
+4. **Nginx**: Reverse proxy with SSL termination and rate limiting
+
+**Performance Metrics**:
+- WebSocket connection time: <500ms
+- Event delivery latency: <1 second (blockchain → frontend)
+- Memory usage: ~109 MB total (85 MB indexer + 24 MB WebSocket)
+- Rate limiting: 10 requests/second per IP
+
+**Repository**: Backend code maintained in separate **private repository** (`kektech-backend`)
+
+📖 **Documentation**: See `VPS_BACKEND_ARCHITECTURE.md` for complete details
+
+---
+
 ### Frontend Infrastructure (90%)
 
 #### API Routes (100%)
