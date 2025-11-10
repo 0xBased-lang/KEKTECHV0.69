@@ -162,20 +162,10 @@ export function useMarketList(watch = false) {
   // Use fallback markets if RPC fails
   const finalMarkets = markets || (marketsError ? FALLBACK_MARKETS : []);
 
+  // Log errors only (not verbose status updates)
   if (marketsError && !markets) {
     console.warn('⚠️  MarketFactory.getAllMarkets() failed, using fallback markets');
   }
-
-  // DEBUG: Log market loading status
-  console.log('[useMarketList] Status:', {
-    marketCount: marketCount?.toString() || 'N/A',
-    marketsLoading,
-    marketsError: !!marketsError,
-    marketsFromContract: markets?.length || 0,
-    finalMarketsCount: finalMarkets.length,
-    usingFallback: marketsError && !markets,
-    addresses: finalMarkets
-  });
 
   return {
     marketCount: marketCount ? Number(marketCount) : (finalMarkets.length || 0),

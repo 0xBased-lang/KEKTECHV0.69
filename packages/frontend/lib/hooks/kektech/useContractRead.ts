@@ -41,6 +41,8 @@ export function useContractRead<T = unknown>({
     query: {
       enabled,
       refetchInterval: watch ? 5000 : false, // Poll every 5s if watching
+      staleTime: 10000, // Consider data fresh for 10s
+      gcTime: 30000, // Keep in cache for 30s (formerly cacheTime)
     },
   });
 
@@ -80,6 +82,8 @@ export function usePredictionMarketRead<T = unknown>({
     query: {
       enabled: enabled && !!marketAddress,
       refetchInterval: watch ? 5000 : false,
+      staleTime: 10000, // Consider data fresh for 10s
+      gcTime: 30000, // Keep in cache for 30s (formerly cacheTime)
     },
   });
 

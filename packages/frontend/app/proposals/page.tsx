@@ -8,27 +8,56 @@ import { ProposalCard } from '@/components/kektech';
 import { useMarketList, useMarketInfo } from '@/lib/hooks/kektech';
 import { LoadingSpinner } from '@/components/kektech/ui/LoadingSpinner';
 import { EmptyState } from '@/components/EmptyState';
-import { MarketState } from '@/lib/contracts/types';
-import { Sparkles, TrendingUp } from 'lucide-react';
+import { MarketState, marketStateToString } from '@/lib/contracts/types';
+import { Sparkles, TrendingUp, Bug } from 'lucide-react';
 import { Address } from 'viem';
+import { useState, memo } from 'react';
 
 /**
  * Wrapper component for each market that calls hooks safely
  * This pattern avoids React Hooks violations when filtering dynamic lists
  */
-function ProposalCardWrapper({ address }: { address: Address }) {
+const ProposalCardWrapper = memo(({
+  address,
+  showAll
+}: {
+  address: Address;
+  showAll: boolean;
+}) => {
   const marketInfo = useMarketInfo(address, true);
 
-  // Only render if market is in PROPOSED state
-  if (marketInfo?.state !== MarketState.PROPOSED) {
+  // In normal mode, only show PROPOSED markets
+  // In debug mode, show ALL markets with state badges
+  if (!showAll && marketInfo?.state !== MarketState.PROPOSED) {
     return null;
   }
 
-  return <ProposalCard marketAddress={address} />;
-}
+  return (
+    <div className="relative">
+      {/* State Badge (only in debug mode) */}
+      {showAll && (
+        <div className="absolute top-4 right-4 z-10">
+          <span className={`
+            px-3 py-1 rounded-full text-xs font-semibold
+            ${marketInfo?.state === MarketState.PROPOSED ? 'bg-yellow-500/20 text-yellow-400' : ''}
+            ${marketInfo?.state === MarketState.APPROVED ? 'bg-green-500/20 text-green-400' : ''}
+            ${marketInfo?.state === MarketState.ACTIVE ? 'bg-blue-500/20 text-blue-400' : ''}
+            ${marketInfo?.state === MarketState.RESOLVING ? 'bg-purple-500/20 text-purple-400' : ''}
+            ${marketInfo?.state === MarketState.DISPUTED ? 'bg-red-500/20 text-red-400' : ''}
+            ${marketInfo?.state === MarketState.FINALIZED ? 'bg-gray-500/20 text-gray-400' : ''}
+          `}>
+            {marketStateToString(marketInfo?.state ?? 0)}
+          </span>
+        </div>
+      )}
+      <ProposalCard marketAddress={address} />
+    </div>
+  );
+});
 
 export default function ProposalsPage() {
   const { markets, isLoading, marketCount } = useMarketList(true);
+  const [showAll, setShowAll] = useState(false);
 
   if (isLoading) {
     return (
@@ -44,9 +73,27 @@ export default function ProposalsPage() {
     <div className="container mx-auto px-4 py-12">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Sparkles className="w-8 h-8 text-[#3fb8bd]" />
-          <h1 className="text-4xl font-bold text-white">Market Proposals</h1>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <Sparkles className="w-8 h-8 text-[#3fb8bd]" />
+            <h1 className="text-4xl font-bold text-white">Market Proposals</h1>
+          </div>
+          {/* Debug Toggle */}
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className={`
+              flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors
+              ${showAll
+                ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400'
+                : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600'
+              }
+            `}
+          >
+            <Bug className="w-4 h-4" />
+            <span className="text-sm font-medium">
+              {showAll ? 'Debug: All States' : 'Proposed Only'}
+            </span>
+          </button>
         </div>
         <p className="text-gray-400 text-lg">
           Community-proposed markets awaiting validation. Vote to help activate the best ideas!
@@ -60,6 +107,12 @@ export default function ProposalsPage() {
             <TrendingUp className="w-4 h-4 text-green-400" />
             <span className="text-gray-400">Need 10+ upvotes to activate</span>
           </div>
+          {showAll && (
+            <div className="flex items-center gap-2 text-yellow-400">
+              <Bug className="w-4 h-4" />
+              <span>Debug mode: Showing all market states</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -69,7 +122,7 @@ export default function ProposalsPage() {
           <EmptyState message="No market proposals yet. Be the first to create one!" />
         ) : (
           markets.map((address) => (
-            <ProposalCardWrapper key={address} address={address} />
+            <ProposalCardWrapper key={address} address={address} showAll={showAll} />
           ))
         )}
       </div>
