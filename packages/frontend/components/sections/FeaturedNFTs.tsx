@@ -41,8 +41,17 @@ export function FeaturedNFTs() {
       try {
         // Use the same robust API client as the gallery
         // Includes: retry logic, exponential backoff, automatic fallback to mock data
-        // ⚡ PERFORMANCE: Only fetch 50 NFTs instead of all 2471 (98% reduction!)
-        const data = await fetchRankingsWithFallback(50)
+        // ⚡ PERFORMANCE OPTIMIZED: Only fetch 12 NFTs for homepage carousel (Context7 recommendation)
+        // Race with timeout for faster fallback to cached/local NFTs
+        const data = await Promise.race([
+          fetchRankingsWithFallback(12),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout after 5 seconds')), 5000)
+          )
+        ]).catch((error) => {
+          console.warn('⚠️  Rankings API timeout or error, using fallback NFTs:', error.message)
+          return { nfts: FALLBACK_NFTS }
+        })
 
         // Transform rankings data to our format
         const nfts: NFTData[] = data.nfts.map((nft) => ({
@@ -52,11 +61,11 @@ export function FeaturedNFTs() {
           rarityScore: nft.rarityScore
         }))
 
-        // Use all fetched NFTs for carousel (already limited to 50)
+        // Use all fetched NFTs for carousel (limited to 12 for performance)
         setAllNFTs(nfts)
       } catch (error) {
         // This should rarely happen since fetchRankingsWithFallback has built-in fallback
-        console.error('Error fetching NFTs:', error)
+        console.error('❌ Error fetching NFTs:', error)
         setAllNFTs(FALLBACK_NFTS)
       } finally {
         setIsLoading(false)

@@ -12,15 +12,20 @@ import { RANKING_API_URL } from '@/config/constants'
  * Benefits:
  * - No CORS issues (server-to-server communication)
  * - Same-origin requests from browser perspective
- * - Caching support via Next.js
+ * - In-memory caching (5 minutes) - Context7 validated
  * - Error handling and retry logic
  */
+
+// In-memory cache (Context7 Next.js API route pattern)
+let cachedRankings: any = null
+let cacheTimestamp = 0
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes in milliseconds
 
 /**
  * GET /api/rankings
  *
  * Fetches all NFT rankings from the external API and returns them to the client.
- * Implements retry logic and proper error handling.
+ * Implements in-memory caching, retry logic, and proper error handling.
  *
  * @returns JSON response with NFT rankings or error message
  */
@@ -28,6 +33,20 @@ export async function GET() {
   const maxRetries = 3
   const retryDelay = 1000
   const timeout = 10000
+
+  // Check cache first (Context7 recommendation)
+  const now = Date.now()
+  if (cachedRankings && now - cacheTimestamp < CACHE_DURATION) {
+    console.log('✅ Rankings served from cache (age:', Math.round((now - cacheTimestamp) / 1000), 'seconds)')
+    return NextResponse.json(cachedRankings, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+        'Content-Type': 'application/json',
+        'X-Cache': 'HIT',
+      },
+    })
+  }
 
   let lastError: Error | null = null
 
@@ -67,12 +86,18 @@ export async function GET() {
         throw new Error('Invalid API response: expected nfts array')
       }
 
-      // Success! Return data with proper headers
+      // Success! Update cache (Context7 pattern)
+      cachedRankings = data
+      cacheTimestamp = Date.now()
+      console.log('✅ Rankings fetched successfully, cache updated')
+
+      // Return data with proper headers
       return NextResponse.json(data, {
         status: 200,
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
           'Content-Type': 'application/json',
+          'X-Cache': 'MISS',
         },
       })
 

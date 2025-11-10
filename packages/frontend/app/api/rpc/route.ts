@@ -12,6 +12,28 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const PRIMARY_RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'https://mainnet.basedaibridge.com/rpc/';
 const FALLBACK_RPC_URL = 'https://rpc.basedai.com'; // Old endpoint (currently down)
+const RPC_TIMEOUT = 5000; // 5 seconds per request (Context7 recommendation)
+const MAX_RETRIES = 2; // Retry each endpoint once
+
+/**
+ * Helper: Fetch with timeout (Context7 pattern)
+ */
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
+}
 
 export async function POST(_request: NextRequest) {
   try {
@@ -29,45 +51,91 @@ export async function POST(_request: NextRequest) {
       );
     }
 
-    // Try primary RPC endpoint
-    let response = await fetch(PRIMARY_RPC_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
+    let lastError: Error | null = null;
 
-    // If primary fails, try fallback
-    if (!response.ok) {
-      console.warn(`Primary RPC failed (${response.status}), trying fallback...`);
+    // Try primary RPC endpoint with retries
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const response = await fetchWithTimeout(
+          PRIMARY_RPC_URL,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          },
+          RPC_TIMEOUT
+        );
 
-      response = await fetch(FALLBACK_RPC_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`✅ RPC success (primary, attempt ${attempt}):`, body.method);
 
-      if (!response.ok) {
-        throw new Error(`Both RPC endpoints failed. Status: ${response.status}`);
+          // Return with proper CORS headers
+          return NextResponse.json(data, {
+            status: 200,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'POST, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type',
+            },
+          });
+        }
+
+        throw new Error(`Primary RPC error: ${response.status} ${response.statusText}`);
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        console.warn(`⚠️  Primary RPC attempt ${attempt}/${MAX_RETRIES} failed:`, lastError.message);
+
+        if (attempt < MAX_RETRIES) {
+          await new Promise(resolve => setTimeout(resolve, 500 * attempt));
+        }
       }
     }
 
-    const data = await response.json();
+    // Try fallback RPC endpoint with retries
+    console.warn('⚠️  Primary RPC exhausted, trying fallback...');
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const response = await fetchWithTimeout(
+          FALLBACK_RPC_URL,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          },
+          RPC_TIMEOUT
+        );
 
-    // Return with proper CORS headers
-    return NextResponse.json(data, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-    });
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`✅ RPC success (fallback, attempt ${attempt}):`, body.method);
+
+          // Return with proper CORS headers
+          return NextResponse.json(data, {
+            status: 200,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'POST, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type',
+            },
+          });
+        }
+
+        throw new Error(`Fallback RPC error: ${response.status} ${response.statusText}`);
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        console.warn(`⚠️  Fallback RPC attempt ${attempt}/${MAX_RETRIES} failed:`, lastError.message);
+
+        if (attempt < MAX_RETRIES) {
+          await new Promise(resolve => setTimeout(resolve, 500 * attempt));
+        }
+      }
+    }
+
+    // All retries exhausted
+    throw new Error(`All RPC endpoints failed. Last error: ${lastError?.message}`);
   } catch (error) {
-    console.error('RPC Proxy Error:', error);
+    console.error('❌ RPC Proxy Error:', error);
 
     return NextResponse.json(
       {
@@ -79,7 +147,14 @@ export async function POST(_request: NextRequest) {
         },
         id: null
       },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+      }
     );
   }
 }
