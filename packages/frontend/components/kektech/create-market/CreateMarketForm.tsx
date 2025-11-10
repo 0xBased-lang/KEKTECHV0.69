@@ -12,13 +12,16 @@ import { TransactionError, InlineError } from '../ui/ErrorDisplay';
 import { parseEther } from 'viem';
 import { ArrowRight, ArrowLeft, Check, Calendar, FileText, Tag, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { categoryToBytes32 } from '@/lib/utils/category';
 
-type Step = 'question' | 'description' | 'category' | 'timing' | 'review' | 'submit';
+type Step = 'question' | 'description' | 'category' | 'outcomes' | 'timing' | 'review' | 'submit';
 
 interface MarketFormData {
   question: string;
   description: string;
   category: string;
+  outcome1: string;
+  outcome2: string;
   endTime: number;
   creatorBond: string;
 }
@@ -27,6 +30,7 @@ const STEPS: { id: Step; title: string; icon: React.ComponentType<{ className?: 
   { id: 'question', title: 'Question', icon: FileText },
   { id: 'description', title: 'Description', icon: FileText },
   { id: 'category', title: 'Category', icon: Tag },
+  { id: 'outcomes', title: 'Outcomes', icon: Check },
   { id: 'timing', title: 'End Time', icon: Calendar },
   { id: 'review', title: 'Review', icon: Check },
 ];
@@ -60,6 +64,8 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
     question: '',
     description: '',
     category: '',
+    outcome1: 'Yes',      // Default positive outcome
+    outcome2: 'No',       // Default negative outcome
     endTime: Math.floor(Date.now() / 1000) + 86400, // Default: 24 hours from now
     creatorBond: '0.1', // Default 0.1 BASED
   });
@@ -104,6 +110,32 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
       case 'category':
         if (!formData.category) {
           newErrors.category = 'Please select a category';
+        }
+        break;
+
+      case 'outcomes':
+        // Validate outcome1
+        if (!formData.outcome1.trim()) {
+          newErrors.outcome1 = 'Outcome 1 is required';
+        } else if (formData.outcome1.length < 2) {
+          newErrors.outcome1 = 'Outcome 1 must be at least 2 characters';
+        } else if (formData.outcome1.length > 50) {
+          newErrors.outcome1 = 'Outcome 1 must be less than 50 characters';
+        }
+
+        // Validate outcome2
+        if (!formData.outcome2.trim()) {
+          newErrors.outcome2 = 'Outcome 2 is required';
+        } else if (formData.outcome2.length < 2) {
+          newErrors.outcome2 = 'Outcome 2 must be at least 2 characters';
+        } else if (formData.outcome2.length > 50) {
+          newErrors.outcome2 = 'Outcome 2 must be less than 50 characters';
+        }
+
+        // Check if outcomes are different
+        if (formData.outcome1.trim().toLowerCase() === formData.outcome2.trim().toLowerCase()) {
+          newErrors.outcome1 = 'Outcomes must be different';
+          newErrors.outcome2 = 'Outcomes must be different';
         }
         break;
 
@@ -179,20 +211,27 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
       return;
     }
 
-    // Create market config with validated endTime
+    // Convert category to bytes32 for contract
+    const categoryBytes32 = categoryToBytes32(formData.category);
+
+    // Create market config matching ABI exactly ✅
     const config = {
       question: formData.question,
       description: formData.description,
-      category: formData.category,
-      endTime: safeEndTime,
-      resolutionTime: safeEndTime + BigInt(3600), // 1 hour after end (safe arithmetic)
-      minBond: bondAmount,
-      curveId: 0n, // Default LMSR curve
-      curveParams: [], // Default params
-      metadata: '', // No additional metadata
+      resolutionTime: safeEndTime,      // ✅ Correct field name (not endTime)
+      creatorBond: bondAmount,           // ✅ Correct field name (not minBond)
+      category: categoryBytes32,         // ✅ bytes32 type (not string)
+      outcome1: formData.outcome1,       // ✅ Added (required by ABI)
+      outcome2: formData.outcome2,       // ✅ Added (required by ABI)
     };
 
-    // Create market
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[CreateMarket] Config:', config);
+      console.log('[CreateMarket] Category bytes32:', categoryBytes32);
+      console.log('[CreateMarket] Bond:', bondAmount.toString());
+    }
+
+    // Create market (bond sent as msg.value, not in struct)
     await createMarket(config, bondAmount);
   };
 
@@ -329,6 +368,75 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
             {errors.category && (
               <div className="mt-4">
                 <InlineError message={errors.category} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Outcomes step */}
+        {currentStep === 'outcomes' && (
+          <div>
+            <h3 className="text-2xl font-bold text-white mb-2">Define the outcomes</h3>
+            <p className="text-gray-400 mb-6">
+              What are the possible outcomes for this market? (e.g., "Yes" and "No")
+            </p>
+
+            <div className="space-y-4">
+              {/* Outcome 1 (Affirmative) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Outcome 1 (Affirmative) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.outcome1}
+                  onChange={(e) => setFormData(prev => ({ ...prev, outcome1: e.target.value }))}
+                  placeholder="Yes"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd]"
+                  maxLength={50}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  The positive or affirmative outcome (max 50 characters)
+                </p>
+              </div>
+
+              {/* Outcome 2 (Negative) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Outcome 2 (Negative) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.outcome2}
+                  onChange={(e) => setFormData(prev => ({ ...prev, outcome2: e.target.value }))}
+                  placeholder="No"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd]"
+                  maxLength={50}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  The negative or opposite outcome (max 50 characters)
+                </p>
+              </div>
+
+              {/* Info box */}
+              <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <div className="flex items-start">
+                  <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
+                  <div className="text-sm text-blue-300">
+                    <p className="font-medium mb-1">Outcome Guidelines</p>
+                    <ul className="list-disc list-inside space-y-1 text-blue-400/80">
+                      <li>Outcomes should be clear and mutually exclusive</li>
+                      <li>Use simple, unambiguous language</li>
+                      <li>Examples: "Yes/No", "Happens/Doesn't Happen", "Above/Below"</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {(errors.outcome1 || errors.outcome2) && (
+              <div className="mt-4">
+                <InlineError message={errors.outcome1 || errors.outcome2 || ''} />
               </div>
             )}
           </div>

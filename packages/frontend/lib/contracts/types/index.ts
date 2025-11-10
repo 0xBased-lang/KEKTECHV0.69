@@ -40,17 +40,16 @@ export enum Role {
 
 /**
  * Market configuration for creation
+ * ✅ Matches deployed contract ABI exactly (Nov 6, 2025)
  */
 export interface MarketConfig {
   question: string;          // Market question (max 500 chars)
   description: string;       // Detailed description
-  category: string;          // Category tag
-  endTime: bigint;          // Unix timestamp when betting closes
   resolutionTime: bigint;   // Unix timestamp when resolution occurs
-  minBond: bigint;          // Minimum bond in wei (e.g., 0.1 BASED)
-  curveId: bigint;          // Bonding curve ID from CurveRegistry
-  curveParams: bigint[];    // Curve-specific parameters
-  metadata: string;          // IPFS hash or additional data
+  creatorBond: bigint;      // Creator bond in wei (e.g., 0.1 BASED)
+  category: `0x${string}`;   // Category as bytes32 (keccak256 hash)
+  outcome1: string;          // First outcome (e.g., "Yes")
+  outcome2: string;          // Second outcome (e.g., "No")
 }
 
 /**
