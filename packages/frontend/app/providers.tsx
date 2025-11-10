@@ -35,10 +35,10 @@ export function Providers({ children, initialState }: ProvidersProps) {
         initializeEthereumProvider()
 
         // Wait for provider to be available
-        const hasProvider = await waitForProvider(5000)
+        const hasProvider = await waitForProvider(1000)
 
         if (!hasProvider) {
-          console.warn('No ethereum provider detected after 5 seconds')
+          console.warn('No ethereum provider detected after 1 second')
         }
 
         // Debug logging in development

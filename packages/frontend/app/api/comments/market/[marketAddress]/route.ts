@@ -11,10 +11,10 @@ import { createClient } from '@/lib/supabase/server';
 // GET - Get comments for a market
 export async function GET(
   request: NextRequest,
-  { params }: { params: { marketAddress: string } }
+  { params }: { params: Promise<{ marketAddress: string }> }
 ) {
   try {
-    const { marketAddress } = params;
+    const { marketAddress } = await params;
     const { searchParams } = new URL(request.url);
 
     const sortBy = searchParams.get('sortBy') || 'recent'; // recent, top, controversial
@@ -78,7 +78,7 @@ export async function GET(
 // POST - Create a new comment (⚠️ REQUIRES AUTHENTICATION)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { marketAddress: string } }
+  { params }: { params: Promise<{ marketAddress: string }> }
 ) {
   try {
     // 🔒 AUTHENTICATION CHECK
@@ -102,7 +102,7 @@ export async function POST(
       );
     }
 
-    const { marketAddress } = params;
+    const { marketAddress } = await params;
     const body = await request.json();
     const { comment } = body; // userId now comes from authenticated session
 

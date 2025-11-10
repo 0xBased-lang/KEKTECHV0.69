@@ -13,7 +13,7 @@ import { verifyAuth } from '@/lib/auth/api-auth';
 // 🔒 REQUIRES AUTHENTICATION
 export async function POST(
   request: NextRequest,
-  { params }: { params: { commentId: string } }
+  { params }: { params: Promise<{ commentId: string }> }
 ) {
   try {
     // 🔒 AUTHENTICATION CHECK
@@ -22,7 +22,7 @@ export async function POST(
 
     const walletAddress = auth.walletAddress!; // ✅ Verified wallet from Supabase
 
-    const { commentId } = params;
+    const { commentId } = await params;
     const body = await request.json();
     const { vote } = body; // userId now comes from authenticated session
 

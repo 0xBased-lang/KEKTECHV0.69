@@ -41,7 +41,8 @@ export function FeaturedNFTs() {
       try {
         // Use the same robust API client as the gallery
         // Includes: retry logic, exponential backoff, automatic fallback to mock data
-        const data = await fetchRankingsWithFallback(2471)
+        // ⚡ PERFORMANCE: Only fetch 50 NFTs instead of all 2471 (98% reduction!)
+        const data = await fetchRankingsWithFallback(50)
 
         // Transform rankings data to our format
         const nfts: NFTData[] = data.nfts.map((nft) => ({
@@ -51,9 +52,8 @@ export function FeaturedNFTs() {
           rarityScore: nft.rarityScore
         }))
 
-        // Shuffle and set random selection for carousel
-        const shuffled = getRandomNFTs(nfts, 50) // Get 50 random NFTs for smooth infinite scroll
-        setAllNFTs(shuffled)
+        // Use all fetched NFTs for carousel (already limited to 50)
+        setAllNFTs(nfts)
       } catch (error) {
         // This should rarely happen since fetchRankingsWithFallback has built-in fallback
         console.error('Error fetching NFTs:', error)

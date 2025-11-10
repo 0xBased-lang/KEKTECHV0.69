@@ -12,10 +12,10 @@ import { createClient } from '@/lib/supabase/server';
 // GET - Get resolution votes for a market
 export async function GET(
   request: NextRequest,
-  { params }: { params: { marketAddress: string } }
+  { params }: { params: Promise<{ marketAddress: string }> }
 ) {
   try {
-    const { marketAddress } = params;
+    const { marketAddress } = await params;
 
     // Get all resolution votes
     const votes = await prisma.resolutionVote.findMany({
@@ -70,7 +70,7 @@ export async function GET(
 // 🔒 REQUIRES AUTHENTICATION
 export async function POST(
   request: NextRequest,
-  { params }: { params: { marketAddress: string } }
+  { params }: { params: Promise<{ marketAddress: string }> }
 ) {
   try {
     // 🔒 AUTHENTICATION CHECK
@@ -79,7 +79,7 @@ export async function POST(
 
     const walletAddress = auth.walletAddress!; // ✅ Verified wallet from Supabase
 
-    const { marketAddress } = params;
+    const { marketAddress } = await params;
     const body = await request.json();
     const { vote, comment } = body; // userId now comes from authenticated session
 

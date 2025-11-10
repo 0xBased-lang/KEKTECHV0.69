@@ -268,7 +268,7 @@ export function useComments(
       if (options?.offset) params.set('offset', options.offset.toString());
 
       const response = await fetch(
-        `/api/comments/${marketAddress}?${params.toString()}`
+        `/api/comments/market/${marketAddress}?${params.toString()}`
       );
       const data = await response.json();
 
@@ -311,7 +311,7 @@ export function useSubmitComment(marketAddress: Address) {
       setSuccess(false);
 
       try {
-        const response = await fetch(`/api/comments/${marketAddress}`, {
+        const response = await fetch(`/api/comments/market/${marketAddress}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
