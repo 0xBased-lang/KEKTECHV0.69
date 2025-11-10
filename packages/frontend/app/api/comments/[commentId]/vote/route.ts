@@ -2,33 +2,49 @@
  * KEKTECH 3.0 - Comment Voting API
  * POST /api/comments/[commentId]/vote - Upvote or downvote a comment
  *
- * 🔒 REQUIRES AUTHENTICATION
+ * 🔒 REQUIRES AUTHENTICATION + SECURITY CHECKS
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
 import { verifyAuth } from '@/lib/auth/api-auth';
+import { applySecurityMiddleware } from '@/lib/middleware/security';
 
 // POST - Vote on a comment (upvote or downvote)
-// 🔒 REQUIRES AUTHENTICATION
+// 🔒 REQUIRES AUTHENTICATION + SECURITY CHECKS
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ commentId: string }> }
 ) {
   try {
-    // 🔒 AUTHENTICATION CHECK
+    // 🛡️ STEP 1: SECURITY MIDDLEWARE (Rate Limiting + Origin Validation)
+    const securityError = await applySecurityMiddleware(request);
+    if (securityError) return securityError;
+
+    // 🔒 STEP 2: AUTHENTICATION CHECK
     const auth = await verifyAuth();
     if (auth.error) return auth.error;
 
     const walletAddress = auth.walletAddress!; // ✅ Verified wallet from Supabase
 
+    // 🧹 STEP 3: VALIDATE INPUTS
     const { commentId } = await params;
     const body = await request.json();
-    const { vote } = body; // userId now comes from authenticated session
+    const { vote } = body;
 
+    // Validate vote input
     if (vote !== 'upvote' && vote !== 'downvote') {
       return NextResponse.json(
         { success: false, error: 'Vote must be "upvote" or "downvote"' },
+        { status: 400 }
+      );
+    }
+
+    // Validate commentId format (should be UUID)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(commentId)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid comment ID format' },
         { status: 400 }
       );
     }

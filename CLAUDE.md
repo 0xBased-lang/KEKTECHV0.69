@@ -1,8 +1,8 @@
 # KEKTECH 3.0 - AI Assistant Instructions
 
-**Last Updated**: 2025-11-09 19:25 CET
+**Last Updated**: 2025-11-10 17:00 CET
 **Purpose**: Accurate guidance for Claude Code AI assistant
-**Status**: Documentation complete, ready for implementation
+**Status**: In progress - Security integration underway
 
 ---
 
@@ -10,25 +10,26 @@
 
 **For complete and accurate status, see `PROJECT_STATUS.md`** ⭐
 
-**Current Completion**: 75% (Most infrastructure complete, needs env setup & testing)
+**Current Completion**: 60% (Infrastructure complete, security integration in progress)
 
 ### What's COMPLETE ✅
 - **Smart Contracts**: ✅ Deployed to BasedAI mainnet (Nov 6, 2025)
+- **VPS Backend**: ✅ Event Indexer + WebSocket operational
 - **Contract Addresses**: ✅ Synced in deployment.json and contracts.json
 - **Backend APIs**: ✅ 9 routes with Supabase authentication
-- **Database Schema**: ✅ 6 tables with migrations ready
+- **Database Schema**: ✅ 7 tables, schema in sync with Supabase
 - **UI Components**: ✅ All 8 engagement components exist
 - **API Client**: ✅ 8 hooks cleaned (userId removed from POST)
 - **Contract Integration**: ✅ Complete hook system for on-chain data
-- **Market Pages**: ✅ Market detail pages with full engagement UI
+- **Repository Security**: ✅ Main + backend repos PRIVATE
 
 ### What Needs Work ⚠️
-- **Environment Variables**: ⚠️ Need to verify in local & Vercel
-- **Database**: ⚠️ Migrations need to be applied to Supabase
-- **Testing**: ⚠️ Frontend tests need to be added (contracts 92% tested)
-- **Deployment**: ⚠️ Ready to deploy to Vercel (envs first)
+- **Security Integration**: ⚠️ CRITICAL - Utilities created but NOT integrated into API routes
+- **Testing**: ⚠️ Security tests, API tests, E2E tests needed
+- **Environment Variables**: ⚠️ Need to verify in Vercel
+- **Deployment**: ⚠️ Ready after security integration
 
-**Reality Check**: System is 75% complete - primary needs are env setup, DB migration, and deployment.
+**Reality Check**: System is 60% complete - CRITICAL security integration in progress. Security files exist but are not yet protecting API routes.
 
 ---
 

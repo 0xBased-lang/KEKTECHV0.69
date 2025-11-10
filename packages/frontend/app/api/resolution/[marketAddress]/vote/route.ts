@@ -1,6 +1,6 @@
 /**
  * KEKTECH 3.0 - Resolution Voting API
- * POST /api/resolution/[marketAddress]/vote - 🔒 REQUIRES AUTHENTICATION
+ * POST /api/resolution/[marketAddress]/vote - 🔒 REQUIRES AUTHENTICATION + SECURITY
  * GET /api/resolution/[marketAddress]/vote - Public (shows user's vote if authenticated)
  */
 
@@ -8,6 +8,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
 import { verifyAuth } from '@/lib/auth/api-auth';
 import { createClient } from '@/lib/supabase/server';
+import { applySecurityMiddleware } from '@/lib/middleware/security';
+import { sanitizeAddress, sanitizeComment } from '@/lib/utils/sanitize';
 
 // GET - Get resolution votes for a market
 export async function GET(
@@ -67,22 +69,37 @@ export async function GET(
 }
 
 // POST - Submit a resolution vote with mandatory comment
-// 🔒 REQUIRES AUTHENTICATION
+// 🔒 REQUIRES AUTHENTICATION + SECURITY CHECKS
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ marketAddress: string }> }
 ) {
   try {
-    // 🔒 AUTHENTICATION CHECK
+    // 🛡️ STEP 1: SECURITY MIDDLEWARE (Rate Limiting + Origin Validation)
+    const securityError = await applySecurityMiddleware(request);
+    if (securityError) return securityError;
+
+    // 🔒 STEP 2: AUTHENTICATION CHECK
     const auth = await verifyAuth();
     if (auth.error) return auth.error;
 
     const walletAddress = auth.walletAddress!; // ✅ Verified wallet from Supabase
 
-    const { marketAddress } = await params;
+    // 🧹 STEP 3: SANITIZE AND VALIDATE INPUTS
+    const { marketAddress: rawMarketAddress } = await params;
     const body = await request.json();
-    const { vote, comment } = body; // userId now comes from authenticated session
+    const { vote, comment: rawComment } = body;
 
+    // Sanitize market address
+    const marketAddress = sanitizeAddress(rawMarketAddress);
+    if (!marketAddress) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid market address format' },
+        { status: 400 }
+      );
+    }
+
+    // Validate vote input
     if (vote !== 'agree' && vote !== 'disagree') {
       return NextResponse.json(
         { success: false, error: 'Vote must be "agree" or "disagree"' },
@@ -90,7 +107,9 @@ export async function POST(
       );
     }
 
-    if (!comment || comment.trim().length < 20) {
+    // Sanitize comment (XSS protection)
+    const comment = sanitizeComment(rawComment);
+    if (!comment || comment.length < 20) {
       return NextResponse.json(
         { success: false, error: 'Comment is required (minimum 20 characters)' },
         { status: 400 }
@@ -114,22 +133,22 @@ export async function POST(
       );
     }
 
-    // Create the resolution vote
+    // ✅ STEP 4: CREATE RESOLUTION VOTE (with sanitized data)
     const result = await prisma.resolutionVote.create({
       data: {
-        marketAddress,
-        userId: walletAddress, // ✅ Using verified wallet address
+        marketAddress, // ✅ Sanitized address
+        userId: walletAddress, // ✅ Verified wallet address
         vote,
-        comment: comment.trim(),
+        comment, // ✅ Sanitized comment (XSS-safe)
       },
     });
 
     // Also create a comment entry (type: resolution_vote)
     await prisma.comment.create({
       data: {
-        marketAddress,
-        userId: walletAddress, // ✅ Using verified wallet address
-        comment: comment.trim(),
+        marketAddress, // ✅ Sanitized address
+        userId: walletAddress, // ✅ Verified wallet address
+        comment, // ✅ Sanitized comment (XSS-safe)
         type: 'resolution_vote',
       },
     });

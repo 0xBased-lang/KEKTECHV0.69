@@ -1,6 +1,6 @@
 /**
  * KEKTECH 3.0 - Proposal Voting API
- * POST /api/proposals/[marketAddress]/vote - 🔒 REQUIRES AUTHENTICATION
+ * POST /api/proposals/[marketAddress]/vote - 🔒 REQUIRES AUTHENTICATION + SECURITY
  * GET /api/proposals/[marketAddress]/vote - Public (shows user's vote if authenticated)
  */
 
@@ -8,6 +8,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
 import { verifyAuth } from '@/lib/auth/api-auth';
 import { createClient } from '@/lib/supabase/server';
+import { applySecurityMiddleware } from '@/lib/middleware/security';
+import { sanitizeAddress } from '@/lib/utils/sanitize';
 
 // GET - Get vote counts for a market proposal
 export async function GET(
@@ -53,22 +55,37 @@ export async function GET(
 }
 
 // POST - Submit a vote for a market proposal
-// 🔒 REQUIRES AUTHENTICATION
+// 🔒 REQUIRES AUTHENTICATION + SECURITY CHECKS
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ marketAddress: string }> }
 ) {
   try {
-    // 🔒 AUTHENTICATION CHECK
+    // 🛡️ STEP 1: SECURITY MIDDLEWARE (Rate Limiting + Origin Validation)
+    const securityError = await applySecurityMiddleware(request);
+    if (securityError) return securityError;
+
+    // 🔒 STEP 2: AUTHENTICATION CHECK
     const auth = await verifyAuth();
     if (auth.error) return auth.error;
 
     const walletAddress = auth.walletAddress!; // ✅ Verified wallet from Supabase
 
-    const { marketAddress } = await params;
+    // 🧹 STEP 3: SANITIZE AND VALIDATE INPUTS
+    const { marketAddress: rawMarketAddress } = await params;
     const body = await request.json();
-    const { vote } = body; // userId now comes from authenticated session
+    const { vote } = body;
 
+    // Sanitize market address
+    const marketAddress = sanitizeAddress(rawMarketAddress);
+    if (!marketAddress) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid market address format' },
+        { status: 400 }
+      );
+    }
+
+    // Validate vote input
     if (vote !== 'like' && vote !== 'dislike') {
       return NextResponse.json(
         { success: false, error: 'Vote must be "like" or "dislike"' },

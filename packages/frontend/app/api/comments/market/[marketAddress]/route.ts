@@ -7,6 +7,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db/prisma';
 import { createClient } from '@/lib/supabase/server';
+import { applySecurityMiddleware } from '@/lib/middleware/security';
+import { sanitizeComment, sanitizeAddress } from '@/lib/utils/sanitize';
 
 // GET - Get comments for a market
 export async function GET(
@@ -75,13 +77,17 @@ export async function GET(
   }
 }
 
-// POST - Create a new comment (⚠️ REQUIRES AUTHENTICATION)
+// POST - Create a new comment (🔒 REQUIRES AUTHENTICATION + SECURITY CHECKS)
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ marketAddress: string }> }
 ) {
   try {
-    // 🔒 AUTHENTICATION CHECK
+    // 🛡️ STEP 1: SECURITY MIDDLEWARE (Rate Limiting + Origin Validation)
+    const securityError = await applySecurityMiddleware(request);
+    if (securityError) return securityError;
+
+    // 🔒 STEP 2: AUTHENTICATION CHECK
     const supabase = createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -102,18 +108,30 @@ export async function POST(
       );
     }
 
-    const { marketAddress } = await params;
+    // 🧹 STEP 3: SANITIZE AND VALIDATE INPUTS
+    const { marketAddress: rawMarketAddress } = await params;
     const body = await request.json();
-    const { comment } = body; // userId now comes from authenticated session
+    const { comment: rawComment } = body;
 
-    // Validate input
-    if (!comment || comment.trim().length < 1) {
+    // Sanitize market address (prevent injection)
+    const marketAddress = sanitizeAddress(rawMarketAddress);
+    if (!marketAddress) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid market address format' },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize comment (XSS protection + validation)
+    const comment = sanitizeComment(rawComment);
+    if (!comment || comment.length < 1) {
       return NextResponse.json(
         { success: false, error: 'Comment cannot be empty' },
         { status: 400 }
       );
     }
 
+    // Additional validation (sanitizeComment already limits to 1000 chars)
     if (comment.length > 1000) {
       return NextResponse.json(
         { success: false, error: 'Comment is too long (max 1000 characters)' },
@@ -121,12 +139,12 @@ export async function POST(
       );
     }
 
-    // Create the comment using authenticated wallet address
+    // ✅ STEP 4: CREATE COMMENT (with sanitized data)
     const result = await prisma.comment.create({
       data: {
-        marketAddress,
-        userId: walletAddress, // ✅ Using verified wallet address
-        comment: comment.trim(),
+        marketAddress, // ✅ Sanitized address
+        userId: walletAddress, // ✅ Verified wallet address
+        comment, // ✅ Sanitized comment (XSS-safe)
         type: 'general',
       },
     });
