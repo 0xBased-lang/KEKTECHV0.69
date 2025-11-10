@@ -99,7 +99,7 @@ export function useSubmitProposalVote(marketAddress: Address) {
   const [success, setSuccess] = useState(false);
 
   const submitVote = useCallback(
-    async (userId: string, vote: 'like' | 'dislike') => {
+    async (vote: 'like' | 'dislike') => {
       setIsSubmitting(true);
       setError(null);
       setSuccess(false);
@@ -110,7 +110,7 @@ export function useSubmitProposalVote(marketAddress: Address) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userId, vote }),
+          body: JSON.stringify({ vote }),
         });
 
         const data = await response.json();
@@ -190,7 +190,7 @@ export function useSubmitResolutionVote(marketAddress: Address) {
   const [success, setSuccess] = useState(false);
 
   const submitVote = useCallback(
-    async (userId: string, vote: 'agree' | 'disagree', comment: string) => {
+    async (vote: 'agree' | 'disagree', comment: string) => {
       setIsSubmitting(true);
       setError(null);
       setSuccess(false);
@@ -209,7 +209,7 @@ export function useSubmitResolutionVote(marketAddress: Address) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userId, vote, comment }),
+          body: JSON.stringify({ vote, comment }),
         });
 
         const data = await response.json();
@@ -305,7 +305,7 @@ export function useSubmitComment(marketAddress: Address) {
   const [success, setSuccess] = useState(false);
 
   const submitComment = useCallback(
-    async (userId: string, comment: string) => {
+    async (comment: string) => {
       setIsSubmitting(true);
       setError(null);
       setSuccess(false);
@@ -316,7 +316,7 @@ export function useSubmitComment(marketAddress: Address) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userId, comment }),
+          body: JSON.stringify({ comment }),
         });
 
         const data = await response.json();
@@ -353,7 +353,7 @@ export function useVoteOnComment(commentId: string) {
   const [error, setError] = useState<Error | null>(null);
 
   const voteOnComment = useCallback(
-    async (userId: string, vote: 'upvote' | 'downvote') => {
+    async (vote: 'upvote' | 'downvote') => {
       setIsVoting(true);
       setError(null);
 
@@ -363,7 +363,7 @@ export function useVoteOnComment(commentId: string) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userId, vote }),
+          body: JSON.stringify({ vote }),
         });
 
         const data = await response.json();

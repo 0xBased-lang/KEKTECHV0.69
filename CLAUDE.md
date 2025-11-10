@@ -8,26 +8,27 @@
 
 ## 🎯 PROJECT STATUS (Evidence-Based Truth)
 
-**Current Completion**: 43% (Infrastructure ready, user features missing)
+**For complete and accurate status, see `PROJECT_STATUS.md`** ⭐
+
+**Current Completion**: 75% (Most infrastructure complete, needs env setup & testing)
 
 ### What's COMPLETE ✅
-- **Smart Contracts**: Deployed to BasedAI mainnet, 320/347 tests passing (92.2%)
-- **Backend APIs**: 9 routes fully implemented with Prisma integration
-- **Database Schema**: 6 tables designed with proper relationships
-- **React Hooks**: 8 hooks implemented for API calls (391 lines)
-- **Frontend Build**: Compiles successfully, 36 static pages
-- **Contract Addresses**: Corrected in .env.local (2025-11-09)
+- **Smart Contracts**: ✅ Deployed to BasedAI mainnet (Nov 6, 2025)
+- **Contract Addresses**: ✅ Synced in deployment.json and contracts.json
+- **Backend APIs**: ✅ 9 routes with Supabase authentication
+- **Database Schema**: ✅ 6 tables with migrations ready
+- **UI Components**: ✅ All 8 engagement components exist
+- **API Client**: ✅ 8 hooks cleaned (userId removed from POST)
+- **Contract Integration**: ✅ Complete hook system for on-chain data
+- **Market Pages**: ✅ Market detail pages with full engagement UI
 
-### What's MISSING ❌
-- **Database**: Not initialized (dev.db file doesn't exist)
-- **User UI**: Zero user-facing components (only 2 admin panels)
-- **Authentication**: No wallet signature verification (security risk)
-- **Testing**: Zero test coverage (no E2E, no API tests)
-- **Market Pages**: Don't exist (no detail page, no list page)
-- **Comments UI**: Don't exist (no form, no list, no voting)
-- **Voting UI**: Don't exist (no proposal/resolution voting for users)
+### What Needs Work ⚠️
+- **Environment Variables**: ⚠️ Need to verify in local & Vercel
+- **Database**: ⚠️ Migrations need to be applied to Supabase
+- **Testing**: ⚠️ Frontend tests need to be added (contracts 92% tested)
+- **Deployment**: ⚠️ Ready to deploy to Vercel (envs first)
 
-**Reality Check**: Backend infrastructure is solid, but users can't interact with anything yet.
+**Reality Check**: System is 75% complete - primary needs are env setup, DB migration, and deployment.
 
 ---
 
@@ -35,27 +36,19 @@
 
 ### Primary Documents (Source of Truth)
 
-**1. CURRENT_STATUS.md** ⭐ START HERE
-- **Purpose**: Evidence-based system state snapshot
-- **Updated**: After each phase completion
-- **Contains**: What works vs what doesn't, completion metrics, critical blockers
+**1. PROJECT_STATUS.md** ⭐ START HERE
+- **Purpose**: Single source of truth for project state (verified via code inspection)
+- **Updated**: 2025-11-10 (major cleanup)
+- **Contains**: What's complete, what needs work, immediate next steps
 - **Rule**: If conflicts exist between files, this file wins
 
-**2. NEXT_STEPS.md** ⭐ IMPLEMENTATION ROADMAP
-- **Purpose**: Phased implementation plan with time tracking
-- **Updated**: After completing each task (with timestamps)
-- **Contains**: 6 phases, detailed tasks, success criteria, dependencies
-- **Format**:
-  ```
-  - [x] Task name (2025-11-09 HH:MM) - X minutes
-  ```
-
-**3. CLAUDE.md** (this file)
+**2. CLAUDE.md** (this file)
 - **Purpose**: AI assistant guidance and project context
 - **Updated**: When project structure or status changes significantly
 - **Contains**: Development workflow, file structure, critical rules
+- **References**: PROJECT_STATUS.md for current state
 
-**4. README.md**
+**3. README.md**
 - **Purpose**: Public-facing project overview
 - **Updated**: Major milestones only
 - **Audience**: External developers, users
@@ -69,19 +62,19 @@
 
 ## 🚫 FILES TO IGNORE
 
-**Exported to Official Archive** (2025-11-09 18:48):
-- ❌ MASTER_STATUS.md (outdated, conflicting data)
-- ❌ TODO_TRACKER.md (outdated task list)
-- ❌ TEST_REALITY.md (incorrect test numbers)
-- ❌ DEPLOYMENT_REALITY.md (archived)
-- ❌ DOCUMENTATION_STATUS.md (archived)
-- ❌ Any files in docs/archive/ (all archived)
-- ❌ CHECKPOINT.md (never existed)
+**Archived Documentation (2025-11-10)**:
+- ❌ `docs/archive/CURRENT_STATUS.md.old` (replaced by PROJECT_STATUS.md)
+- ❌ `docs/archive/NEXT_STEPS.md.old` (outdated task list)
+- ❌ Any files in `docs/archive/` (historical reference only)
 
-**Archive Location**: `/Users/seman/KEKTECH_OFFICIALS/KEKTECH_ARCHIVE_20251109_184834/`
-- 292 files safely archived
-- Permanent reference, safe to search if needed
-- Current docs take precedence
+**Previous Archive** (2025-11-09 18:48):
+- Location: `/Users/seman/KEKTECH_OFFICIALS/KEKTECH_ARCHIVE_20251109_184834/`
+- Contains: 292 historical files, metadata, git history
+- Status: Permanent reference, safe to search if needed
+- Rule: Current docs take precedence
+
+**Never Existed**:
+- ❌ CHECKPOINT.md (mentioned in error)
 
 ---
 
@@ -178,13 +171,10 @@ OFFICIAL ARCHIVE:
 #### 1. Start of Session
 ```bash
 # Check current system state
-cat CURRENT_STATUS.md
+cat PROJECT_STATUS.md
 
-# Check what phase you're on
-cat NEXT_STEPS.md | head -30
-
-# Review current phase tasks
-# Focus on tasks marked "⏳" (in progress) or next "[ ]" (pending)
+# Review immediate next steps
+cat PROJECT_STATUS.md | grep -A 20 "Immediate Next Steps"
 ```
 
 #### 2. During Development
@@ -233,25 +223,20 @@ cat root-docs/MASTER_STATUS.md
 
 ---
 
-## 📋 IMPLEMENTATION PHASES
+## 📋 IMMEDIATE NEXT STEPS
 
-**Current Phase**: Phase 0 - Documentation Update (In Progress)
+**See PROJECT_STATUS.md for detailed priority order and success criteria**
 
-### Phase Overview
+### Quick Overview
 
-| Phase | Goal | Time | Status |
-|-------|------|------|--------|
-| **Phase 0** | Update documentation | 1-2h | 🔄 66% |
-| **Phase 1** | Initialize database, install deps | 0.5h | ⏳ Next |
-| **Phase 2** | Build authentication | 2-3h | ⏳ Pending |
-| **Phase 3** | Build user UI (15 components) | 5-7h | ⏳ Pending |
-| **Phase 4** | Add error handling, polish | 2-3h | ⏳ Pending |
-| **Phase 5** | Create test suite | 4-6h | ⏳ Pending |
-| **Phase 6** | Production hardening | 1-2h | ⏳ Pending |
+| Priority | Task | Time | Status |
+|----------|------|------|--------|
+| **P1** | Environment & Database Setup | 30min | ⏳ Next |
+| **P2** | Local Testing & Verification | 1h | ⏳ Pending |
+| **P3** | Add Smoke Tests | 1h | ⏳ Pending |
+| **P4** | Production Deployment | 30min | ⏳ Pending |
 
-**Total Estimated**: 16-24 hours over 3-4 days
-
-See NEXT_STEPS.md for detailed task breakdowns, dependencies, and success criteria.
+**Total Remaining**: ~3 hours to production-ready
 
 ---
 
@@ -327,11 +312,11 @@ npx playwright test comment-posting   # Specific test file
 ## 🚨 CRITICAL RULES
 
 ### Documentation Rules
-1. **ALWAYS read CURRENT_STATUS.md first** - It's the source of truth
-2. **ALWAYS update NEXT_STEPS.md** after tasks with timestamp AND time spent
+1. **ALWAYS read PROJECT_STATUS.md first** - It's the single source of truth
+2. **UPDATE PROJECT_STATUS.md** after major changes with evidence
 3. **NEVER create new root .md files** without explicit approval
-4. **UPDATE Progress Tracker** in NEXT_STEPS.md after each phase
-5. **COMMIT frequently** with descriptive messages
+4. **COMMIT frequently** with descriptive messages
+5. **ARCHIVE old docs** to docs/archive/ rather than deleting
 
 ### Development Rules
 1. **RUN TESTS** before marking any task complete
@@ -388,50 +373,54 @@ npx playwright test comment-posting   # Specific test file
 
 ## 🎯 NEXT IMMEDIATE STEPS
 
-**After Phase 0 documentation complete**:
+**Status**: Documentation cleanup complete! ✅
 
-### Phase 1: Foundation (30 minutes)
+### Priority 1: Environment & Database (30 minutes)
 ```bash
-# 1.1 Initialize database (10 min)
 cd packages/frontend
-npx prisma generate
-npx prisma migrate deploy
-sqlite3 dev.db ".tables"
 
-# 1.2 Install testing dependencies (5 min)
-npm install -D vitest @vitest/ui @playwright/test
-npm install date-fns sonner
-npx playwright install
+# 1. Verify .env.local has all required variables
+cat .env.local
+
+# 2. Generate Prisma client
+npx prisma generate
+
+# 3. Apply migrations to Supabase
+npx prisma migrate deploy
+
+# 4. Test DB connectivity
+# (Create simple test query)
 ```
 
-### Phase 2: Authentication (2-3 hours)
-1. Create `lib/auth/wallet-auth.ts` (45 min)
-2. Create `lib/hooks/useWalletAuth.ts` (30 min)
-3. Create `middleware.ts` and update 5 API routes (1-1.5 hours)
+### Priority 2: Local Testing (1 hour)
+1. Start dev server and verify homepage loads
+2. Test wallet connection (MetaMask/WalletConnect)
+3. Navigate to test market and verify data loads
+4. Test comment posting (with Supabase auth)
 
-### Phase 3: UI Components (5-7 hours)
-1. Comments System: 5 components (2-3 hours)
-2. Voting UIs: 3 components (1.5 hours)
-3. Market Pages: 2 pages (2-3 hours)
+### Priority 3: Add Smoke Tests (1 hour)
+1. API test: POST comment without auth → 401
+2. API test: POST comment with auth → 201
+3. E2E test: Wallet connection flow
 
-**See NEXT_STEPS.md for complete detailed breakdown**
+**See PROJECT_STATUS.md for complete details**
 
 ---
 
 ## 💡 TIPS & BEST PRACTICES
 
 ### For New Contributors
-1. Start by reading CURRENT_STATUS.md to understand what exists
-2. Check NEXT_STEPS.md to see what phase we're on
+1. Start by reading PROJECT_STATUS.md to understand what exists
+2. Check PROJECT_STATUS.md "Immediate Next Steps" to see priorities
 3. Don't assume something works - verify with tests
 4. Ask questions if documentation is unclear
 
 ### For AI Assistants (Claude)
-1. Always check CURRENT_STATUS.md before making claims
-2. Update NEXT_STEPS.md with timestamps after each task
-3. Don't skip phases - they have dependencies
-4. Provide evidence when claiming something is complete
-5. If files conflict, CURRENT_STATUS.md wins
+1. Always check PROJECT_STATUS.md before making claims
+2. Provide evidence when claiming something is complete (run tests, check files)
+3. Update PROJECT_STATUS.md after major changes
+4. If files conflict, PROJECT_STATUS.md wins
+5. Archive outdated docs instead of deleting them
 
 ### For Testing
 1. Test locally before claiming complete
@@ -446,21 +435,20 @@ npx playwright install
 **Check Progress**:
 ```bash
 # Current completion percentage
-cat CURRENT_STATUS.md | grep "Overall.*%"
+cat PROJECT_STATUS.md | grep "Overall.*%"
 
-# Current phase
-cat NEXT_STEPS.md | grep "CURRENT PHASE" -A 5
+# Current priorities
+cat PROJECT_STATUS.md | grep -A 20 "Immediate Next Steps"
 
-# Hours logged
-cat NEXT_STEPS.md | grep "Progress Tracker" -A 10
+# What's complete
+cat PROJECT_STATUS.md | grep -A 30 "What's Complete"
 ```
 
 **Update Progress**:
-1. Mark tasks complete in NEXT_STEPS.md with timestamps
-2. Log actual hours in Progress Tracker table
-3. Update phase percentage when phase complete
-4. Update CURRENT_STATUS.md completion percentage
-5. Commit changes with progress update
+1. Update PROJECT_STATUS.md after major milestones
+2. Provide evidence for completed items (test results, screenshots)
+3. Archive old status docs to docs/archive/
+4. Commit changes with descriptive messages
 
 ---
 
@@ -540,24 +528,25 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 **If documentation files conflict**:
 
-1. **CURRENT_STATUS.md** > CLAUDE.md > NEXT_STEPS.md > README.md
+1. **PROJECT_STATUS.md** > CLAUDE.md > README.md > archived docs
 2. Evidence-based claims > assumptions
-3. Latest timestamp wins if both evidence-based
-4. Ask user if genuinely unclear
+3. Code reality > documentation claims
+4. Latest verification timestamp wins
+5. Ask user if genuinely unclear
 
 **If code vs docs conflicts**:
 
 1. Run actual tests to verify reality
 2. Update docs to match verified reality
-3. Note the discrepancy for investigation
+3. Document the discrepancy and investigation findings
 
 ---
 
-**Last Verified**: 2025-11-09 19:25 CET
-**Next Update**: After Phase 1 complete
-**Verification Method**: Comprehensive codebase analysis, file inspection, test execution
+**Last Verified**: 2025-11-10
+**Last Updated**: 2025-11-10 (documentation cleanup)
+**Verification Method**: Comprehensive codebase analysis, file inspection, deployment verification
 
 ---
 
-*This file contains accurate, evidence-based guidance. All claims verified through direct inspection of code, test results, and file structure. If something seems wrong, verify with CURRENT_STATUS.md.*
+*This file contains accurate, evidence-based guidance. All claims verified through direct inspection of code, test results, and file structure. If something seems wrong, verify with PROJECT_STATUS.md.*
 - always use supabase cli instead human interaction, whenever is possible and helpful

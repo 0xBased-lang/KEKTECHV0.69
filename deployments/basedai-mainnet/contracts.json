@@ -1,16 +1,16 @@
 {
   "network": "basedai-mainnet",
   "chainId": 32323,
-  "deployedAt": "TBD",
+  "deployedAt": "2025-11-06T18:13:01.730Z",
   "contracts": {
-    "VersionedRegistry": "TBD",
-    "ParameterStorage": "TBD",
-    "AccessControlManager": "TBD",
-    "CurveRegistry": "TBD",
-    "MarketTemplateRegistry": "TBD",
-    "ResolutionManager": "TBD",
-    "RewardDistributor": "TBD",
-    "FlexibleMarketFactoryUnified": "TBD",
-    "PredictionMarket": "TBD"
+    "VersionedRegistry": "0x67F8F023f6cFAe44353d797D6e0B157F2579301A",
+    "ParameterStorage": "0x0FdcaCE9dEE78c70C92B243346cDf763A06fEdF8",
+    "AccessControlManager": "0x4d1afBb8E50e17F24dCbB4Fc3197537be646315A",
+    "CurveRegistry": "0x5AcC0f00c0675975a2c4A54aBcC7826Bd229Ca70",
+    "MarketTemplateRegistry": "0x420687494Dad8da9d058e9399cD401Deca17f6bd",
+    "ResolutionManager": "0x10daF33E321ED8977e369a36FcC6Beb3d3d106a0",
+    "RewardDistributor": "0x3D274362423847B53E43a27b9E835d668754C96B",
+    "FlexibleMarketFactoryUnified": "0x3eaF643482Fe35d13DB812946E14F5345eb60d62",
+    "PredictionMarket": "0x1064f1FCeE5aA859468559eB9dC9564F0ef20111"
   }
 }
