@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 
-// Lazy load FeaturedNFTs (Context7 Next.js 15 pattern)
+// Lazy load FeaturedNFTs (Next.js 15 App Router pattern)
 // This component makes API calls and renders many images - load it only when needed
 const FeaturedNFTs = dynamic(
   () => import('@/components/sections/FeaturedNFTs').then((mod) => ({ default: mod.FeaturedNFTs })),
@@ -34,7 +34,6 @@ const FeaturedNFTs = dynamic(
         </div>
       </section>
     ),
-    ssr: false, // Don't render on server (Context7 recommendation for heavy components)
   }
 )
 
