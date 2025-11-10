@@ -323,16 +323,61 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
             <p className="text-gray-400 mb-6">
               Choose when betting should close and resolution can begin
             </p>
-            <input
-              type="datetime-local"
-              value={formData.endTime > 0 ? new Date(formData.endTime * 1000).toISOString().slice(0, 16) : ''}
-              onChange={(e) => {
-                const timestamp = Math.floor(new Date(e.target.value).getTime() / 1000);
-                setFormData({ ...formData, endTime: timestamp });
-              }}
-              min={new Date(Date.now() + 3600000).toISOString().slice(0, 16)} // Min 1 hour from now
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd]"
-            />
+            {/* Separate date and time inputs for better stability */}
+            <div className="space-y-4">
+              {/* Date selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  value={formData.endTime > 0
+                    ? new Date(formData.endTime * 1000).toISOString().split('T')[0]
+                    : ''
+                  }
+                  onChange={(e) => {
+                    const currentDate = formData.endTime > 0
+                      ? new Date(formData.endTime * 1000)
+                      : new Date();
+                    const [year, month, day] = e.target.value.split('-').map(Number);
+                    currentDate.setFullYear(year, month - 1, day);
+                    setFormData({
+                      ...formData,
+                      endTime: Math.floor(currentDate.getTime() / 1000)
+                    });
+                  }}
+                  min={new Date(Date.now() + 3600000).toISOString().split('T')[0]}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd]"
+                />
+              </div>
+
+              {/* Time selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  End Time
+                </label>
+                <input
+                  type="time"
+                  value={formData.endTime > 0
+                    ? new Date(formData.endTime * 1000).toTimeString().slice(0, 5)
+                    : '12:00'
+                  }
+                  onChange={(e) => {
+                    const currentDate = formData.endTime > 0
+                      ? new Date(formData.endTime * 1000)
+                      : new Date();
+                    const [hours, minutes] = e.target.value.split(':').map(Number);
+                    currentDate.setHours(hours, minutes, 0, 0);
+                    setFormData({
+                      ...formData,
+                      endTime: Math.floor(currentDate.getTime() / 1000)
+                    });
+                  }}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd]"
+                />
+              </div>
+            </div>
             {errors.endTime && (
               <div className="mt-2">
                 <InlineError message={errors.endTime} />
