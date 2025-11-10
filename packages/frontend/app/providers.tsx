@@ -34,11 +34,13 @@ export function Providers({ children, initialState }: ProvidersProps) {
         // Initialize provider without conflicts
         initializeEthereumProvider()
 
-        // Wait for provider to be available
-        const hasProvider = await waitForProvider(1000)
+        // Wait for provider to be available (Context7 recommendation: 10s timeout)
+        const hasProvider = await waitForProvider(10000)
 
         if (!hasProvider) {
-          console.warn('No ethereum provider detected after 1 second')
+          console.warn('⚠️ No ethereum provider detected after 10 seconds')
+          console.warn('💡 Please install MetaMask or another Web3 wallet')
+          console.warn('📱 App will continue in read-only mode')
         }
 
         // Debug logging in development
@@ -107,7 +109,7 @@ export function Providers({ children, initialState }: ProvidersProps) {
   return (
     <WagmiProvider config={config} initialState={initialState} reconnectOnMount={true}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={kektechTheme}>
+        <RainbowKitProvider theme={kektechTheme} initialChain={32323}>
           <Toaster
             position="top-right"
             theme="dark"
