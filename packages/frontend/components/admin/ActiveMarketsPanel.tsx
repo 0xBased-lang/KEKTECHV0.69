@@ -42,10 +42,25 @@ export function ActiveMarketsPanel() {
   // Call hooks for ALL markets at top level (required by React rules)
   const marketInfos = markets.map((address) => useMarketInfo(address, true));
 
+  // DEBUG: Log market info
+  useEffect(() => {
+    console.log('[ActiveMarketsPanel] Total markets:', markets.length);
+    console.log('[ActiveMarketsPanel] Market states:', marketInfos.map((info, idx) => ({
+      address: markets[idx],
+      state: info?.state,
+      question: info?.question
+    })));
+  }, [markets, marketInfos]);
+
   // Filter for ACTIVE markets (state = 2) using the pre-fetched info
   const activeMarkets = markets.filter((_, index) => {
     return marketInfos[index]?.state === 2;
   });
+
+  // DEBUG: Log active markets count
+  useEffect(() => {
+    console.log('[ActiveMarketsPanel] Active markets (state=2):', activeMarkets.length);
+  }, [activeMarkets.length]);
 
   useEffect(() => {
     // Fetch metrics for all active markets
