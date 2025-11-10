@@ -4,7 +4,7 @@
  */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCreateMarket } from '@/lib/hooks/kektech';
 import { useWallet } from '@/lib/hooks/kektech';
 import { ButtonLoading } from '../ui/LoadingSpinner';
@@ -54,6 +54,7 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
   const { isConnected, connect, balance } = useWallet();
   const [currentStep, setCurrentStep] = useState<Step>('question');
   const [errors, setErrors] = useState<Partial<Record<keyof MarketFormData, string>>>({});
+  const endTimeSetRef = useRef(false); // Track if user has set timing
 
   const [formData, setFormData] = useState<MarketFormData>({
     question: '',
@@ -147,6 +148,13 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
       }
     }
 
+    // Ensure user actually set timing (not just relying on initial value)
+    if (!endTimeSetRef.current) {
+      setErrors({ endTime: 'Please select an end date and time' });
+      setCurrentStep('timing');
+      return;
+    }
+
     // Check balance
     const bondAmount = parseEther(formData.creatorBond);
     if (balance && bondAmount > balance) {
@@ -154,20 +162,30 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
       return;
     }
 
-    // Validate endTime is valid before creating config
-    if (!formData.endTime || formData.endTime === 0) {
-      setErrors({ endTime: 'Invalid end time - please select a date' });
+    // Defensive BigInt conversion with clear error handling
+    const safeEndTime = formData.endTime && formData.endTime > 0
+      ? BigInt(formData.endTime)
+      : null;
+
+    if (!safeEndTime) {
+      console.error('[CreateMarket] Invalid endTime at submission:', {
+        endTime: formData.endTime,
+        endTimeType: typeof formData.endTime,
+        endTimeSetRef: endTimeSetRef.current,
+        formData: formData,
+      });
+      setErrors({ endTime: 'Invalid end time value. Please select date and time again.' });
       setCurrentStep('timing');
       return;
     }
 
-    // Create market config
+    // Create market config with validated endTime
     const config = {
       question: formData.question,
       description: formData.description,
       category: formData.category,
-      endTime: BigInt(formData.endTime),
-      resolutionTime: BigInt(formData.endTime) + BigInt(3600), // 1 hour after end (safer BigInt arithmetic)
+      endTime: safeEndTime,
+      resolutionTime: safeEndTime + BigInt(3600), // 1 hour after end (safe arithmetic)
       minBond: bondAmount,
       curveId: 0n, // Default LMSR curve
       curveParams: [], // Default params
@@ -247,7 +265,7 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
             <input
               type="text"
               value={formData.question}
-              onChange={(e) => setFormData({ ...formData, question: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, question: e.target.value }))}
               placeholder="Will Bitcoin reach $100,000 by end of 2025?"
               className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd]"
               maxLength={200}
@@ -270,7 +288,7 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
             </p>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Describe the market, resolution criteria, and any relevant context..."
               rows={6}
               className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd] resize-none"
@@ -296,7 +314,7 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => setFormData({ ...formData, category: cat })}
+                  onClick={() => setFormData(prev => ({ ...prev, category: cat }))}
                   className={cn(
                     'px-4 py-3 rounded-lg font-medium transition',
                     formData.category === cat
@@ -346,6 +364,7 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
                         ...prev,
                         endTime: Math.floor(combined.getTime() / 1000)
                       }));
+                      endTimeSetRef.current = true; // Mark as user-set
                     }
                   }}
                   min={new Date(Date.now() + 3600000).toISOString().split('T')[0]}
@@ -374,6 +393,7 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
                         ...prev,
                         endTime: Math.floor(combined.getTime() / 1000)
                       }));
+                      endTimeSetRef.current = true; // Mark as user-set
                     }
                   }}
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd]"
@@ -407,7 +427,7 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
               <input
                 type="number"
                 value={formData.creatorBond}
-                onChange={(e) => setFormData({ ...formData, creatorBond: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, creatorBond: e.target.value }))}
                 step="0.1"
                 min="0.1"
                 className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd]"
