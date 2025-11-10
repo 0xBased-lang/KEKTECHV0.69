@@ -92,3 +92,24 @@ model UserActivity {
   @@index([marketAddress])
   @@index([timestamp])
 }
+
+// Indexed blockchain events (captured by Event Indexer backend)
+// Used for real-time event processing and historical data
+model IndexedEvent {
+  id              String   @id @default(uuid())
+  eventType       String   // MarketCreated, BetPlaced, BetResolved, MarketResolved, etc.
+  marketAddress   String?  // Market contract address (null for factory events)
+  blockNumber     BigInt   // Block where event occurred
+  transactionHash String   // Transaction hash
+  logIndex        Int      // Log index within transaction (for uniqueness)
+  eventData       Json     // Full event data (question, outcomes, bettor, amounts, etc.)
+  processed       Boolean  @default(false) // Whether this event has been processed
+  timestamp       DateTime @default(now()) // When event was indexed
+
+  @@unique([transactionHash, logIndex]) // Ensure no duplicate events
+  @@index([marketAddress])
+  @@index([blockNumber])
+  @@index([eventType])
+  @@index([processed])
+  @@index([timestamp])
+}
