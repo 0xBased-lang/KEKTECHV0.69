@@ -342,10 +342,10 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
 
                     if (dateStr) {
                       const combined = new Date(`${dateStr}T${timeStr}`);
-                      setFormData({
-                        ...formData,
+                      setFormData(prev => ({
+                        ...prev,
                         endTime: Math.floor(combined.getTime() / 1000)
-                      });
+                      }));
                     }
                   }}
                   min={new Date(Date.now() + 3600000).toISOString().split('T')[0]}
@@ -370,10 +370,10 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
 
                     if (dateStr && timeStr) {
                       const combined = new Date(`${dateStr}T${timeStr}`);
-                      setFormData({
-                        ...formData,
+                      setFormData(prev => ({
+                        ...prev,
                         endTime: Math.floor(combined.getTime() / 1000)
-                      });
+                      }));
                     }
                   }}
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd]"
