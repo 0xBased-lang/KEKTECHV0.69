@@ -10,25 +10,25 @@ import { LoadingSpinner } from '@/components/kektech/ui/LoadingSpinner';
 import { EmptyState } from '@/components/EmptyState';
 import { MarketState } from '@/lib/contracts/types';
 import { Sparkles, TrendingUp } from 'lucide-react';
+import { Address } from 'viem';
+
+/**
+ * Wrapper component for each market that calls hooks safely
+ * This pattern avoids React Hooks violations when filtering dynamic lists
+ */
+function ProposalCardWrapper({ address }: { address: Address }) {
+  const marketInfo = useMarketInfo(address, true);
+
+  // Only render if market is in PROPOSED state
+  if (marketInfo?.state !== MarketState.PROPOSED) {
+    return null;
+  }
+
+  return <ProposalCard marketAddress={address} />;
+}
 
 export default function ProposalsPage() {
   const { markets, isLoading, marketCount } = useMarketList(true);
-
-  // Call hooks for all markets at top level (required by React rules)
-  const marketInfos = markets.map((address) => useMarketInfo(address, true));
-
-  // Filter for PROPOSED markets (state = 0)
-  const proposedMarkets = markets.filter((_, index) => {
-    return marketInfos[index]?.state === MarketState.PROPOSED;
-  });
-
-  // DEBUG: Log proposals
-  console.log('[ProposalsPage] Total markets:', markets.length);
-  console.log('[ProposalsPage] Proposed markets:', proposedMarkets.length);
-  console.log('[ProposalsPage] Market states:', marketInfos.map((info, idx) => ({
-    address: markets[idx],
-    state: info?.state
-  })));
 
   if (isLoading) {
     return (
@@ -57,10 +57,6 @@ export default function ProposalsPage() {
             <span className="font-semibold text-white">{marketCount}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-gray-400">Proposed:</span>
-            <span className="font-semibold text-[#3fb8bd]">{proposedMarkets.length}</span>
-          </div>
-          <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-green-400" />
             <span className="text-gray-400">Need 10+ upvotes to activate</span>
           </div>
@@ -68,15 +64,15 @@ export default function ProposalsPage() {
       </div>
 
       {/* Proposals Grid */}
-      {proposedMarkets.length === 0 ? (
-        <EmptyState message="No market proposals yet. Be the first to create one!" />
-      ) : (
-        <div className="grid gap-4">
-          {proposedMarkets.map((address) => (
-            <ProposalCard key={address} marketAddress={address} />
-          ))}
-        </div>
-      )}
+      <div className="grid gap-4">
+        {markets.length === 0 ? (
+          <EmptyState message="No market proposals yet. Be the first to create one!" />
+        ) : (
+          markets.map((address) => (
+            <ProposalCardWrapper key={address} address={address} />
+          ))
+        )}
+      </div>
 
       {/* Info Section */}
       <div className="mt-12 p-6 bg-gray-900 rounded-xl border border-gray-800">
