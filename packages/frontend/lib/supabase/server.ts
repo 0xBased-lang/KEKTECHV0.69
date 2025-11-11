@@ -25,7 +25,7 @@ import type { Database } from './types'
  * import { createClient } from '@/lib/supabase/server'
  *
  * export async function GET(request: Request) {
- *   const supabase = createClient()
+ *   const supabase = await createClient()
  *   const { data: { user }, error } = await supabase.auth.getUser()
  *   // ...
  * }
@@ -33,7 +33,7 @@ import type { Database } from './types'
  *
  * @returns Typed Supabase client instance
  */
-export function createClient() {
+export async function createClient() {
   // Validate environment variables
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -45,7 +45,8 @@ export function createClient() {
     )
   }
 
-  const cookieStore = cookies()
+  // ✅ FIXED: Await cookies() for Next.js 15 compatibility
+  const cookieStore = await cookies()
 
   return createServerClient<Database>(
     supabaseUrl,

@@ -28,7 +28,7 @@ export async function GET(
     const dislikes = votes.filter((v) => v.vote === 'dislike').length;
 
     // Get user's vote if authenticated (optional)
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     const walletAddress = user?.user_metadata?.wallet_address || user?.email?.split('@')[0];
 
