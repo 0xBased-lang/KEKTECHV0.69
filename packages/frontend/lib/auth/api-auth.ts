@@ -29,7 +29,7 @@ export async function verifyAuth(): Promise<{
   error?: NextResponse
 }> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
