@@ -1,85 +1,83 @@
 /**
  * KEKTECH 3.0 - Wallet Helper Utilities
  * Helper functions for wallet connection and Web3 interactions in E2E tests
+ *
+ * ✅ UPDATED: Now uses programmatic authentication via Viem + Supabase
  */
 
 import { Page, expect } from '@playwright/test';
+import type { WalletClient } from 'viem';
+import { AuthHelper, authenticatePageWithWallet } from './auth-helper';
+import { createTestWallet, createAdminWallet, getWalletAddress } from './wallet-client';
 
 export class WalletHelper {
-  constructor(private page: Page) {}
+  private page: Page;
+  private walletClient?: WalletClient;
+  private authHelper: AuthHelper;
 
-  /**
-   * Connect wallet via UI (not actual MetaMask - tests UI flow only)
-   * For full MetaMask testing, use persistent browser context with extension
-   */
-  async connectWallet() {
-    // Look for "Connect Wallet" button
-    const connectButton = this.page.getByRole('button', { name: /connect wallet/i });
-
-    if (await connectButton.isVisible()) {
-      await connectButton.click();
-
-      // Wait for wallet selector modal
-      await this.page.waitForSelector('[data-testid="wallet-modal"]', { timeout: 5000 }).catch(() => {
-        console.log('Wallet modal not found - might already be connected');
-      });
-
-      // Click MetaMask option
-      await this.page.click('button:has-text("MetaMask")');
-
-      // Wait for connection success
-      await expect(this.page.locator('text=/0x[a-fA-F0-9]{4}\\.\\.\\.[a-fA-F0-9]{4}/')).toBeVisible({ timeout: 10000 });
-
-      console.log('✅ Wallet connected successfully');
-      return true;
-    }
-
-    console.log('✅ Wallet already connected');
-    return false;
+  constructor(page: Page) {
+    this.page = page;
+    this.authHelper = new AuthHelper();
   }
 
   /**
-   * Disconnect wallet
+   * ✅ NEW: Connect wallet programmatically (no UI interaction)
+   * Uses Viem wallet client + Supabase authentication
+   *
+   * @param walletType - 'test' for regular user, 'admin' for admin wallet
+   * @returns Wallet address
+   */
+  async connectWallet(walletType: 'test' | 'admin' = 'test'): Promise<string> {
+    // 1. Create wallet client from private key
+    this.walletClient = walletType === 'admin' ? createAdminWallet() : createTestWallet();
+
+    // 2. Authenticate and inject session
+    const sessionData = await authenticatePageWithWallet(this.page, this.walletClient);
+
+    const address = sessionData.walletAddress;
+    console.log(`✅ Wallet connected programmatically: ${address}`);
+
+    return address;
+  }
+
+  /**
+   * Get the wallet client instance
+   * @returns Viem wallet client
+   */
+  getWalletClient(): WalletClient | undefined {
+    return this.walletClient;
+  }
+
+  /**
+   * ✅ UPDATED: Disconnect wallet programmatically
+   * Clears Supabase session
    */
   async disconnectWallet() {
-    const walletButton = this.page.locator('button:has-text("0x")');
+    await this.authHelper.clearAuthSession(this.page);
+    this.walletClient = undefined;
 
-    if (await walletButton.isVisible()) {
-      await walletButton.click();
-
-      // Click disconnect in dropdown
-      await this.page.click('button:has-text("Disconnect")');
-
-      await expect(this.page.getByRole('button', { name: /connect wallet/i })).toBeVisible({ timeout: 5000 });
-
-      console.log('✅ Wallet disconnected');
-      return true;
-    }
-
-    return false;
+    console.log('✅ Wallet disconnected programmatically');
+    await this.page.reload(); // Reload to apply disconnection
+    return true;
   }
 
   /**
-   * Get currently connected wallet address from UI
+   * ✅ UPDATED: Get currently connected wallet address
+   * Uses wallet client instead of parsing UI
    */
   async getConnectedAddress(): Promise<string | null> {
-    const addressRegex = /0x[a-fA-F0-9]{4}\.\.\.[a-fA-F0-9]{4}/;
-    const addressElement = this.page.locator(`text=${addressRegex}`);
-
-    if (await addressElement.isVisible()) {
-      const text = await addressElement.textContent();
-      return text?.match(/0x[a-fA-F0-9]{4}/) ? text : null;
+    if (!this.walletClient?.account) {
+      return null;
     }
 
-    return null;
+    return getWalletAddress(this.walletClient);
   }
 
   /**
-   * Check if wallet is connected
+   * ✅ UPDATED: Check if wallet is connected programmatically
    */
   async isConnected(): Promise<boolean> {
-    const address = await this.getConnectedAddress();
-    return address !== null;
+    return this.walletClient !== undefined && this.walletClient.account !== undefined;
   }
 
   /**
