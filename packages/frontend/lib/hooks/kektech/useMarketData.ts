@@ -11,98 +11,83 @@ import type { Address } from 'viem';
 import type { MarketState, Outcome, Position } from '@/lib/contracts/types';
 
 /**
+ * Type definition for MarketInfo struct returned from contract
+ */
+type MarketInfoStruct = {
+  question: string;
+  outcome1Name: string;
+  outcome2Name: string;
+  creator: Address;
+  createdAt: bigint;
+  resolutionTime: bigint;
+  result: Outcome;
+  totalBets: bigint;
+  totalVolume: bigint;
+  isResolved: boolean;
+};
+
+/**
  * Get market information
+ *
+ * BULLETPROOF VERSION: Uses actual contract functions
+ * - getMarketInfo() → Returns struct with all market data
+ * - getMarketState() → Returns current state
+ *
+ * This replaces 12+ individual calls with just 2 calls!
+ * Reduces RPC calls by 83% and eliminates "function not found" errors.
  */
 export function useMarketInfo(marketAddress: Address, watch = false) {
-  const { data: question, isLoading: questionLoading, isError: questionError } = usePredictionMarketRead<string>({
+  // Call 1: Get market info struct (contains question, outcomes, creator, etc.)
+  const {
+    data: marketInfo,
+    isLoading: infoLoading,
+    isError: infoError
+  } = usePredictionMarketRead<MarketInfoStruct>({
     marketAddress,
-    functionName: 'question',
+    functionName: 'getMarketInfo',
     watch,
   });
 
-  const { data: description } = usePredictionMarketRead<string>({
+  // Call 2: Get current market state
+  const {
+    data: state,
+    isLoading: stateLoading,
+    isError: stateError
+  } = usePredictionMarketRead<MarketState>({
     marketAddress,
-    functionName: 'description',
+    functionName: 'getMarketState',
     watch,
   });
 
-  const { data: category } = usePredictionMarketRead<string>({
-    marketAddress,
-    functionName: 'category',
-    watch,
-  });
-
-  const { data: state, isLoading: stateLoading, isError: stateError } = usePredictionMarketRead<MarketState>({
-    marketAddress,
-    functionName: 'state',
-    watch,
-  });
-
-  const { data: outcome } = usePredictionMarketRead<Outcome>({
-    marketAddress,
-    functionName: 'outcome',
-    watch,
-  });
-
-  const { data: creator } = usePredictionMarketRead<Address>({
-    marketAddress,
-    functionName: 'creator',
-    watch,
-  });
-
-  const { data: endTime } = usePredictionMarketRead<bigint>({
-    marketAddress,
-    functionName: 'endTime',
-    watch,
-  });
-
-  const { data: resolutionTime } = usePredictionMarketRead<bigint>({
-    marketAddress,
-    functionName: 'resolutionTime',
-    watch,
-  });
-
-  const { data: totalYesShares } = usePredictionMarketRead<bigint>({
-    marketAddress,
-    functionName: 'totalYesShares',
-    watch,
-  });
-
-  const { data: totalNoShares } = usePredictionMarketRead<bigint>({
-    marketAddress,
-    functionName: 'totalNoShares',
-    watch,
-  });
-
-  const { data: totalVolume } = usePredictionMarketRead<bigint>({
-    marketAddress,
-    functionName: 'totalVolume',
-    watch,
-  });
-
-  const { data: createdAt } = usePredictionMarketRead<bigint>({
-    marketAddress,
-    functionName: 'createdAt',
-    watch,
-  });
-
-  // Better loading logic: Check critical fields and their loading states
-  const isLoading = (questionLoading || stateLoading) && !question && state === undefined;
-  const hasError = (questionError || stateError) && !questionLoading && !stateLoading;
+  // Smart loading logic: Both calls must complete
+  const isLoading = infoLoading || stateLoading;
+  const hasError = (infoError || stateError) && !isLoading;
 
   return {
-    question: question || (hasError ? 'Error loading market' : undefined),
-    description: description || '',
-    category,
+    // Core market data from struct
+    question: marketInfo?.question || (hasError ? 'Error loading market' : undefined),
+    outcome1Name: marketInfo?.outcome1Name || 'YES',
+    outcome2Name: marketInfo?.outcome2Name || 'NO',
+    creator: marketInfo?.creator,
+    createdAt: marketInfo?.createdAt,
+    resolutionTime: marketInfo?.resolutionTime,
+    result: marketInfo?.result,
+    totalBets: marketInfo?.totalBets,
+    totalVolume: marketInfo?.totalVolume,
+    isResolved: marketInfo?.isResolved || false,
+
+    // Current state from separate call
     state: state ?? 0, // Default to PROPOSED if undefined
-    outcome,
-    creator,
-    endTime,
-    resolutionTime,
-    totalYesShares,
-    totalNoShares,
-    totalVolume,
-    createdAt,
+
+    // Removed fields that don't exist in contract:
+    // - description (never existed)
+    // - category (never existed)
+    // - endTime (use resolutionTime instead)
+    // - totalYesShares (use getOdds() hook instead)
+    // - totalNoShares (use getOdds() hook instead)
+    // - outcome (use result instead)
+
+    // Loading/error state
     isLoading,
     hasError,
   };

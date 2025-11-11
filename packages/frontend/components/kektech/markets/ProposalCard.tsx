@@ -158,10 +158,12 @@ export function ProposalCard({ marketAddress, compact = false }: ProposalCardPro
               {market.question}
             </h3>
           </Link>
-          {!compact && market.description && (
-            <p className="text-sm text-gray-400 line-clamp-2 mb-2">
-              {truncate(market.description, 150)}
-            </p>
+          {!compact && (
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm text-green-400">{market.outcome1Name}</span>
+              <span className="text-sm text-gray-500">vs</span>
+              <span className="text-sm text-red-400">{market.outcome2Name}</span>
+            </div>
           )}
           <p className="text-xs text-gray-500">
             by {truncate(market.creator || '', 10, 6)}
