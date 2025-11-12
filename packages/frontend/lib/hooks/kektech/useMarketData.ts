@@ -93,8 +93,8 @@ export function useMarketInfo(marketAddress: Address, watch = false) {
     totalVolume: marketInfo?.totalVolume || fallbackData?.totalVolume,
     isResolved: marketInfo?.isResolved || fallbackData?.isResolved || false,
 
-    // Current state from separate call (default to ACTIVE for fallback)
-    state: state ?? (useFallback ? 2 : 0), // Default to ACTIVE(2) if using fallback, PROPOSED(0) otherwise
+    // 🎯 FIX: Current state from separate call (never default to ACTIVE - safer to show "Unknown")
+    state: state, // undefined if unavailable - UI will show loading/warning instead of misleading "Active" state
 
     // Removed fields that don't exist in contract:
     // - description (never existed)
@@ -203,7 +203,8 @@ export function useMarketAddress(marketId: bigint) {
 }
 
 /**
- * Get price for buying shares
+ * Get estimated shares for buying with ETH amount
+ * Uses contract's estimateShares(ethAmount, outcome) function
  */
 export function useBuyPrice(
   marketAddress: Address,
@@ -213,8 +214,8 @@ export function useBuyPrice(
 ) {
   const { data: price, isLoading, refetch } = usePredictionMarketRead<bigint>({
     marketAddress,
-    functionName: 'getBuyPrice',
-    args: [outcome, amount],
+    functionName: 'estimateShares',
+    args: [amount, outcome], // Note: ethAmount first, outcome second
     enabled: enabled && amount > 0n,
   });
 

@@ -12,8 +12,17 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 
-// Environment variable for WebSocket URL
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3180/ws';
+// Environment variable for WebSocket URL with fallback logic
+const getWebSocketUrl = () => {
+  // In production, try the secure WebSocket first
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    return process.env.NEXT_PUBLIC_WS_URL || 'wss://ws.kektech.xyz/ws';
+  }
+  // In development, use local WebSocket
+  return process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3180/ws';
+};
+
+const WS_URL = getWebSocketUrl();
 
 export interface MarketEvent {
   type: 'MarketCreated' | 'BetPlaced' | 'MarketResolved' | string;
@@ -81,8 +90,8 @@ export function useKektechWebSocket(
     marketAddress,
     subscribeToAll = false,
     autoReconnect = true,
-    maxReconnectAttempts = 5,
-    reconnectDelay: initialReconnectDelay = 1000,
+    maxReconnectAttempts = 10, // Increased from 5 to 10
+    reconnectDelay: initialReconnectDelay = 2000, // Increased from 1000 to 2000
     debug = false,
   } = options;
 
@@ -216,7 +225,12 @@ export function useKektechWebSocket(
 
       ws.onerror = (event) => {
         console.error('[WebSocket Error Event]', event);
-        setError('Connection error');
+        // More specific error messages based on the failure
+        if (!navigator.onLine) {
+          setError('No internet connection');
+        } else {
+          setError(`WebSocket connection failed (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`);
+        }
       };
 
       ws.onclose = (event) => {
@@ -224,11 +238,23 @@ export function useKektechWebSocket(
         setConnected(false);
         clearHeartbeat();
 
+        // More descriptive close reasons
+        let closeReason = 'Connection closed';
+        if (event.code === 1006) {
+          closeReason = 'Connection lost unexpectedly';
+        } else if (event.code === 1000) {
+          closeReason = 'Normal closure';
+        } else if (event.code === 1001) {
+          closeReason = 'Server going away';
+        }
+
         // Auto-reconnect logic
         if (autoReconnect && reconnectAttempts < maxReconnectAttempts) {
           clearReconnectTimeout();
           const delay = reconnectDelayRef.current;
-          log(`Reconnecting in ${delay}ms... (attempt ${reconnectAttempts + 1}/${maxReconnectAttempts})`);
+          const nextAttempt = reconnectAttempts + 1;
+          setError(`${closeReason}. Reconnecting... (${nextAttempt}/${maxReconnectAttempts})`);
+          log(`Reconnecting in ${delay}ms... (attempt ${nextAttempt}/${maxReconnectAttempts})`);
 
           reconnectTimeoutRef.current = setTimeout(() => {
             setReconnectAttempts((prev) => prev + 1);
@@ -236,7 +262,7 @@ export function useKektechWebSocket(
             connect();
           }, delay);
         } else if (reconnectAttempts >= maxReconnectAttempts) {
-          setError('Max reconnection attempts reached');
+          setError(`Connection failed after ${maxReconnectAttempts} attempts. Please refresh the page.`);
           log('Max reconnection attempts reached');
         }
       };

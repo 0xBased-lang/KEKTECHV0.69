@@ -2,6 +2,52 @@
 
 Event Indexer and WebSocket Server for BasedAI blockchain integration.
 
+## 🚀 Quick Start
+
+### Local Development
+```bash
+# Install dependencies
+npm install
+
+# Copy and configure environment
+cp .env.example .env
+# Edit .env with your Supabase credentials
+
+# Start services
+npm run dev:indexer  # Event indexer (blockchain → database)
+npm run dev:ws       # WebSocket server (real-time updates)
+```
+
+### VPS Production
+```bash
+# Access VPS
+ssh kek
+
+# Navigate to backend
+cd /var/www/kektech/backend
+
+# Pull latest changes
+git pull origin main
+
+# Install & build
+npm install && npm run build
+
+# Manage services
+pm2 status           # Check services
+pm2 logs             # View logs
+pm2 restart all      # Restart services
+pm2 monit            # Interactive dashboard
+```
+
+### Git Workflow
+```
+Local Changes → Push to main → SSH to VPS → Pull & Restart
+```
+
+**⚠️ Critical**: Local backend is for development only. Production runs on VPS at `/var/www/kektech/backend/`
+
+---
+
 ## Overview
 
 This backend service indexes blockchain events from the BasedAI mainnet and provides real-time updates to the frontend via WebSocket.

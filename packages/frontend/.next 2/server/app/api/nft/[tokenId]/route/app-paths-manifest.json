@@ -1,0 +1,3 @@
+{
+  "/api/nft/[tokenId]/route": "app-edge-has-no-entrypoint"
+}

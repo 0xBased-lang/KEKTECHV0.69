@@ -33,6 +33,120 @@
 
 ---
 
+## 🖥️ BACKEND INFRASTRUCTURE
+
+**Location**: `packages/backend/` (Monorepo) | `/var/www/kektech/backend/` (VPS Production)
+**Status**: ✅ Deployed and operational on VPS
+**Access**: `ssh kek` → `/var/www/kektech/backend/`
+**Repository**: Consolidated in main monorepo (single git repository)
+
+### Architecture Flow
+```
+BasedAI Blockchain → Event Indexer → Supabase PostgreSQL
+                     (VPS: PM2)       (Cloud Database)
+                          ↓
+                     Redis Pub/Sub
+                       (VPS)
+                          ↓
+                 WebSocket Server → Frontend Clients
+                   (VPS:3180)
+```
+
+### Services (PM2 Managed on VPS)
+
+| Service | Purpose | Status | Memory |
+|---------|---------|--------|--------|
+| `kektech-event-indexer` | Polls BasedAI blockchain, indexes events to Supabase | ✅ Running | 500M |
+| `kektech-websocket-server` | Broadcasts real-time updates via WebSocket | ✅ Running | 300M |
+
+### VPS Deployment Workflow
+
+```bash
+# Deploy/update backend on VPS
+ssh kek
+cd /var/www/kektech/backend
+
+# Pull latest changes from monorepo
+git pull origin main
+
+# Install dependencies and build
+npm install
+npm run build
+
+# Restart PM2 services
+pm2 restart all
+
+# Monitor services
+pm2 status              # Check service status
+pm2 logs                # View real-time logs
+pm2 logs --lines 100    # View last 100 lines
+```
+
+### Key Components
+
+**Services** (`packages/backend/services/`):
+- `event-indexer/index.ts` - Polls BasedAI mainnet every 10s, batch processes 100 blocks
+- `websocket-server/index.ts` - Real-time event broadcasting on port 3180
+
+**Shared Utilities** (`packages/backend/shared/`):
+- `config/contracts.ts` - Contract addresses & ethers.js providers
+- `utils/supabase.ts` - Database client (service role key)
+- `utils/redis.ts` - Pub/sub messaging for real-time events
+- `utils/logger.ts` - Winston logging to files
+- `abis/` - MarketFactory & PredictionMarket ABIs
+
+**Configuration**:
+- `ecosystem.config.js` - PM2 process management config
+- `.env` - VPS production credentials (NOT in git, lives on VPS only)
+- `tsconfig.json` - TypeScript compilation settings
+
+### Database Tables Written
+
+| Table | Purpose | Written By |
+|-------|---------|------------|
+| `IndexedEvent` | Raw blockchain events | Event Indexer |
+| `MarketMetadata` | Market state snapshots | Event Indexer |
+
+### Critical Notes
+
+⚠️ **Local vs VPS**:
+- Local `packages/backend/` - Development and testing only
+- VPS `/var/www/kektech/backend/` - Production deployment
+- Changes: Local → Git push → SSH to VPS → Pull & restart
+
+⚠️ **Environment Variables**:
+- `.env.example` in git (template only)
+- `.env` on VPS only (contains production secrets)
+- Never commit production `.env` to git
+
+⚠️ **Service Management**:
+- Services run via PM2 (process manager)
+- Auto-restart on crash (max 10 retries)
+- Logs: `/var/www/kektech/backend/logs/`
+
+### Quick Commands
+
+```bash
+# VPS Access
+ssh kek                          # Connect to VPS
+
+# Service Management
+pm2 status                       # View all services
+pm2 restart kektech-event-indexer
+pm2 restart kektech-websocket-server
+pm2 restart all                  # Restart both services
+
+# Logs
+pm2 logs                         # Real-time logs (all services)
+pm2 logs kektech-event-indexer  # Specific service logs
+pm2 flush                        # Clear log files
+
+# Monitoring
+pm2 monit                        # Interactive monitoring dashboard
+```
+
+---
+
 ## 📁 DOCUMENTATION STRUCTURE
 
 ### Primary Documents (Source of Truth)
@@ -92,6 +206,17 @@ kektechV0.69/
 │   │   │       ├── deployment.json   # Contract addresses
 │   │   │       └── ...
 │   │   └── scripts/                  # Deployment scripts
+│   │
+│   ├── backend/                       # Backend Services (VPS Deployment)
+│   │   ├── services/
+│   │   │   ├── event-indexer/        # ✅ Blockchain event indexing
+│   │   │   └── websocket-server/     # ✅ Real-time WebSocket updates
+│   │   ├── shared/
+│   │   │   ├── abis/                 # Contract ABIs
+│   │   │   ├── config/               # Contract addresses
+│   │   │   └── utils/                # Supabase, Redis, Logger
+│   │   ├── ecosystem.config.js       # PM2 production config
+│   │   └── .env.example              # Environment template
 │   │
 │   └── frontend/                      # Next.js 15 App
 │       ├── app/                       # App Router

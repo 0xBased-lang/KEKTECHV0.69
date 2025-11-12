@@ -55,8 +55,8 @@ export function Header() {
   }, [mobileMenuOpen])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#3fb8bd]/20 bg-[#000000] backdrop-blur-sm">
-      <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-terminal bg-terminal backdrop-blur-sm">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo - Left Side */}
         <Link href="/" className="flex items-center hover:opacity-80 transition py-1">
           <Image
@@ -76,7 +76,7 @@ export function Header() {
           <Link
             href="/feels-good-markets"
             className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
-              pathname?.startsWith('/feels-good-markets') ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
+              pathname?.startsWith('/feels-good-markets') ? 'text-[#3fb8bd] font-bold' : 'text-terminal-secondary'
             }`}
           >
             Feels Good Markets
@@ -84,15 +84,31 @@ export function Header() {
           <Link
             href="/proposals"
             className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
-              pathname === '/proposals' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
+              pathname === '/proposals' ? 'text-[#3fb8bd] font-bold' : 'text-terminal-secondary'
             }`}
           >
             💡 Proposals
           </Link>
           <Link
+            href="/markets"
+            className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
+              pathname?.startsWith('/market') ? 'text-[#3fb8bd] font-bold' : 'text-terminal-secondary'
+            }`}
+          >
+            Markets
+          </Link>
+          <Link
+            href="/feed"
+            className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
+              pathname === '/feed' ? 'text-[#3fb8bd] font-bold' : 'text-terminal-secondary'
+            }`}
+          >
+            Feed
+          </Link>
+          <Link
             href="/dashboard"
             className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
-              pathname === '/dashboard' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
+              pathname === '/dashboard' ? 'text-[#3fb8bd] font-bold' : 'text-terminal-secondary'
             }`}
           >
             Dashboard
@@ -100,7 +116,7 @@ export function Header() {
           <Link
             href="/gallery"
             className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
-              pathname === '/gallery' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
+              pathname === '/gallery' ? 'text-[#3fb8bd] font-bold' : 'text-terminal-secondary'
             }`}
           >
             Gallery
@@ -108,7 +124,7 @@ export function Header() {
           <Link
             href="/staking"
             className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
-              pathname === '/staking' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
+              pathname === '/staking' ? 'text-[#3fb8bd] font-bold' : 'text-terminal-secondary'
             }`}
           >
             Staking
@@ -116,7 +132,7 @@ export function Header() {
           <Link
             href="/about"
             className={`font-fredoka text-sm font-medium transition-colors hover:text-[#3fb8bd] ${
-              pathname === '/about' ? 'text-[#3fb8bd] font-bold' : 'text-gray-300'
+              pathname === '/about' ? 'text-[#3fb8bd] font-bold' : 'text-terminal-secondary'
             }`}
           >
             About Us
@@ -221,7 +237,7 @@ export function Header() {
             className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
               pathname?.startsWith('/feels-good-markets')
                 ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
-                : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
+                : 'text-terminal-secondary hover:bg-terminal-elevated hover:text-[#3fb8bd]'
             }`}
           >
             Feels Good Markets
@@ -232,10 +248,32 @@ export function Header() {
             className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
               pathname === '/proposals'
                 ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
-                : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
+                : 'text-terminal-secondary hover:bg-terminal-elevated hover:text-[#3fb8bd]'
             }`}
           >
             💡 Proposals
+          </Link>
+          <Link
+            href="/markets"
+            onClick={closeMobileMenu}
+            className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
+              pathname?.startsWith('/market')
+                ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
+                : 'text-terminal-secondary hover:bg-terminal-elevated hover:text-[#3fb8bd]'
+            }`}
+          >
+            Markets
+          </Link>
+          <Link
+            href="/feed"
+            onClick={closeMobileMenu}
+            className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
+              pathname === '/feed'
+                ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
+                : 'text-terminal-secondary hover:bg-terminal-elevated hover:text-[#3fb8bd]'
+            }`}
+          >
+            Feed
           </Link>
           <Link
             href="/dashboard"
@@ -243,7 +281,7 @@ export function Header() {
             className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
               pathname === '/dashboard'
                 ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
-                : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
+                : 'text-terminal-secondary hover:bg-terminal-elevated hover:text-[#3fb8bd]'
             }`}
           >
             Dashboard
@@ -254,7 +292,7 @@ export function Header() {
             className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
               pathname === '/gallery'
                 ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
-                : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
+                : 'text-terminal-secondary hover:bg-terminal-elevated hover:text-[#3fb8bd]'
             }`}
           >
             Gallery
@@ -265,7 +303,7 @@ export function Header() {
             className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
               pathname === '/staking'
                 ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
-                : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
+                : 'text-terminal-secondary hover:bg-terminal-elevated hover:text-[#3fb8bd]'
             }`}
           >
             Staking
@@ -276,7 +314,7 @@ export function Header() {
             className={`font-fredoka text-lg font-medium py-4 px-5 rounded-lg transition-colors touch-manipulation ${
               pathname === '/about'
                 ? 'bg-[#3fb8bd]/20 text-[#3fb8bd] font-bold'
-                : 'text-gray-300 hover:bg-gray-900/60 hover:text-[#3fb8bd]'
+                : 'text-terminal-secondary hover:bg-terminal-elevated hover:text-[#3fb8bd]'
             }`}
           >
             About Us

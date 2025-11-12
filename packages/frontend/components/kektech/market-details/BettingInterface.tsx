@@ -5,14 +5,24 @@
 'use client';
 
 import { useState } from 'react';
-import { usePlaceBet, useBuyPrice } from '@/lib/hooks/kektech';
+import { usePlaceBet, useBuyPrice, useMarketInfo } from '@/lib/hooks/kektech';
 import { useWallet } from '@/lib/hooks/kektech';
 import { Outcome } from '@/lib/contracts/types';
 import { ButtonLoading } from '../ui/LoadingSpinner';
 import { TransactionError, InlineError } from '../ui/ErrorDisplay';
 import { parseEther, formatEther } from 'viem';
 import type { Address } from 'viem';
-import { TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, AlertTriangle } from 'lucide-react';
+
+// Market state names for user-friendly messages
+const STATE_NAMES: Record<number, string> = {
+  0: 'Proposed (Awaiting Approval)',
+  1: 'Approved (Pending Activation)',
+  2: 'Active',
+  3: 'Resolving',
+  4: 'Disputed',
+  5: 'Finalized',
+};
 
 interface BettingInterfaceProps {
   marketAddress: Address;
@@ -32,9 +42,20 @@ export function BettingInterface({ marketAddress, onSuccess }: BettingInterfaceP
   const { price: yesPrice } = useBuyPrice(marketAddress, Outcome.YES, parseEther(amount || '0'));
   const { price: noPrice } = useBuyPrice(marketAddress, Outcome.NO, parseEther(amount || '0'));
 
+  // 🎯 FIX: Get market state to validate before allowing bets
+  const market = useMarketInfo(marketAddress);
+  const marketState = market.state;
+
   const handleBet = async () => {
     try {
       setError('');
+
+      // 🎯 FIX: Validate market is in ACTIVE(2) state
+      if (marketState !== 2) {
+        const stateName = marketState !== undefined ? STATE_NAMES[marketState] : 'Unknown';
+        setError(`Cannot bet: Market is "${stateName}". Only Active markets accept bets.`);
+        return;
+      }
 
       // Validate amount
       if (!amount || Number(amount) <= 0) {
@@ -82,6 +103,25 @@ export function BettingInterface({ marketAddress, onSuccess }: BettingInterfaceP
   return (
     <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
       <h3 className="text-xl font-bold text-white mb-6">Place Your Bet</h3>
+
+      {/* 🎯 FIX: Show warning if market is not ACTIVE */}
+      {marketState !== undefined && marketState !== 2 && (
+        <div className="mb-4 p-4 bg-yellow-500/10 border border-yellow-500/50 rounded-xl flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-yellow-400 font-semibold mb-1">
+              Market Status: {STATE_NAMES[marketState]}
+            </p>
+            <p className="text-yellow-300/80 text-sm">
+              {marketState === 0 && 'This market is awaiting admin approval. Betting will open once activated.'}
+              {marketState === 1 && 'This market is approved. An admin will activate betting soon.'}
+              {marketState === 3 && 'This market is resolving. Betting is closed, outcome will be determined shortly.'}
+              {marketState === 4 && 'This market is disputed. Admin review in progress.'}
+              {marketState === 5 && 'This market is finalized. Betting is closed, winners can claim their rewards.'}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Outcome selector */}
       <div className="grid grid-cols-2 gap-4 mb-6">
@@ -145,9 +185,11 @@ export function BettingInterface({ marketAddress, onSuccess }: BettingInterfaceP
       {/* Submit button */}
       <button
         onClick={handleBet}
-        disabled={isLoading || isSuccess}
+        disabled={isLoading || isSuccess || marketState !== 2}
         className={`w-full py-4 rounded-xl font-bold transition ${
-          outcome === Outcome.YES
+          marketState !== 2
+            ? 'bg-gray-600 cursor-not-allowed'
+            : outcome === Outcome.YES
             ? 'bg-green-500 hover:bg-green-600'
             : 'bg-red-500 hover:bg-red-600'
         } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
@@ -156,6 +198,8 @@ export function BettingInterface({ marketAddress, onSuccess }: BettingInterfaceP
           <ButtonLoading text="Placing Bet..." />
         ) : isSuccess ? (
           'Bet Placed! ✓'
+        ) : marketState !== 2 ? (
+          'Betting Not Available'
         ) : (
           `Bet ${amount} BASED on ${outcome === Outcome.YES ? 'YES' : 'NO'}`
         )}

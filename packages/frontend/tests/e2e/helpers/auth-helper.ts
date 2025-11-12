@@ -8,6 +8,7 @@
 import { type WalletClient, type Address, recoverMessageAddress } from 'viem';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import type { Page } from '@playwright/test';
+import { createHash } from 'crypto';
 
 // ==================== AUTH MESSAGE GENERATION ====================
 
@@ -34,11 +35,13 @@ function generateNonce(): string {
 export class AuthHelper {
   private supabaseUrl: string;
   private supabaseAnonKey: string;
+  private supabaseServiceKey?: string;
 
   constructor() {
     // Get Supabase config from ENV
     this.supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     this.supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    this.supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
     if (!this.supabaseUrl || !this.supabaseAnonKey) {
       throw new Error('Supabase config missing in .env.test');
@@ -81,17 +84,26 @@ export class AuthHelper {
       }
 
       // 4. Sign in to Supabase (or create account if needed)
+      // Use wallet address as deterministic password (not signature which changes each time)
+      // Hash to fit Supabase 72-char password limit
+      const hashedPassword = createHash('sha256').update(address.toLowerCase()).digest('hex').substring(0, 64);
+
+      // Format email: hash address to shorter format (Supabase has strict email validation)
+      // Use first 16 chars of address hash for brevity
+      const addressHash = createHash('sha256').update(address.toLowerCase()).digest('hex').substring(0, 16);
+      const emailAddress = `wallet-${addressHash}@kektech.xyz`;
+
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: `${address.toLowerCase()}@wallet.kektech.xyz`,
-        password: signature,
+        email: emailAddress,
+        password: hashedPassword,
       });
 
       if (signInError) {
         // User doesn't exist - create account
         if (signInError.message.includes('Invalid login credentials')) {
           const { error: signUpError } = await supabase.auth.signUp({
-            email: `${address.toLowerCase()}@wallet.kektech.xyz`,
-            password: signature,
+            email: emailAddress,
+            password: hashedPassword,
             options: {
               data: {
                 wallet_address: address.toLowerCase(),
@@ -101,14 +113,65 @@ export class AuthHelper {
             },
           });
 
+          // If user already exists, try to sign in instead
+          if (signUpError && signUpError.message.includes('User already registered')) {
+            const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
+              email: emailAddress,
+              password: hashedPassword,
+            });
+
+            if (retryError) {
+              throw new Error(`Sign in failed for existing user: ${retryError.message}`);
+            }
+
+            if (!retryData.session) {
+              throw new Error('No session after sign in');
+            }
+
+            return {
+              session: retryData.session,
+              user: retryData.user,
+              walletAddress: address,
+            };
+          }
+
           if (signUpError) {
             throw new Error(`Sign up failed: ${signUpError.message}`);
           }
 
+          // Auto-confirm email for E2E testing (only if service key available)
+          if (this.supabaseServiceKey) {
+            try {
+              // Create admin client with service role
+              const adminClient = createSupabaseClient(
+                this.supabaseUrl,
+                this.supabaseServiceKey
+              );
+
+              // Get the user that was just created
+              const { data: userData } = await adminClient.auth.admin.listUsers();
+              const newUser = userData?.users.find((u: any) => u.email === emailAddress);
+
+              if (newUser) {
+                // Confirm the email
+                await adminClient.auth.admin.updateUserById(newUser.id, {
+                  email_confirm: true
+                });
+                console.log(`✅ Auto-confirmed email for test user: ${emailAddress}`);
+
+                // Small delay to let Supabase process the confirmation
+                await new Promise(resolve => setTimeout(resolve, 1000));
+              }
+            } catch (confirmError) {
+              console.warn('⚠️ Auto-confirmation failed (continuing anyway):', confirmError);
+              // Don't throw - let the test continue, it might still work
+            }
+          }
+
           // Retry sign in
           const { data: retryData, error: retryError } = await supabase.auth.signInWithPassword({
-            email: `${address.toLowerCase()}@wallet.kektech.xyz`,
-            password: signature,
+            email: emailAddress,
+            password: hashedPassword,
           });
 
           if (retryError) {

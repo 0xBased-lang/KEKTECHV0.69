@@ -71,12 +71,14 @@ export class ContractHelper {
    * @param marketAddress - Market contract address
    * @param outcome - 0 for NO, 1 for YES
    * @param amount - Amount in BASED (e.g., "1.5")
+   * @param minExpectedOdds - Minimum acceptable odds (default: 0 = no slippage protection)
    * @returns Transaction hash
    */
   async placeBet(
     marketAddress: Address,
     outcome: number,
-    amount: string
+    amount: string,
+    minExpectedOdds: bigint = 0n  // 🎯 FIX: Added missing parameter with default value
   ): Promise<Hash> {
     const amountWei = parseEther(amount);
 
@@ -84,7 +86,7 @@ export class ContractHelper {
       address: marketAddress,
       abi: ABIS.PredictionMarket,
       functionName: 'placeBet',
-      args: [outcome],
+      args: [outcome, minExpectedOdds],  // 🎯 FIX: Contract expects 2 parameters
       value: amountWei,
     });
 

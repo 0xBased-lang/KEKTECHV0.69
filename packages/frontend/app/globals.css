@@ -24,6 +24,81 @@
   --color-kek-green-dark: #2fa8ad;
   --color-kek-purple-light: #ff33ff;
   --color-kek-purple-dark: #cc00cc;
+
+  /* ========================================
+     TRADING TERMINAL THEME
+     ======================================== */
+
+  /* Terminal Backgrounds (Dark Theme) */
+  --color-terminal-black: #000000;
+  --color-terminal-bg-primary: #0d1117;    /* Main background */
+  --color-terminal-bg-secondary: #161b22;  /* Card backgrounds */
+  --color-terminal-bg-tertiary: #21262d;   /* Elevated elements */
+  --color-terminal-bg-hover: #30363d;      /* Hover states */
+  --color-terminal-bg-active: #3a4149;     /* Active states */
+
+  /* Terminal Text Colors */
+  --color-terminal-text-primary: #ffffff;   /* Important data */
+  --color-terminal-text-secondary: #c9d1d9; /* Secondary info */
+  --color-terminal-text-tertiary: #8b949e;  /* Metadata */
+  --color-terminal-text-muted: #6e7681;     /* Disabled */
+
+  /* Trading Status Colors (High Contrast) */
+  --color-terminal-green: #3fb950;    /* YES, Bullish, Positive */
+  --color-terminal-green-bright: #4aca5e;
+  --color-terminal-green-dark: #2f8f3f;
+  --color-terminal-red: #f85149;      /* NO, Bearish, Negative */
+  --color-terminal-red-bright: #ff6b6b;
+  --color-terminal-red-dark: #d03838;
+  --color-terminal-yellow: #d29922;   /* Warning, Resolving */
+  --color-terminal-yellow-bright: #e5a730;
+  --color-terminal-blue: #58a6ff;     /* Info, Approved, Links */
+  --color-terminal-blue-bright: #79c0ff;
+  --color-terminal-purple: #bc8cff;   /* Finalized, Premium */
+  --color-terminal-purple-bright: #d2a8ff;
+
+  /* Terminal UI Elements */
+  --color-terminal-border: #30363d;
+  --color-terminal-border-bright: #58a6ff;
+  --color-terminal-border-muted: #21262d;
+  --color-terminal-shadow: rgba(0, 0, 0, 0.5);
+  --color-terminal-shadow-bright: rgba(63, 184, 189, 0.2);
+
+  /* Terminal Grid & Charts */
+  --color-terminal-grid: rgba(255, 255, 255, 0.05);
+  --color-terminal-volume: rgba(63, 184, 189, 0.2);
+
+  /* Engagement & Priority Colors */
+  --color-engagement-fire: #ff6b35;      /* 🔥 Trending */
+  --color-engagement-ice: #4ecca7;       /* ❄️ Cool */
+  --color-priority-urgent: #ff0055;      /* 🚨 URGENT */
+  --color-priority-high: #ff6b35;        /* 🎯 CONSENSUS */
+  --color-priority-medium: #ffd966;      /* 💰 HIGH STAKES */
+  --color-priority-low: #8b949e;         /* Low */
+
+  /* Terminal Typography (8px base) */
+  --spacing-1: 4px;   /* Tight */
+  --spacing-2: 8px;   /* Base */
+  --spacing-3: 12px;  /* Comfortable */
+  --spacing-4: 16px;  /* Sections */
+  --spacing-5: 24px;  /* Panels */
+  --spacing-6: 32px;  /* Major sections */
+  --spacing-8: 48px;  /* Page sections */
+
+  /* Animation Timings */
+  --duration-instant: 100ms;  /* Hover states */
+  --duration-fast: 200ms;     /* Transitions */
+  --duration-normal: 300ms;   /* Modals */
+  --duration-slow: 500ms;     /* Complex animations */
+
+  /* Terminal Borders */
+  --border-width-thin: 1px;
+  --border-width-medium: 2px;
+  --border-width-thick: 3px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -153,4 +228,172 @@ body {
 
 .animate-shimmer {
   animation: shimmer 8s ease-in-out infinite;
+}
+
+/* ========================================
+   TRADING TERMINAL UTILITY CLASSES
+   ======================================== */
+
+/* Terminal Backgrounds */
+.bg-terminal {
+  background-color: var(--color-terminal-bg-primary);
+}
+
+.bg-terminal-card {
+  background-color: var(--color-terminal-bg-secondary);
+}
+
+.bg-terminal-elevated {
+  background-color: var(--color-terminal-bg-tertiary);
+}
+
+/* Terminal Text */
+.text-terminal-primary {
+  color: var(--color-terminal-text-primary);
+}
+
+.text-terminal-secondary {
+  color: var(--color-terminal-text-secondary);
+}
+
+.text-terminal-tertiary {
+  color: var(--color-terminal-text-tertiary);
+}
+
+.text-terminal-muted {
+  color: var(--color-terminal-text-muted);
+}
+
+/* Trading Colors */
+.text-bullish {
+  color: var(--color-terminal-green);
+}
+
+.text-bearish {
+  color: var(--color-terminal-red);
+}
+
+.bg-bullish {
+  background-color: var(--color-terminal-green);
+}
+
+.bg-bearish {
+  background-color: var(--color-terminal-red);
+}
+
+/* Terminal Borders */
+.border-terminal {
+  border-color: var(--color-terminal-border);
+}
+
+.border-terminal-bright {
+  border-color: var(--color-terminal-border-bright);
+}
+
+/* Priority Badges */
+.badge-urgent {
+  background-color: var(--color-priority-urgent);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-high {
+  background-color: var(--color-priority-high);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-medium {
+  background-color: var(--color-priority-medium);
+  color: var(--color-terminal-black);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Terminal Hover Effects */
+.terminal-hover {
+  transition: all var(--duration-instant) ease;
+}
+
+.terminal-hover:hover {
+  background-color: var(--color-terminal-bg-hover);
+  border-color: var(--color-terminal-border-bright);
+}
+
+/* Engagement Indicators */
+.engagement-fire {
+  color: var(--color-engagement-fire);
+}
+
+.engagement-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(63, 184, 189, 0.1));
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* YES/NO Percentage Bar */
+.percentage-bar {
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--color-terminal-bg-tertiary);
+  display: flex;
+}
+
+.percentage-bar-yes {
+  background-color: var(--color-terminal-green);
+  transition: width var(--duration-fast) ease;
+}
+
+.percentage-bar-no {
+  background-color: var(--color-terminal-red);
+  transition: width var(--duration-fast) ease;
+}
+
+/* Terminal Card */
+.terminal-card {
+  background-color: var(--color-terminal-bg-secondary);
+  border: 1px solid var(--color-terminal-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-4);
+  transition: all var(--duration-fast) ease;
+}
+
+.terminal-card:hover {
+  border-color: var(--color-terminal-border-bright);
+  box-shadow: 0 4px 12px var(--color-terminal-shadow-bright);
+}
+
+/* Monospace Numbers (Trading Data) */
+.mono-numbers {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Glow Effect for Status */
+.status-glow-green {
+  box-shadow: 0 0 16px rgba(63, 185, 80, 0.4);
+}
+
+.status-glow-red {
+  box-shadow: 0 0 16px rgba(248, 81, 73, 0.4);
+}
+
+.status-glow-yellow {
+  box-shadow: 0 0 16px rgba(210, 153, 34, 0.4);
 }

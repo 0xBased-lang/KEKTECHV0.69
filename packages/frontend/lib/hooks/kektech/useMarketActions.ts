@@ -43,8 +43,10 @@ export function usePlaceBet(marketAddress: Address) {
     usePredictionMarketWrite({ marketAddress });
 
   const placeBet = useCallback(
-    (outcome: Outcome, amount: bigint) => {
-      write('placeBet', [outcome], amount);
+    (outcome: Outcome, amount: bigint, minOdds: bigint = 0n) => {
+      // minOdds: Minimum acceptable odds (0n = no slippage protection)
+      // Contract signature: placeBet(uint8 _outcome, uint256 _minExpectedOdds)
+      write('placeBet', [outcome, minOdds], amount);
     },
     [write]
   );
