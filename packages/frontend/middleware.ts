@@ -16,29 +16,45 @@ export async function middleware(request: NextRequest) {
     request,
   })
 
-  // Create Supabase client with cookie handling
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options)
-          })
-        },
-      },
-    }
-  )
+  // Validate environment variables before using them
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  // Refresh session if needed
-  // This validates the JWT and refreshes it if it's about to expire
-  await supabase.auth.getUser()
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('[MIDDLEWARE] Missing Supabase environment variables')
+    // Continue serving request without authentication rather than crashing
+    return response
+  }
 
-  return response
+  try {
+    // Create Supabase client with cookie handling
+    const supabase = createServerClient(
+      supabaseUrl,
+      supabaseKey,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options)
+            })
+          },
+        },
+      }
+    )
+
+    // Refresh session if needed
+    // This validates the JWT and refreshes it if it's about to expire
+    await supabase.auth.getUser()
+
+    return response
+  } catch (error) {
+    console.error('[MIDDLEWARE] Error refreshing session:', error)
+    // Continue serving request even if auth refresh fails
+    return response
+  }
 }
 
 // Configure which routes the middleware runs on
