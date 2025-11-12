@@ -99,7 +99,16 @@ export async function POST(
     }
 
     // Extract wallet address from authenticated user metadata
-    const walletAddress = user.user_metadata?.wallet_address || user.email?.split('@')[0];
+    // Web3 auth stores wallet address in multiple possible locations:
+    // 1. user_metadata.wallet_address (custom field)
+    // 2. user_metadata.sub (EIP-4361 standard field - primary for signInWithWeb3)
+    // 3. user.id (Supabase user ID, could be wallet address)
+    // 4. email prefix (legacy fallback)
+    const walletAddress =
+      user.user_metadata?.wallet_address ||
+      user.user_metadata?.sub ||
+      user.id ||
+      user.email?.split('@')[0];
 
     if (!walletAddress) {
       return NextResponse.json(

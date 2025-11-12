@@ -29,23 +29,7 @@
 import { useState, useEffect } from 'react'
 import { useAccount, useSignMessage } from 'wagmi'
 import { createClient } from '@/lib/supabase/client'
-import { recoverMessageAddress } from 'viem'
-
-/**
- * Generate authentication message for signing
- * Includes timestamp and nonce for replay protection
- */
-function generateAuthMessage(address: string, nonce: string): string {
-  return `Welcome to KEKTECH!\n\nSign this message to authenticate your wallet.\n\nWallet: ${address}\nNonce: ${nonce}\nTimestamp: ${new Date().toISOString()}\n\nThis request will not trigger a blockchain transaction or cost any gas fees.`
-}
-
-/**
- * Generate random nonce for replay protection
- */
-function generateNonce(): string {
-  return Math.random().toString(36).substring(2, 15) +
-         Math.random().toString(36).substring(2, 15)
-}
+import { SiweMessage } from 'siwe'
 
 export function useWalletAuth() {
   const { address, isConnected } = useAccount()
@@ -91,6 +75,13 @@ export function useWalletAuth() {
 
   /**
    * Authenticate user with wallet signature
+   * Uses SIWE (Sign-In with Ethereum) EIP-4361 standard
+   *
+   * Flow:
+   * 1. Generate SIWE message with nonce
+   * 2. Request signature from wallet via wagmi
+   * 3. Verify signature on backend
+   * 4. Create Supabase session with JWT token
    */
   async function authenticate() {
     if (!isConnected || !address) {
@@ -102,66 +93,75 @@ export function useWalletAuth() {
     setError(null)
 
     try {
-      // 1. Generate nonce for replay protection
-      const nonce = generateNonce()
-
-      // 2. Generate message to sign
-      const message = generateAuthMessage(address, nonce)
-
-      // 3. Request signature from wallet
-      const signature = await signMessageAsync({ message })
-
-      // 4. Verify signature locally (optional but recommended)
-      const recoveredAddress = await recoverMessageAddress({
-        message,
-        signature,
+      // 1. Create SIWE message (EIP-4361 standard)
+      // Note: issuedAt is automatically added by SIWE library when preparing message
+      const message = new SiweMessage({
+        domain: window.location.host,
+        address: address,
+        statement: 'Sign in to KEKTECH 3.0',
+        uri: window.location.origin,
+        version: '1',
+        chainId: 32323, // BasedAI mainnet
+        nonce: crypto.randomUUID().replace(/-/g, ''), // EIP-4361: alphanumeric only (no hyphens)
       })
 
-      if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
-        throw new Error('Signature verification failed')
+      const messageString = message.prepareMessage()
+
+      // 2. Sign message with wagmi (works with ALL wallet connectors)
+      const signature = await signMessageAsync({
+        message: messageString,
+      })
+
+      // 3. Verify signature on backend and get JWT token
+      const response = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: messageString,
+          signature,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Verification failed')
       }
 
-      // 5. Sign in to Supabase with wallet address as user ID
-      // Note: We're using the wallet address as the user identifier
-      // Supabase will create a session based on this
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: `${address.toLowerCase()}@wallet.kektech.xyz`,
-        password: signature, // Use signature as password
-      })
+      // Backend verification succeeded, session is now stored in cookies!
+      const { success, userId, walletAddress: verifiedAddress } = await response.json()
 
-      if (authError) {
-        // If user doesn't exist, create account
-        if (authError.message.includes('Invalid login credentials')) {
-          const { error: signUpError } = await supabase.auth.signUp({
-            email: `${address.toLowerCase()}@wallet.kektech.xyz`,
-            password: signature,
-            options: {
-              data: {
-                wallet_address: address.toLowerCase(),
-                nonce,
-                signed_at: new Date().toISOString(),
-              },
-            },
-          })
+      // 🔧 FIX: Wait for session to be available from cookies (with retry)
+      // Prevents race conditions where cookies haven't fully propagated yet
+      let session = null
+      let retries = 0
+      const maxRetries = 10 // 2 seconds max wait
 
-          if (signUpError) {
-            throw signUpError
-          }
+      while (retries < maxRetries && !session) {
+        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession()
 
-          // Try signing in again
-          const { error: retryError } = await supabase.auth.signInWithPassword({
-            email: `${address.toLowerCase()}@wallet.kektech.xyz`,
-            password: signature,
-          })
-
-          if (retryError) {
-            throw retryError
-          }
-        } else {
-          throw authError
+        if (currentSession) {
+          session = currentSession
+          console.log('[Auth] Session successfully retrieved from cookies after', retries, 'retries')
+          break
         }
+
+        if (sessionError) {
+          console.warn('[Auth] Session check error (retry', retries + 1, '):', sessionError)
+        }
+
+        // Wait 200ms before retry
+        await new Promise(resolve => setTimeout(resolve, 200))
+        retries++
       }
 
+      if (!session) {
+        console.error('[Auth] Session not available after', retries, 'retries')
+        throw new Error('Session not available after authentication. Please try again.')
+      }
+
+      // Success! User is authenticated (session from cookies confirmed)
       setIsAuthenticated(true)
     } catch (err) {
       console.error('Authentication error:', err)

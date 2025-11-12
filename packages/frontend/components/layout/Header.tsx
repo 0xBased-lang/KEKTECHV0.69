@@ -5,9 +5,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useAccount } from 'wagmi'
-import { Shield } from 'lucide-react'
+import { Shield, LogOut, CheckCircle, XCircle } from 'lucide-react'
 import { ConnectButton } from '@/components/web3/ConnectButton'
 import { NetworkSwitcher } from '@/components/web3/NetworkSwitcher'
+import { useWalletAuth } from '@/lib/hooks/useWalletAuth'
+import { Button } from '@/components/ui/button'
 
 // Admin wallet address
 const ADMIN_WALLET = '0x25fD72154857Bd204345808a690d51a61A81EB0b'
@@ -23,8 +25,11 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Check if connected wallet is admin
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
   const isAdmin = address?.toLowerCase() === ADMIN_WALLET.toLowerCase()
+
+  // Get authentication state and methods
+  const { isAuthenticated, isAuthenticating, signOut } = useWalletAuth()
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)
@@ -154,10 +159,37 @@ export function Header() {
 
         {/* Right Side: Wallet Connect & Mobile Menu Button */}
         <div className="flex items-center gap-3">
-          {/* Desktop: Network Switcher + Connect Button */}
+          {/* Desktop: Network Switcher + Connect Button + Auth Status */}
           <div className="hidden md:flex items-center gap-3">
             <NetworkSwitcher inline />
             <ConnectButton />
+
+            {/* Authentication Status & Sign Out */}
+            {isConnected && (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-900/60 border border-gray-800">
+                {isAuthenticated ? (
+                  <>
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <span className="text-xs text-green-500 font-medium">Signed In</span>
+                    <Button
+                      onClick={signOut}
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs hover:bg-gray-800"
+                      title="Sign out and clear Supabase session"
+                    >
+                      <LogOut className="h-3 w-3 mr-1" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-4 w-4 text-yellow-500" />
+                    <span className="text-xs text-yellow-500 font-medium">Not Signed In</span>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Mobile: Hamburger Menu Button */}
@@ -207,19 +239,51 @@ export function Header() {
         }}
       >
         {/* Mobile Menu Header - Fixed at top */}
-        <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-gray-800" style={{ backgroundColor: 'rgba(0, 0, 0, 0.98)' }}>
-          <div className="flex-1 mr-3">
-            <ConnectButton />
+        <div className="flex-shrink-0 p-4 border-b border-gray-800" style={{ backgroundColor: 'rgba(0, 0, 0, 0.98)' }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex-1 mr-3">
+              <ConnectButton />
+            </div>
+            <button
+              onClick={closeMobileMenu}
+              type="button"
+              className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-900 border-2 border-gray-800 hover:border-[#3fb8bd] hover:bg-gray-800 active:scale-95 transition-all relative z-[120] touch-manipulation flex-shrink-0"
+              aria-label="Close menu"
+              style={{ pointerEvents: 'auto' }}
+            >
+              <span className="text-[#3fb8bd] text-3xl font-bold leading-none select-none">×</span>
+            </button>
           </div>
-          <button
-            onClick={closeMobileMenu}
-            type="button"
-            className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-900 border-2 border-gray-800 hover:border-[#3fb8bd] hover:bg-gray-800 active:scale-95 transition-all relative z-[120] touch-manipulation flex-shrink-0"
-            aria-label="Close menu"
-            style={{ pointerEvents: 'auto' }}
-          >
-            <span className="text-[#3fb8bd] text-3xl font-bold leading-none select-none">×</span>
-          </button>
+
+          {/* Mobile Authentication Status */}
+          {isConnected && (
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-900/60 border border-gray-800">
+              <div className="flex items-center gap-2">
+                {isAuthenticated ? (
+                  <>
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <span className="text-sm text-green-500 font-medium">Signed In</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-4 w-4 text-yellow-500" />
+                    <span className="text-sm text-yellow-500 font-medium">Not Signed In</span>
+                  </>
+                )}
+              </div>
+              {isAuthenticated && (
+                <Button
+                  onClick={signOut}
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs hover:bg-gray-800"
+                >
+                  <LogOut className="h-3 w-3 mr-1" />
+                  Sign Out
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Mobile Navigation Links - Scrollable content - Only 5 Links */}
