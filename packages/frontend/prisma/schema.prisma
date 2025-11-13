@@ -1,6 +1,3 @@
-// KEKTECH 3.0 - Database Schema
-// Engagement System: Proposal Voting, Resolution Voting, Comments
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,82 +7,82 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Proposal Votes (like/dislike for market proposals)
 model ProposalVote {
   id            String   @id @default(uuid())
-  marketAddress String   // Market contract address
-  userId        String   // Wallet address
-  vote          String   // 'like' or 'dislike'
+  marketAddress String
+  userId        String
+  vote          String
   timestamp     DateTime @default(now())
 
   @@unique([marketAddress, userId])
   @@index([marketAddress])
   @@index([userId])
+  @@index([marketAddress], map: "idx_proposalevote_market")
 }
 
-// Resolution Votes (agree/disagree with proposed outcome)
 model ResolutionVote {
   id            String   @id @default(uuid())
-  marketAddress String   // Market contract address
-  userId        String   // Wallet address
-  vote          String   // 'agree' or 'disagree'
-  comment       String   // Required comment (min 20 chars)
+  marketAddress String
+  userId        String
+  vote          String
+  comment       String
   timestamp     DateTime @default(now())
 
   @@unique([marketAddress, userId])
   @@index([marketAddress])
   @@index([userId])
+  @@index([marketAddress], map: "idx_resolutionvote_market")
 }
 
-// Comments on markets (general discussion)
 model Comment {
   id            String   @id @default(uuid())
-  marketAddress String   // Market contract address
-  userId        String   // Wallet address
-  comment       String   // Comment text
+  marketAddress String
+  userId        String
+  comment       String
   upvotes       Int      @default(0)
   downvotes     Int      @default(0)
-  type          String   @default("general") // 'general' or 'resolution_vote'
+  type          String   @default("general")
   timestamp     DateTime @default(now())
 
   @@index([marketAddress])
   @@index([userId])
   @@index([timestamp])
+  @@index([marketAddress], map: "idx_comment_market")
 }
 
-// Comment votes (upvote/downvote on comments)
 model CommentVote {
   id        String   @id @default(uuid())
-  commentId String   // Comment ID
-  userId    String   // Wallet address
-  vote      String   // 'upvote' or 'downvote'
+  commentId String
+  userId    String
+  vote      String
   timestamp DateTime @default(now())
 
   @@unique([commentId, userId])
   @@index([commentId])
+  @@index([commentId], map: "idx_commentvote_comment")
 }
 
-// Market metadata (cached from blockchain for quick access)
 model MarketMetadata {
-  id            String   @id // Market contract address
-  question      String
-  description   String?
-  creator       String   // Wallet address
-  state         Int      // Market state (0-5)
-  expiryTime    BigInt
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String   @id
+  question    String
+  description String?
+  creator     String
+  state       Int
+  expiryTime  BigInt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([state])
   @@index([creator])
+  @@index([creator], map: "idx_marketmetadata_creator")
+  @@index([state], map: "idx_marketmetadata_state")
 }
 
-// User activity tracking
 model UserActivity {
   id            String   @id @default(uuid())
-  userId        String   // Wallet address
-  activityType  String   // 'vote', 'comment', 'bet', etc.
-  marketAddress String   // Related market
+  userId        String
+  activityType  String
+  marketAddress String
   timestamp     DateTime @default(now())
 
   @@index([userId])
@@ -93,23 +90,24 @@ model UserActivity {
   @@index([timestamp])
 }
 
-// Indexed blockchain events (captured by Event Indexer backend)
-// Used for real-time event processing and historical data
 model IndexedEvent {
   id              String   @id @default(uuid())
-  eventType       String   // MarketCreated, BetPlaced, BetResolved, MarketResolved, etc.
-  marketAddress   String?  // Market contract address (null for factory events)
-  blockNumber     BigInt   // Block where event occurred
-  transactionHash String   // Transaction hash
-  logIndex        Int      // Log index within transaction (for uniqueness)
-  eventData       Json     // Full event data (question, outcomes, bettor, amounts, etc.)
-  processed       Boolean  @default(false) // Whether this event has been processed
-  timestamp       DateTime @default(now()) // When event was indexed
+  eventType       String
+  marketAddress   String?
+  blockNumber     BigInt
+  transactionHash String
+  logIndex        Int
+  eventData       Json
+  processed       Boolean  @default(false)
+  timestamp       DateTime @default(now())
 
-  @@unique([transactionHash, logIndex]) // Ensure no duplicate events
+  @@unique([transactionHash, logIndex])
   @@index([marketAddress])
   @@index([blockNumber])
   @@index([eventType])
   @@index([processed])
   @@index([timestamp])
+  @@index([eventType], map: "idx_indexedevent_eventtype")
+  @@index([marketAddress], map: "idx_indexedevent_marketaddress")
+  @@index([processed], map: "idx_indexedevent_processed")
 }

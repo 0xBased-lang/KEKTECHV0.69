@@ -6,7 +6,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/db/prisma';
 import { verifyAuth } from '@/lib/auth/api-auth';
 import { applySecurityMiddleware } from '@/lib/middleware/security';
 
@@ -17,6 +16,9 @@ export async function POST(
   { params }: { params: Promise<{ commentId: string }> }
 ) {
   try {
+    // 🔌 LAZY IMPORT: Ensures DATABASE_URL is available before Prisma initialization
+    const prisma = (await import('@/lib/db/prisma')).default;
+
     // 🛡️ STEP 1: SECURITY MIDDLEWARE (Rate Limiting + Origin Validation)
     const securityError = await applySecurityMiddleware(request);
     if (securityError) return securityError;

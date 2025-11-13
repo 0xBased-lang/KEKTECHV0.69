@@ -5,7 +5,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/db/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { applySecurityMiddleware } from '@/lib/middleware/security';
 import { sanitizeComment, sanitizeAddress } from '@/lib/utils/sanitize';
@@ -16,6 +15,9 @@ export async function GET(
   { params }: { params: Promise<{ marketAddress: string }> }
 ) {
   try {
+    // 🔌 LAZY IMPORT: Ensures DATABASE_URL is available before Prisma initialization
+    const prisma = (await import('@/lib/db/prisma')).default;
+
     const { marketAddress } = await params;
     const { searchParams } = new URL(request.url);
 
@@ -83,6 +85,9 @@ export async function POST(
   { params }: { params: Promise<{ marketAddress: string }> }
 ) {
   try {
+    // 🔌 LAZY IMPORT: Ensures DATABASE_URL is available before Prisma initialization
+    const prisma = (await import('@/lib/db/prisma')).default;
+
     // 🛡️ STEP 1: SECURITY MIDDLEWARE (Rate Limiting + Origin Validation)
     const securityError = await applySecurityMiddleware(request);
     if (securityError) return securityError;
