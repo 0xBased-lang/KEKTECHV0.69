@@ -201,7 +201,6 @@ function ResolutionDetailPanel({
   const [adminReason, setAdminReason] = useState("");
   const [selectedOutcome, setSelectedOutcome] = useState<0 | 1>(0);
 
-  const totalVotes = votes?.total || 0;
   const agreePercentage = votes?.agreePercentage || 0;
 
   const handleAdminResolve = async () => {
