@@ -6,7 +6,7 @@
  */
 'use client'
 
-import { useComments, useCommentSubscription } from '@/lib/api/engagement'
+import type { CommentResponse } from '@/lib/api/engagement'
 import { CommentItem } from './CommentItem'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2 } from 'lucide-react'
@@ -14,19 +14,19 @@ import type { Address } from 'viem'
 
 interface CommentListProps {
   marketAddress: Address
+  comments: CommentResponse | null
+  isLoading: boolean
+  error: Error | null
+  refetch: () => void
 }
 
-export function CommentList({ marketAddress }: CommentListProps) {
-  // Fetch comments
-  const {
-    comments,
-    error,
-    refetch,
-    isLoading
-  } = useComments(marketAddress)
-
-  // Subscribe to real-time updates
-  useCommentSubscription(marketAddress, refetch)
+export function CommentList({
+  marketAddress,
+  comments,
+  error,
+  refetch,
+  isLoading
+}: CommentListProps) {
 
   // Loading state
   if (isLoading) {

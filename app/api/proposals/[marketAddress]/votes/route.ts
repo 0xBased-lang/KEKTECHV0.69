@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sanitizeAddress } from '@/lib/utils/sanitize';
 
 interface ProposalVote {
   userId: string;
@@ -31,7 +32,16 @@ export async function GET(
   { params }: { params: Promise<{ marketAddress: string }> }
 ) {
   try {
-    const { marketAddress } = await params;
+    const { marketAddress: rawMarketAddress } = await params;
+    let marketAddress: string;
+    try {
+      marketAddress = sanitizeAddress(rawMarketAddress);
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid market address format' },
+        { status: 400 }
+      );
+    }
     const { searchParams } = new URL(request.url);
     const userAddress = searchParams.get('userAddress');
 

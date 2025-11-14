@@ -3,8 +3,9 @@
 # KEKTECH API Endpoint Testing Script
 # Run this after fixing the DATABASE_URL in Vercel
 
-BASE_URL="https://kektech-frontend.vercel.app"
+BASE_URL=${1:-"https://kektech-frontend.vercel.app"}
 TEST_MARKET="0x593c6A47d51644A54115e60aCf0Bd8bbd371e449"
+ORIGIN_HEADER="$BASE_URL"
 
 echo "🧪 KEKTECH API Endpoint Testing"
 echo "====================================="
@@ -56,6 +57,7 @@ fi
 echo "Testing POST /api/comments/market/[address] (should return 401 Unauthorized without auth)"
 HTTP_CODE=$(curl -s -X POST "${BASE_URL}/api/comments/market/${TEST_MARKET}" \
     -H "Content-Type: application/json" \
+    -H "Origin: ${ORIGIN_HEADER}" \
     -d '{"comment":"Test comment"}' \
     -w "%{http_code}" -o /dev/null)
 
@@ -81,6 +83,7 @@ fi
 echo "Testing POST /api/proposals/[marketAddress]/vote (should return 401 without auth)"
 HTTP_CODE=$(curl -s -X POST "${BASE_URL}/api/proposals/${TEST_MARKET}/vote" \
     -H "Content-Type: application/json" \
+    -H "Origin: ${ORIGIN_HEADER}" \
     -d '{"vote":"like"}' \
     -w "%{http_code}" -o /dev/null)
 
@@ -104,6 +107,7 @@ fi
 echo "Testing POST /api/resolution/[marketAddress]/vote (should return 401 without auth)"
 HTTP_CODE=$(curl -s -X POST "${BASE_URL}/api/resolution/${TEST_MARKET}/vote" \
     -H "Content-Type: application/json" \
+    -H "Origin: ${ORIGIN_HEADER}" \
     -d '{"vote":"agree","comment":"Test comment"}' \
     -w "%{http_code}" -o /dev/null)
 

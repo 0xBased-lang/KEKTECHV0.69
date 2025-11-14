@@ -58,6 +58,13 @@ export function CommentForm({ marketAddress, onCommentPosted }: CommentFormProps
       toast.success('Comment posted successfully!')
       setComment('') // Clear form
       onCommentPosted?.() // Callback for parent to refresh
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('comments:updated', {
+            detail: { marketAddress: marketAddress.toLowerCase() }
+          })
+        )
+      }
     } catch (err) {
       // Error already set by hook
       toast.error((err as Error).message || 'Failed to post comment')

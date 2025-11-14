@@ -19,7 +19,16 @@ export async function GET(
     // 🔌 LAZY IMPORT: Ensures DATABASE_URL is available before Prisma initialization
     const prisma = (await import('@/lib/db/prisma')).default;
 
-    const { marketAddress } = await params;
+    const { marketAddress: rawMarketAddress } = await params;
+    let marketAddress: string;
+    try {
+      marketAddress = sanitizeAddress(rawMarketAddress);
+    } catch {
+      return NextResponse.json(
+        { success: false, error: 'Invalid market address format' },
+        { status: 400 }
+      );
+    }
 
     // Get all votes for this market
     const votes = await prisma.proposalVote.findMany({
