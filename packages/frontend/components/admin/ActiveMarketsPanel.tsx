@@ -14,7 +14,7 @@ import {
   Eye,
   AlertCircle
 } from "lucide-react";
-import { useMarketList, useMarketInfo } from "@/lib/hooks/kektech/useMarketData";
+import { useMarketList } from "@/lib/hooks/kektech/useMarketData";
 import { useMarketInfoList } from "@/lib/hooks/useMarketInfoList";
 import { formatDistanceToNow } from "date-fns";
 import { formatEther } from "viem";
@@ -89,7 +89,7 @@ export function ActiveMarketsPanel() {
     };
 
     fetchMetrics();
-  }, [activeMarkets.length]);
+  }, [activeMarkets]);
 
   // Sort markets based on selected criteria
   // Note: We already have marketInfos from above for all markets
@@ -237,6 +237,7 @@ export function ActiveMarketsPanel() {
                 marketAddress={address}
                 metrics={metrics[address]}
                 loadingMetrics={loadingMetrics}
+                marketInfo={marketInfoByAddress[address]}
               />
             ))}
           </div>
@@ -249,15 +250,16 @@ export function ActiveMarketsPanel() {
 function ActiveMarketCard({
   marketAddress,
   metrics,
-  loadingMetrics
+  loadingMetrics,
+  marketInfo
 }: {
   marketAddress: Address;
   metrics?: MarketMetrics;
   loadingMetrics: boolean;
+  marketInfo?: MarketInfo;
 }) {
-  const marketInfo = useMarketInfo(marketAddress, true);
 
-  const expiryTime = marketInfo.resolutionTime ? new Date(Number(marketInfo.resolutionTime) * 1000) : null;
+  const expiryTime = marketInfo?.resolutionTime ? new Date(Number(marketInfo.resolutionTime) * 1000) : null;
   const isExpiringSoon = expiryTime && expiryTime.getTime() - Date.now() < 24 * 60 * 60 * 1000;
 
   return (
@@ -267,7 +269,7 @@ function ActiveMarketCard({
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <h3 className="font-semibold line-clamp-1">
-              {marketInfo.question || "Loading..."}
+              {marketInfo?.question || "Loading..."}
             </h3>
             {isExpiringSoon && (
               <Badge variant="destructive" className="text-xs">

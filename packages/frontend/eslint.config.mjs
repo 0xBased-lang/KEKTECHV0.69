@@ -22,7 +22,7 @@ const eslintConfig = [
   },
   {
     rules: {
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "no-console": ["warn", { allow: ["warn", "error", "log", "info"] }],
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
