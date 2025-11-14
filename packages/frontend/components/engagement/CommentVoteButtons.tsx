@@ -88,8 +88,7 @@ export function CommentVoteButtons({
 
     // Submit vote
     try {
-      const userId = walletAddress || 'unknown-user'
-      const result = await voteOnComment(userId, voteType)
+      const result = await voteOnComment(voteType)
 
       // Update with actual server data
       if (result?.upvotes !== undefined && result?.downvotes !== undefined) {
