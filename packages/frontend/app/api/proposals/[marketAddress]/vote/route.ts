@@ -82,8 +82,10 @@ export async function POST(
     const { vote } = body;
 
     // Sanitize market address
-    const marketAddress = sanitizeAddress(rawMarketAddress);
-    if (!marketAddress) {
+    let marketAddress: string;
+    try {
+      marketAddress = sanitizeAddress(rawMarketAddress);
+    } catch (error) {
       return NextResponse.json(
         { success: false, error: 'Invalid market address format' },
         { status: 400 }

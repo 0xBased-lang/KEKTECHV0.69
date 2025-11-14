@@ -128,8 +128,10 @@ export async function POST(
     const { comment: rawComment } = body;
 
     // Sanitize market address (prevent injection)
-    const marketAddress = sanitizeAddress(rawMarketAddress);
-    if (!marketAddress) {
+    let marketAddress: string;
+    try {
+      marketAddress = sanitizeAddress(rawMarketAddress);
+    } catch (error) {
       return NextResponse.json(
         { success: false, error: 'Invalid market address format' },
         { status: 400 }

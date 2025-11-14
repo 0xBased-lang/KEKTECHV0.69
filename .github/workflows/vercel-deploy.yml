@@ -43,6 +43,11 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
+      - name: Make Verification Scripts Executable
+        run: |
+          chmod +x ./scripts/verify-deployment-config.sh
+          chmod +x ./scripts/pre-deploy.sh
+
       - name: Setup Vercel Project Config
         run: |
           # Create .vercel directory in packages/frontend with project config
@@ -52,6 +57,25 @@ jobs:
             "orgId": "'${{ secrets.VERCEL_ORG_ID }}'",
             "projectName": "kektech-frontend"
           }' > ./packages/frontend/.vercel/project.json
+
+      - name: Verify Configuration
+        run: |
+          echo "🔍 Running deployment configuration verification..."
+          ./scripts/verify-deployment-config.sh
+
+      - name: Pre-deployment Safety Check
+        run: |
+          echo "🎯 Verifying deployment target..."
+          cat ./packages/frontend/.vercel/project.json
+          echo ""
+          echo "✅ Checking project ID matches expected value..."
+          if ! grep -q "prj_xYbdi0E0eJ1amYm3DAPknR1gWUxR" ./packages/frontend/.vercel/project.json; then
+            echo "❌ ERROR: Wrong project ID detected in .vercel/project.json!"
+            echo "Expected: prj_xYbdi0E0eJ1amYm3DAPknR1gWUxR"
+            echo "GitHub Secret VERCEL_PROJECT_ID may be incorrect!"
+            exit 1
+          fi
+          echo "✅ Project ID verified - deploying to kektech-frontend"
 
       - name: Deploy to Vercel
         id: deploy

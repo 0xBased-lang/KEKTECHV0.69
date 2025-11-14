@@ -45,6 +45,9 @@ const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
     optimizePackageImports: ['lucide-react'],
+    turbopack: {
+      root: process.cwd(),
+    },
   },
   // Security headers
   async headers() {
