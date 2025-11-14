@@ -127,8 +127,10 @@ function CommentEventCard({ event }: { event: MarketEvent }) {
   };
 
   // Extract comment text from event data
-  const commentText = event.data?.content || event.data?.text || event.data?.comment || '';
-  const author = event.data?.author || event.data?.user || 'Anonymous';
+  const rawComment = event.data?.content ?? event.data?.text ?? event.data?.comment ?? '';
+  const commentText: string = typeof rawComment === 'string' ? rawComment : String(rawComment ?? '');
+  const rawAuthor = event.data?.author ?? event.data?.user ?? 'Anonymous';
+  const author = typeof rawAuthor === 'string' ? rawAuthor : String(rawAuthor ?? 'Anonymous');
   const marketName = event.data?.marketName || truncate(event.marketAddress, 12);
 
   return (
