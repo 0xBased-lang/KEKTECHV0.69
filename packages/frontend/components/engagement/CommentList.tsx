@@ -19,7 +19,7 @@ interface CommentListProps {
 export function CommentList({ marketAddress }: CommentListProps) {
   // Fetch comments
   const {
-    data: comments,
+    comments,
     error,
     refetch,
     isLoading
@@ -49,7 +49,7 @@ export function CommentList({ marketAddress }: CommentListProps) {
   }
 
   // Empty state
-  if (!comments || comments.length === 0) {
+  if (!comments || !comments.comments || comments.comments.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <p className="text-lg font-medium mb-2">No comments yet</p>
@@ -61,7 +61,7 @@ export function CommentList({ marketAddress }: CommentListProps) {
   // Render comments (sorted by newest first)
   return (
     <div className="space-y-4">
-      {comments.map((comment) => (
+      {comments.comments.map((comment) => (
         <CommentItem
           key={comment.id}
           comment={comment}

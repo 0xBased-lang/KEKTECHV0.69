@@ -24,7 +24,7 @@ import { Alert } from '@/components/ui/alert'
 import { toast } from 'sonner'
 
 interface CommentFormProps {
-  marketAddress: string
+  marketAddress: `0x${string}`
   onCommentPosted?: () => void
 }
 
