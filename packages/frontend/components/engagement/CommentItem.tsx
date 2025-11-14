@@ -16,23 +16,21 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CommentVoteButtons } from './CommentVoteButtons'
 
-export interface Comment {
-  id: string
-  marketAddress: string
-  userId: string
-  comment: string
-  upvotes: number
-  downvotes: number
-  type: 'general' | 'resolution_vote'
-  createdAt: Date | string
-}
-
 interface CommentItemProps {
-  comment: Comment
+  comment: {
+    id: string
+    userId: string
+    comment: string
+    upvotes: number
+    downvotes: number
+    type: 'general' | 'resolution_vote'
+    timestamp: Date
+  }
+  marketAddress: `0x${string}`
   onVote?: () => void
 }
 
-export function CommentItem({ comment, onVote }: CommentItemProps) {
+export function CommentItem({ comment, marketAddress, onVote }: CommentItemProps) {
   // Truncate wallet address: 0x1234...5678
   const truncatedAddress = comment.userId
     ? `${comment.userId.slice(0, 6)}...${comment.userId.slice(-4)}`
@@ -40,9 +38,9 @@ export function CommentItem({ comment, onVote }: CommentItemProps) {
 
   // Format timestamp
   const timestamp =
-    typeof comment.createdAt === 'string'
-      ? new Date(comment.createdAt)
-      : comment.createdAt
+    typeof comment.timestamp === 'string'
+      ? new Date(comment.timestamp)
+      : comment.timestamp
   const timeAgo = formatDistanceToNow(timestamp, { addSuffix: true })
 
   // Net votes (upvotes - downvotes)
