@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   eslint: {
@@ -45,10 +46,8 @@ const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
     optimizePackageImports: ['lucide-react'],
-    turbopack: {
-      root: process.cwd(),
-    },
   },
+  outputFileTracingRoot: path.join(__dirname, '../../'),
   // Security headers
   async headers() {
     return [

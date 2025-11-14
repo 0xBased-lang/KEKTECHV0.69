@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,8 @@ import {
   Eye,
   AlertCircle
 } from "lucide-react";
-import { useMarketList, useMarketInfo } from "@/lib/hooks/kektech/useMarketData";
+import { useMarketList } from "@/lib/hooks/kektech/useMarketData";
+import { useMarketInfoList } from "@/lib/hooks/useMarketInfoList";
 import { formatDistanceToNow } from "date-fns";
 import { formatEther } from "viem";
 import type { Address } from "viem";
@@ -34,32 +35,27 @@ interface MarketMetrics {
 
 export function ActiveMarketsPanel() {
   const { markets, isLoading } = useMarketList(true);
+  const {
+    marketInfos,
+    isLoading: isLoadingMarketInfo,
+  } = useMarketInfoList(markets as Address[] | undefined);
   const [metrics, setMetrics] = useState<Record<string, MarketMetrics>>({});
   const [loadingMetrics, setLoadingMetrics] = useState(false);
   const [sortBy, setSortBy] = useState<'volume' | 'activity' | 'expiry'>('volume');
 
-  // Call hooks for ALL markets at top level (required by React rules)
-  const marketInfos = markets.map((address) => useMarketInfo(address, true));
+  const marketInfoByAddress = useMemo(() => {
+    const map: Record<string, (typeof marketInfos)[number]['info']> = {};
+    marketInfos.forEach(({ address, info }) => {
+      map[address] = info;
+    });
+    return map;
+  }, [marketInfos]);
 
-  // DEBUG: Log market info
-  useEffect(() => {
-    console.log('[ActiveMarketsPanel] Total markets:', markets.length);
-    console.log('[ActiveMarketsPanel] Market states:', marketInfos.map((info, idx) => ({
-      address: markets[idx],
-      state: info?.state,
-      question: info?.question
-    })));
-  }, [markets, marketInfos]);
-
-  // Filter for ACTIVE markets (state = 2) using the pre-fetched info
-  const activeMarkets = markets.filter((_, index) => {
-    return marketInfos[index]?.state === 2;
-  });
-
-  // DEBUG: Log active markets count
-  useEffect(() => {
-    console.log('[ActiveMarketsPanel] Active markets (state=2):', activeMarkets.length);
-  }, [activeMarkets.length]);
+  const activeMarkets = useMemo(() => {
+    return marketInfos
+      .filter(({ info }) => info?.state === 2)
+      .map(({ address }) => address);
+  }, [marketInfos]);
 
   useEffect(() => {
     // Fetch metrics for all active markets
@@ -100,27 +96,27 @@ export function ActiveMarketsPanel() {
 
   // Sort markets based on selected criteria
   // Note: We already have marketInfos from above for all markets
-  const sortedMarkets = [...activeMarkets].sort((aAddress, bAddress) => {
-    const aIndex = markets.indexOf(aAddress);
-    const bIndex = markets.indexOf(bAddress);
+  const sortedMarkets = useMemo(() => {
+    return [...activeMarkets].sort((aAddress, bAddress) => {
+      if (sortBy === 'volume') {
+        const volumeA = metrics[aAddress]?.volume24h || 0n;
+        const volumeB = metrics[bAddress]?.volume24h || 0n;
+        return volumeB > volumeA ? 1 : -1;
+      }
 
-    if (sortBy === 'volume') {
-      const volumeA = metrics[aAddress]?.volume24h || 0n;
-      const volumeB = metrics[bAddress]?.volume24h || 0n;
-      return volumeB > volumeA ? 1 : -1;
-    } else if (sortBy === 'activity') {
-      const betsA = metrics[aAddress]?.totalBets || 0;
-      const betsB = metrics[bAddress]?.totalBets || 0;
-      return betsB - betsA;
-    } else {
-      // Sort by expiry (soonest first) using pre-fetched market info
-      const infoA = marketInfos[aIndex];
-      const infoB = marketInfos[bIndex];
-      return Number(infoA?.resolutionTime || 0n) - Number(infoB?.resolutionTime || 0n);
-    }
-  });
+      if (sortBy === 'activity') {
+        const betsA = metrics[aAddress]?.totalBets || 0;
+        const betsB = metrics[bAddress]?.totalBets || 0;
+        return betsB - betsA;
+      }
 
-  if (isLoading) {
+      const resolutionA = marketInfoByAddress[aAddress]?.resolutionTime || 0n;
+      const resolutionB = marketInfoByAddress[bAddress]?.resolutionTime || 0n;
+      return Number(resolutionA) - Number(resolutionB);
+    });
+  }, [activeMarkets, sortBy, metrics, marketInfoByAddress]);
+
+  if (isLoading || isLoadingMarketInfo) {
     return (
       <Card>
         <CardHeader>
