@@ -6,7 +6,6 @@
  */
 'use client'
 
-import { useEffect } from 'react'
 import { useComments, useCommentSubscription } from '@/lib/api/engagement'
 import { CommentItem } from './CommentItem'
 import { Alert, AlertDescription } from '@/components/ui/alert'

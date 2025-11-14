@@ -17,13 +17,13 @@ import { useState, memo } from 'react';
  * Wrapper component for each market that calls hooks safely
  * This pattern avoids React Hooks violations when filtering dynamic lists
  */
-const ProposalCardWrapper = memo(({
+const ProposalCardWrapper = memo(function ProposalCardWrapper({
   address,
   showAll
 }: {
   address: Address;
   showAll: boolean;
-}) => {
+}) {
   const marketInfo = useMarketInfo(address, true);
 
   // In normal mode, only show PROPOSED markets

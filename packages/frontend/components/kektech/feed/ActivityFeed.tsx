@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react';
 import { FeedPost } from './FeedPost';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
-import { MessageSquare, TrendingUp, Users, Clock } from 'lucide-react';
+import { MessageSquare, TrendingUp, Clock } from 'lucide-react';
 
 export type FeedTab = 'all' | 'markets' | 'comments' | 'following';
 

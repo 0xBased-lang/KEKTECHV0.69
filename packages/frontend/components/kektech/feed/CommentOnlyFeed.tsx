@@ -5,7 +5,7 @@
 'use client';
 
 import { useKektechWebSocket, MarketEvent } from '@/lib/hooks/useKektechWebSocket';
-import { MessageSquare, ThumbsUp, ThumbsDown, User, Clock } from 'lucide-react';
+import { MessageSquare, ThumbsUp, ThumbsDown, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { truncate } from '@/lib/utils';
