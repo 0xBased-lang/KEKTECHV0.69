@@ -117,6 +117,7 @@ export function ConnectWalletButton() {
                         }}
                       >
                         {chain.iconUrl && (
+                          /* eslint-disable-next-line @next/next/no-img-element */
                           <img
                             alt={chain.name ?? 'Chain icon'}
                             src={chain.iconUrl}

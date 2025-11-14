@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useAccount, usePublicClient, useReadContract } from 'wagmi'
 import { KEKTV_MARKETPLACE_ADDRESS, KEKTV_MARKETPLACE_ABI } from '@/config/contracts/kektv-marketplace'
 import { KEKTECH_VOUCHERS, VOUCHER_TYPES } from '@/config/contracts/kektech-vouchers'
@@ -38,7 +38,10 @@ export function useKektvListings(sellerAddress?: `0x${string}`) {
 
   // If seller address provided, check only that seller (for "Your Listings")
   // If not provided, check ALL known sellers (for "Browse & Buy")
-  const targetAddresses = sellerAddress ? [sellerAddress] : KNOWN_SELLERS
+  const targetAddresses = useMemo(
+    () => (sellerAddress ? [sellerAddress] : KNOWN_SELLERS),
+    [sellerAddress]
+  )
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -100,7 +103,7 @@ export function useKektvListings(sellerAddress?: `0x${string}`) {
     }
 
     fetchListings()
-  }, [publicClient, ...targetAddresses])
+  }, [publicClient, targetAddresses])
 
   return {
     listings,

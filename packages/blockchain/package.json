@@ -40,8 +40,6 @@
     "security:mythril": "myth analyze contracts/**/*.sol",
     "lint": "solhint 'contracts/**/*.sol'",
     "format": "prettier --write 'contracts/**/*.sol'",
-    "backend:dev": "cd backend && npm run dev",
-    "backend:build": "cd backend && npm run build",
     "frontend:dev": "cd frontend && npm run dev",
     "frontend:build": "cd frontend && npm run build",
     "agent:architect": "node agents/cli/blockchain-architect.js",

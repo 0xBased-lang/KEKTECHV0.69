@@ -33,7 +33,6 @@ export function useRankings(pollInterval = 30000) {
       
       // Log successful update (only in development)
       if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
         console.log(`✅ Rankings updated: ${data.nfts?.length || 0} NFTs at ${new Date().toLocaleTimeString()}`)
       }
     } catch (err) {

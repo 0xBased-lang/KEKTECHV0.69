@@ -177,6 +177,7 @@ export function MintForm() {
               {mintedNFTs.slice(0, 3).map((nft) => (
                 <div key={nft.tokenId} className="relative group">
                   {nft.imageUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={nft.imageUrl}
                       alt={nft.name}

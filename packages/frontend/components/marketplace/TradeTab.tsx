@@ -376,6 +376,7 @@ function BrowseListings({ onSelectNFT }: { onSelectNFT: (tokenId: number) => voi
 function ListVouchers() {
   const { vouchers, isLoading } = useUserVoucherBalances()
   const approval = useKektvApproval()
+  const { isSuccess, refetch } = approval
   const marketplace = useKektvMarketplace()
   const { metadataMap, loading: metadataLoading } = useAllVoucherMetadata()
   const [selectedVoucher, setSelectedVoucher] = useState<number | null>(null)
@@ -384,15 +385,15 @@ function ListVouchers() {
 
   // Watch for successful approval and refetch approval status
   useEffect(() => {
-    if (approval.isSuccess) {
+    if (isSuccess) {
       // Wait a bit for blockchain to update, then refetch
       const timer = setTimeout(async () => {
-        await approval.refetch()
+        await refetch()
         alert('Marketplace approved! You can now list vouchers.')
       }, 2000)
       return () => clearTimeout(timer)
     }
-  }, [approval.isSuccess, approval.refetch])
+  }, [isSuccess, refetch])
 
   const handleApprove = async () => {
     try {

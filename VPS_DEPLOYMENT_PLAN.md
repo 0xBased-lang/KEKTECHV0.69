@@ -2,6 +2,8 @@
 **Date**: 2025-11-13
 **Purpose**: Deploy TypeScript config fixes and recent backend improvements
 
+> **Important**: The backend code no longer lives under `packages/backend` in this monorepo. Use the private `kektech-backend` repository (either locally or directly on the VPS at `/var/www/kektech/backend`) when following the steps below. Replace any references to `packages/backend` with the actual backend repo path on your machine.
+
 ## Pre-Deployment Checklist
 
 ### 1. Local Verification ✅
@@ -46,13 +48,14 @@ git log -1 --oneline
 
 ### Step 1: Commit Local Changes
 ```bash
-cd /Users/seman/Desktop/kektechV0.69
+# Work inside the private backend repository (example path shown)
+cd /path/to/kektech-backend
 
 # Stage backend changes only (safer)
-git add packages/backend/tsconfig.json
-git add packages/backend/package.json
-git add packages/backend/services/
-git add packages/backend/shared/
+git add tsconfig.json
+git add package.json
+git add services/
+git add shared/
 
 # Create deployment commit
 git commit -m "fix: Backend TypeScript config and service improvements

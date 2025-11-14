@@ -35,10 +35,10 @@
 
 ## 🖥️ BACKEND INFRASTRUCTURE
 
-**Location**: `packages/backend/` (Monorepo) | `/var/www/kektech/backend/` (VPS Production)
-**Status**: ✅ Deployed and operational on VPS
-**Access**: `ssh kek` → `/var/www/kektech/backend/`
-**Repository**: Consolidated in main monorepo (single git repository)
+**Location**: `/var/www/kektech/backend/` (VPS Production)  
+**Status**: ✅ Deployed and operational on VPS  
+**Access**: `ssh kek` → `/var/www/kektech/backend/`  
+**Repository**: Private `kektech-backend` repo (not tracked in this monorepo – pull directly on the VPS)
 
 ### Architecture Flow
 ```
@@ -84,11 +84,11 @@ pm2 logs --lines 100    # View last 100 lines
 
 ### Key Components
 
-**Services** (`packages/backend/services/`):
+**Services** (refer to private backend repo paths):
 - `event-indexer/index.ts` - Polls BasedAI mainnet every 10s, batch processes 100 blocks
 - `websocket-server/index.ts` - Real-time event broadcasting on port 3180
 
-**Shared Utilities** (`packages/backend/shared/`):
+**Shared Utilities**:
 - `config/contracts.ts` - Contract addresses & ethers.js providers
 - `utils/supabase.ts` - Database client (service role key)
 - `utils/redis.ts` - Pub/sub messaging for real-time events
@@ -110,9 +110,9 @@ pm2 logs --lines 100    # View last 100 lines
 ### Critical Notes
 
 ⚠️ **Local vs VPS**:
-- Local `packages/backend/` - Development and testing only
-- VPS `/var/www/kektech/backend/` - Production deployment
-- Changes: Local → Git push → SSH to VPS → Pull & restart
+- The `packages/backend` folder was removed from this repository. Do **not** recreate it here.
+- Use the private backend repository when making changes, then deploy via `ssh kek` → `/var/www/kektech/backend/`.
+- Production updates still follow: private repo → push → SSH into VPS → `git pull` → restart PM2.
 
 ⚠️ **Environment Variables**:
 - `.env.example` in git (template only)

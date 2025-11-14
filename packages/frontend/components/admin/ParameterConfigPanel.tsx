@@ -1,7 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -43,9 +39,11 @@ interface Parameter {
   category: string;
 }
 
+type ParameterChange = number | boolean;
+
 export function ParameterConfigPanel() {
   const [mode, setMode] = useState<'testing' | 'production'>('testing');
-  const [changes, setChanges] = useState<Record<string, any>>({});
+  const [changes, setChanges] = useState<Record<string, ParameterChange>>({});
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -247,7 +245,7 @@ export function ParameterConfigPanel() {
     },
   };
 
-  const handleParameterChange = (key: string, value: any) => {
+  const handleParameterChange = (key: string, value: ParameterChange) => {
     setChanges({
       ...changes,
       [key]: value
@@ -268,7 +266,7 @@ export function ParameterConfigPanel() {
           continue; // Handle separately
         } else if (typeof value === 'boolean') {
           booleanChanges.push([key, value]);
-        } else {
+        } else if (typeof value === 'number') {
           // Convert BASED values to wei
           let finalValue = value;
           if (parameters[key]?.unit === 'BASED') {
@@ -291,10 +289,11 @@ export function ParameterConfigPanel() {
       }
 
       // Handle dispute window separately if changed
-      if (changes.disputeWindow !== undefined) {
+      const disputeWindowChange = changes.disputeWindow;
+      if (typeof disputeWindowChange === 'number') {
         const seconds = mode === 'testing'
-          ? Math.floor(changes.disputeWindow * 60)
-          : Math.floor(changes.disputeWindow * 3600);
+          ? Math.floor(disputeWindowChange * 60)
+          : Math.floor(disputeWindowChange * 3600);
         await updateDisputeWindowHook.updateDisputeWindow(seconds);
       }
 
@@ -306,9 +305,9 @@ export function ParameterConfigPanel() {
       // Data will update automatically after transactions confirm
 
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to save parameters:", error);
-      setSaveError(error.message || "Failed to save parameters");
+      setSaveError(error instanceof Error ? error.message : "Failed to save parameters");
     }
   };
 
@@ -328,13 +327,29 @@ export function ParameterConfigPanel() {
 
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to switch mode:", error);
-      setSaveError(error.message || "Failed to switch mode");
+      setSaveError(error instanceof Error ? error.message : "Failed to switch mode");
     }
   };
 
   const hasChanges = Object.keys(changes).length > 0;
+
+  const getNumericValue = (param: Parameter): number => {
+    const change = changes[param.key]
+    if (typeof change === 'number') {
+      return change
+    }
+    return typeof param.value === 'number' ? param.value : Number(param.value)
+  }
+
+  const getBooleanValue = (param: Parameter): boolean => {
+    const change = changes[param.key]
+    if (typeof change === 'boolean') {
+      return change
+    }
+    return Boolean(param.value)
+  }
 
   return (
     <Card>
@@ -454,7 +469,7 @@ export function ParameterConfigPanel() {
                   <ParameterField
                     key={param.key}
                     param={param}
-                    value={changes[param.key] ?? param.value}
+                    value={getNumericValue(param)}
                     onChange={(val) => handleParameterChange(param.key, val)}
                   />
                 ))}
@@ -475,7 +490,7 @@ export function ParameterConfigPanel() {
                   <ParameterField
                     key={param.key}
                     param={param}
-                    value={changes[param.key] ?? param.value}
+                    value={getNumericValue(param)}
                     onChange={(val) => handleParameterChange(param.key, val)}
                   />
                 ))}
@@ -498,7 +513,7 @@ export function ParameterConfigPanel() {
                   <ParameterField
                     key={param.key}
                     param={param}
-                    value={changes[param.key] ?? param.value}
+                    value={getNumericValue(param)}
                     onChange={(val) => handleParameterChange(param.key, val)}
                   />
                 ))}
@@ -519,7 +534,7 @@ export function ParameterConfigPanel() {
                   <ParameterField
                     key={param.key}
                     param={param}
-                    value={changes[param.key] ?? param.value}
+                    value={getNumericValue(param)}
                     onChange={(val) => handleParameterChange(param.key, val)}
                   />
                 ))}
@@ -540,7 +555,7 @@ export function ParameterConfigPanel() {
                   <BooleanParameterField
                     key={param.key}
                     param={param}
-                    value={changes[param.key] ?? param.value}
+                    value={getBooleanValue(param)}
                     onChange={(val) => handleParameterChange(param.key, val)}
                   />
                 ))}

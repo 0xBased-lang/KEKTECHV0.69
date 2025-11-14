@@ -15,7 +15,7 @@ Copy and paste these into your Vercel Dashboard:
 
 ---
 
-## Variables to Add (16 total)
+## Variables to Add (21 total)
 
 ### 1. DATABASE_URL
 - **Name**: `DATABASE_URL`
@@ -130,6 +130,68 @@ Copy and paste these into your Vercel Dashboard:
 
 ---
 
+### 17. NEXT_PUBLIC_METADATA_API
+- **Name**: `NEXT_PUBLIC_METADATA_API`
+- **Value**: `https://kektech.xyz/api/metadata`
+- **Environments**: ✅ Production, ✅ Preview, ✅ Development
+
+---
+
+### 18. NEXT_PUBLIC_RANKING_API
+- **Name**: `NEXT_PUBLIC_RANKING_API`
+- **Value**: `https://api.kektech.xyz`
+- **Environments**: ✅ Production, ✅ Preview, ✅ Development
+
+---
+
+### 19. NEXT_PUBLIC_CONTRACT_ADDRESS
+- **Name**: `NEXT_PUBLIC_CONTRACT_ADDRESS`
+- **Value**: `0x40B6184b901334C0A88f528c1A0a1de7a77490f1`
+- **Environments**: ✅ Production, ✅ Preview, ✅ Development
+
+---
+
+### 20. NEXT_PUBLIC_APP_URL
+- **Name**: `NEXT_PUBLIC_APP_URL`
+- **Value**: `https://kektech-frontend.vercel.app` (Production) / `http://localhost:3000` (Development)
+- **Environments**: ✅ Production, ✅ Preview, ✅ Development
+
+---
+
+### 21. NEXT_PUBLIC_REOWN_PROJECT_ID
+- **Name**: `NEXT_PUBLIC_REOWN_PROJECT_ID`
+- **Value**: `[Your Reown / WalletConnect Cloud project ID]`
+- **Environments**: ✅ Production, ✅ Preview, ✅ Development
+
+---
+
+## Server-side Only Variables
+
+Add these to Vercel with _Server_ exposure only (Default permission). They must never be exposed to the client.
+
+### SUPABASE_SERVICE_KEY
+- **Name**: `SUPABASE_SERVICE_KEY`
+- **Value**: `[Supabase service_role key from Settings → API]`
+- **Environments**: ✅ Production, ✅ Preview, ❌ Development
+- **Purpose**: Required for SIWE auth and admin actions.
+
+---
+
+### UPSTASH_REDIS_REST_URL
+- **Name**: `UPSTASH_REDIS_REST_URL`
+- **Value**: `[Your Upstash REST endpoint URL]`
+- **Environments**: ✅ Production, ✅ Preview, (optional) ✅ Development
+- **Purpose**: Enables global rate limiting. Leave blank to fallback to in-memory limits while developing.
+
+---
+
+### UPSTASH_REDIS_REST_TOKEN
+- **Name**: `UPSTASH_REDIS_REST_TOKEN`
+- **Value**: `[Matching Upstash REST token]`
+- **Environments**: ✅ Production, ✅ Preview, (optional) ✅ Development
+
+---
+
 ## Verification
 
 After adding all variables, run:
@@ -137,7 +199,7 @@ After adding all variables, run:
 vercel env ls
 ```
 
-You should see 16 environment variables listed.
+You should see all 21 public variables listed (plus the server-only entries if you added them).
 
 ---
 

@@ -9,7 +9,8 @@ const TEST_MARKET_ADDRESS = '0x31d2BC49A6FD4a066F5f8AC61Acd0E6c9105DD84'
 const TEST_USER_ID = 'test-voter-123'
 const BASE_URL = 'http://localhost:3000'
 
-describe('Voting API', () => {
+// Legacy endpoints under /api/voting/* were removed; skip until new routes exist.
+describe.skip('Voting API (legacy endpoints)', () => {
   describe('Proposal Voting', () => {
     describe('GET /api/voting/proposal-votes/[marketAddress]', () => {
       it('should fetch proposal votes for a market', async () => {

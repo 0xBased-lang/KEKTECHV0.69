@@ -12,7 +12,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   // Create a response object to modify
-  let response = NextResponse.next({
+  const response = NextResponse.next({
     request,
   })
 

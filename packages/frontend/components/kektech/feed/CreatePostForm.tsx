@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
-import { Send, Image, Link as LinkIcon, X } from 'lucide-react';
+import { Send, Image as ImageIcon, Link as LinkIcon, X } from 'lucide-react';
 
 const MAX_POST_LENGTH = 500;
 
@@ -79,7 +79,7 @@ export function CreatePostForm() {
                   className="p-2 hover:bg-terminal-elevated rounded transition"
                   title="Advanced options"
                 >
-                  <Image className="w-4 h-4 text-terminal-tertiary hover:text-[#3fb8bd] transition" />
+                  <ImageIcon className="w-4 h-4 text-terminal-tertiary hover:text-[#3fb8bd] transition" />
                 </button>
                 <button
                   type="button"
