@@ -31,8 +31,7 @@ import {
   useGetMinDisputeBond,
   useUpdateParameter,
   useUpdateBoolParameter,
-  useUpdateDisputeWindow,
-  useBatchUpdateParameters
+  useUpdateDisputeWindow
 } from "@/lib/hooks/kektech";
 
 // Parameter structure from config/parameters.js
@@ -84,7 +83,6 @@ export function ParameterConfigPanel() {
   const updateParameter = useUpdateParameter();
   const updateBoolParameter = useUpdateBoolParameter();
   const updateDisputeWindowHook = useUpdateDisputeWindow();
-  const batchUpdate = useBatchUpdateParameters();
 
   // Determine mode from dispute window (15 min = testing, 48 hours = production)
   useEffect(() => {
