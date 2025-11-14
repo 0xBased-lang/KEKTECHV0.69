@@ -165,7 +165,7 @@ function TopCommentCard({
           <div className="flex-1 min-w-0">
             {/* Comment Text */}
             <p className="text-gray-200 mb-3 group-hover:text-white transition">
-              "{truncate(comment.comment, 200)}"
+              &ldquo;{truncate(comment.comment, 200)}&rdquo;
             </p>
 
             {/* Metadata */}

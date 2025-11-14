@@ -156,7 +156,7 @@ function CommentEventCard({ event }: { event: MarketEvent }) {
             {/* Comment text (if available) */}
             {commentText && (
               <p className="text-sm text-gray-400 line-clamp-2 mb-2">
-                "{truncate(commentText, 100)}"
+                &ldquo;{truncate(commentText, 100)}&rdquo;
               </p>
             )}
 

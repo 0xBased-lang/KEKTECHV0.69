@@ -60,7 +60,7 @@ export function TopCommentsWidget({ className = '' }: TopCommentsWidgetProps) {
         {/* Comment Text */}
         <div className="mb-3 p-3 bg-gray-900/50 rounded-lg">
           <p className="text-sm text-gray-200 group-hover:text-white transition line-clamp-3">
-            "{truncate(topComment.comment, 150)}"
+            &ldquo;{truncate(topComment.comment, 150)}&rdquo;
           </p>
         </div>
 

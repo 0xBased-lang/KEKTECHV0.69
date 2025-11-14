@@ -71,7 +71,7 @@ export default function MarketPage({ params }: MarketPageProps) {
         <div className="text-center">
           <div className="text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-white mb-2">Market Not Found</h2>
-          <p className="text-gray-400 mb-6">This market doesn't exist or failed to load</p>
+          <p className="text-gray-400 mb-6">This market doesn&apos;t exist or failed to load</p>
           <Link
             href="/markets"
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#3fb8bd] hover:bg-[#3fb8bd]/90 text-white font-semibold rounded-xl transition"

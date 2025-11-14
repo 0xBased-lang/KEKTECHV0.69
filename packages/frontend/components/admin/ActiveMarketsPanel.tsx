@@ -234,7 +234,7 @@ export function ActiveMarketsPanel() {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              No active markets at the moment. Markets will appear here once they're activated.
+              No active markets at the moment. Markets will appear here once they&apos;re activated.
             </AlertDescription>
           </Alert>
         ) : (

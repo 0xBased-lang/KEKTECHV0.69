@@ -378,7 +378,7 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
           <div>
             <h3 className="text-2xl font-bold text-white mb-2">Define the outcomes</h3>
             <p className="text-gray-400 mb-6">
-              What are the possible outcomes for this market? (e.g., "Yes" and "No")
+              What are the possible outcomes for this market? (e.g., &ldquo;Yes&rdquo; and &ldquo;No&rdquo;)
             </p>
 
             <div className="space-y-4">
@@ -427,7 +427,7 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
                     <ul className="list-disc list-inside space-y-1 text-blue-400/80">
                       <li>Outcomes should be clear and mutually exclusive</li>
                       <li>Use simple, unambiguous language</li>
-                      <li>Examples: "Yes/No", "Happens/Doesn't Happen", "Above/Below"</li>
+                      <li>Examples: &ldquo;Yes/No&rdquo;, &ldquo;Happens/Doesn&apos;t Happen&rdquo;, &ldquo;Above/Below&rdquo;</li>
                     </ul>
                   </div>
                 </div>
