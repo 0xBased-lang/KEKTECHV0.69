@@ -119,7 +119,7 @@ export function ResolutionVoteDisplay({ marketAddress }: ResolutionVoteDisplayPr
 
                 {/* Voter */}
                 <p className="text-xs font-mono text-muted-foreground">
-                  {vote.userAddress.slice(0, 6)}...{vote.userAddress.slice(-4)}
+                  {vote.userId.slice(0, 6)}...{vote.userId.slice(-4)}
                 </p>
 
                 {/* Comment */}
