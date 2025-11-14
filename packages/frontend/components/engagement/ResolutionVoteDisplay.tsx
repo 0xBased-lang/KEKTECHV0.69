@@ -18,7 +18,7 @@ interface ResolutionVoteDisplayProps {
 }
 
 export function ResolutionVoteDisplay({ marketAddress }: ResolutionVoteDisplayProps) {
-  const { data: votes, isLoading } = useResolutionVotes(marketAddress)
+  const { votes, isLoading } = useResolutionVotes(marketAddress)
 
   if (isLoading) {
     return (
