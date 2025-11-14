@@ -32,7 +32,6 @@ import {
   useUpdateParameter,
   useUpdateBoolParameter,
   useUpdateDisputeWindow,
-  useUpdateMinDisputeBond,
   useBatchUpdateParameters
 } from "@/lib/hooks/kektech";
 
