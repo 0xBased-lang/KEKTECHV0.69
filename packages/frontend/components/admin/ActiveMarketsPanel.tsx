@@ -116,7 +116,7 @@ export function ActiveMarketsPanel() {
       // Sort by expiry (soonest first) using pre-fetched market info
       const infoA = marketInfos[aIndex];
       const infoB = marketInfos[bIndex];
-      return (infoA?.expiryTime || 0) - (infoB?.expiryTime || 0);
+      return Number(infoA?.resolutionTime || 0n) - Number(infoB?.resolutionTime || 0n);
     }
   });
 
@@ -264,7 +264,7 @@ function ActiveMarketCard({
 }) {
   const marketInfo = useMarketInfo(marketAddress, true);
 
-  const expiryTime = marketInfo.expiryTime ? new Date(Number(marketInfo.expiryTime) * 1000) : null;
+  const expiryTime = marketInfo.resolutionTime ? new Date(Number(marketInfo.resolutionTime) * 1000) : null;
   const isExpiringSoon = expiryTime && expiryTime.getTime() - Date.now() < 24 * 60 * 60 * 1000;
 
   return (
@@ -289,11 +289,13 @@ function ActiveMarketCard({
         </div>
 
         {/* View Market Button */}
-        <Button variant="outline" size="sm" asChild>
-          <a href={`/market/${marketAddress}`} target="_blank" rel="noopener noreferrer">
-            <Eye className="h-4 w-4 mr-1" />
-            View
-          </a>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => window.open(`/market/${marketAddress}`, '_blank')}
+        >
+          <Eye className="h-4 w-4 mr-1" />
+          View
         </Button>
       </div>
 
