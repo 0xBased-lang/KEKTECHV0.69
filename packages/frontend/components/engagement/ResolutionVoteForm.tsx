@@ -22,7 +22,7 @@ interface ResolutionVoteFormProps {
 }
 
 export function ResolutionVoteForm({ marketAddress }: ResolutionVoteFormProps) {
-  const { isAuthenticated, authenticate, walletAddress } = useWalletAuth()
+  const { isAuthenticated, authenticate, walletAddress: _walletAddress } = useWalletAuth()
   const { submitVote, isSubmitting } = useSubmitResolutionVote(marketAddress)
   const [isAgree, setIsAgree] = useState<boolean | null>(null)
   const [comment, setComment] = useState('')
@@ -47,8 +47,7 @@ export function ResolutionVoteForm({ marketAddress }: ResolutionVoteFormProps) {
     }
 
     try {
-      const userId = walletAddress || 'unknown-user'
-      await submitVote(userId, isAgree ? 'agree' : 'disagree', comment.trim())
+      await submitVote(isAgree ? 'agree' : 'disagree', comment.trim())
       toast.success('Resolution vote submitted!')
       setIsAgree(null)
       setComment('')
