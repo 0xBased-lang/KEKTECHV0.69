@@ -95,7 +95,7 @@ export function ResolutionVoteDisplay({ marketAddress }: ResolutionVoteDisplayPr
         <div className="space-y-3">
           <h4 className="font-medium text-sm">Community Votes</h4>
           <div className="space-y-3 max-h-96 overflow-y-auto">
-            {votes.map((vote) => (
+            {votes.votes.map((vote) => (
               <div
                 key={vote.id}
                 className="border rounded-lg p-4 space-y-2"
