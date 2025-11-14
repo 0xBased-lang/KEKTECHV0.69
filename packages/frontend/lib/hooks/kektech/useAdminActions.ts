@@ -321,7 +321,7 @@ export function useResolutionVotes(_marketAddress: Address) {
   const [votes] = useState({
     agreeCount: 0,
     disagreeCount: 0,
-    comments: [] as any[],
+    comments: [] as unknown[],
   });
 
   return {

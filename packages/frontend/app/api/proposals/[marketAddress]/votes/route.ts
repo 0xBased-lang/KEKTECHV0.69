@@ -6,6 +6,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+interface ProposalVote {
+  userId: string;
+  vote: 'like' | 'dislike';
+  marketAddress: string;
+  timestamp: string;
+}
+
 // Helper function to create Supabase client (lazy initialization)
 function getSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -43,14 +50,14 @@ export async function GET(
     }
 
     // Calculate vote counts
-    const likes = votes?.filter((v: any) => v.vote === 'like').length || 0;
-    const dislikes = votes?.filter((v: any) => v.vote === 'dislike').length || 0;
+    const likes = (votes as ProposalVote[])?.filter((v) => v.vote === 'like').length || 0;
+    const dislikes = (votes as ProposalVote[])?.filter((v) => v.vote === 'dislike').length || 0;
     const netVotes = likes - dislikes;
 
     // Get user's vote if userAddress provided
     let userVote: 'like' | 'dislike' | null = null;
     if (userAddress && votes) {
-      const userVoteRecord = votes.find((v: any) =>
+      const userVoteRecord = (votes as ProposalVote[]).find((v) =>
         v.userId.toLowerCase() === userAddress.toLowerCase()
       );
       userVote = userVoteRecord?.vote || null;

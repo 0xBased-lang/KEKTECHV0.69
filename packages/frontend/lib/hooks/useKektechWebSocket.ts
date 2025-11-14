@@ -27,7 +27,7 @@ const WS_URL = getWebSocketUrl();
 export interface MarketEvent {
   type: 'MarketCreated' | 'BetPlaced' | 'MarketResolved' | string;
   marketAddress: string;
-  data: any;
+  data: Record<string, unknown>;
   timestamp: string;
   blockNumber?: number;
   transactionHash?: string;
@@ -107,7 +107,7 @@ export function useKektechWebSocket(
   const eventIdsRef = useRef(new Set<string>()); // De-duplication
 
   const log = useCallback(
-    (...args: any[]) => {
+    (...args: unknown[]) => {
       if (debug) {
         console.log('[useKektechWebSocket]', ...args);
       }

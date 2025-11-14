@@ -105,9 +105,9 @@ export function ProposalCard({ marketAddress, compact = false }: ProposalCardPro
           userVote: voteType
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error submitting vote:', error);
-      alert(error.message || 'Failed to submit vote');
+      alert((error as Error).message || 'Failed to submit vote');
     } finally {
       setIsVoting(false);
     }
