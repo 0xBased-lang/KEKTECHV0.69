@@ -36,8 +36,7 @@ export function ProposalVoteButtons({ marketAddress }: ProposalVoteButtonsProps)
     }
 
     try {
-      const userId = address || 'unknown-user'
-      await submitVote(userId, isUpvote ? 'like' : 'dislike')
+      await submitVote(isUpvote ? 'like' : 'dislike')
       toast.success(isUpvote ? 'Voted like!' : 'Voted dislike!')
       refetch()
     } catch (error: unknown) {

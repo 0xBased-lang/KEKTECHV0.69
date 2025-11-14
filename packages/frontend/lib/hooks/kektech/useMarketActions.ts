@@ -196,7 +196,7 @@ export function useAdminApproveMarket(marketAddress: Address) {
   });
 
   const approveMarket = useCallback(() => {
-    write('approveMarket', [marketAddress]);
+    write('adminApproveMarket', [marketAddress]);
   }, [write, marketAddress]);
 
   return {
