@@ -5,7 +5,7 @@
 'use client';
 
 import { useTopComments } from '@/lib/hooks/useTopComments';
-import { MessageSquare, ThumbsUp, Crown, Sparkles } from 'lucide-react';
+import { ThumbsUp, Crown, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { truncate } from '@/lib/utils';

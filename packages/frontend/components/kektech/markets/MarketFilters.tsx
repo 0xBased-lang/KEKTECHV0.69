@@ -4,7 +4,7 @@
  */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Search, SlidersHorizontal, X, TrendingUp, Clock, DollarSign, Zap } from 'lucide-react';
 import { MarketState } from '@/lib/contracts/types';
 

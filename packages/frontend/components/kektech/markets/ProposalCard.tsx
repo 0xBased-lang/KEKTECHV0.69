@@ -10,7 +10,7 @@ import { useAccount } from 'wagmi';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { MarketState } from '@/lib/contracts/types';
 import { truncate, formatRelativeTime } from '@/lib/utils';
-import { ThumbsUp, ThumbsDown, TrendingUp, Users, Clock, Sparkles } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, TrendingUp, Clock, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import type { Address } from 'viem';
 

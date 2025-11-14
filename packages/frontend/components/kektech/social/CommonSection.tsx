@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import { useTopComments, TopCommentsTimeframe } from '@/lib/hooks/useTopComments';
-import { MessageSquare, ThumbsUp, TrendingUp, Clock, User } from 'lucide-react';
+import { MessageSquare, ThumbsUp, Clock, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { truncate } from '@/lib/utils';
