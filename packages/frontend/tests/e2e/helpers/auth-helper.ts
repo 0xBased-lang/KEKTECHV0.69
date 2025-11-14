@@ -70,6 +70,7 @@ export class AuthHelper {
 
       // 2. Sign message with wallet
       const signature = await walletClient.signMessage({
+        account: walletClient.account,
         message,
       });
 

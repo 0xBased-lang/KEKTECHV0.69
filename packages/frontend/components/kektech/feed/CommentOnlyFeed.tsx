@@ -131,7 +131,9 @@ function CommentEventCard({ event }: { event: MarketEvent }) {
   const commentText: string = typeof rawComment === 'string' ? rawComment : String(rawComment ?? '');
   const rawAuthor = event.data?.author ?? event.data?.user ?? 'Anonymous';
   const author = typeof rawAuthor === 'string' ? rawAuthor : String(rawAuthor ?? 'Anonymous');
-  const marketName = event.data?.marketName || truncate(event.marketAddress, 12);
+  const rawMarketName = event.data?.marketName ?? event.marketAddress;
+  const marketLabel = typeof rawMarketName === 'string' ? rawMarketName : String(rawMarketName ?? event.marketAddress);
+  const marketName = truncate(marketLabel, 32);
 
   return (
     <Link

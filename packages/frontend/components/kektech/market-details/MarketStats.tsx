@@ -7,7 +7,7 @@
 import { useMarketInfo, useMarketOdds } from '@/lib/hooks/kektech';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { formatBasedAmount, formatPercentage } from '@/lib/utils';
-import { TrendingUp, TrendingDown, Users, DollarSign, BarChart3, PieChart } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, BarChart3, PieChart } from 'lucide-react';
 import type { Address } from 'viem';
 
 interface MarketStatsProps {
@@ -41,11 +41,10 @@ export function MarketStats({ marketAddress }: MarketStatsProps) {
   // DO NOT calculate from raw shares - that misses virtual liquidity!
   const yesPercentage = odds.odds1Probability;
   const noPercentage = odds.odds2Probability;
-  const totalShares = (market.totalYesShares || 0n) + (market.totalNoShares || 0n);
-  const totalVolume = totalShares;
+  const totalVolume = market.totalVolume || 0n;
 
   // Calculate liquidity (simplified - in production, get from contract)
-  const liquidity = totalShares; // Placeholder
+  const liquidity = totalVolume; // Placeholder
 
   return (
     <div className="space-y-6">
@@ -79,9 +78,6 @@ export function MarketStats({ marketAddress }: MarketStatsProps) {
                 style={{ width: `${yesPercentage}%` }}
               />
             </div>
-            <p className="text-xs text-gray-400 mt-1">
-              {formatBasedAmount(market.totalYesShares || 0n, 2)} shares
-            </p>
           </div>
 
           {/* NO bar */}
@@ -106,9 +102,6 @@ export function MarketStats({ marketAddress }: MarketStatsProps) {
                 style={{ width: `${noPercentage}%` }}
               />
             </div>
-            <p className="text-xs text-gray-400 mt-1">
-              {formatBasedAmount(market.totalNoShares || 0n, 2)} shares
-            </p>
           </div>
         </div>
       </div>
@@ -140,36 +133,12 @@ export function MarketStats({ marketAddress }: MarketStatsProps) {
         </div>
       </div>
 
-      {/* Market Activity */}
-      <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
-        <div className="flex items-center gap-2 mb-4">
-          <Users className="w-5 h-5 text-[#3fb8bd]" />
-          <h3 className="text-lg font-bold text-white">Market Activity</h3>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 bg-gray-800 rounded-lg">
-            <p className="text-xs text-gray-400 mb-1">YES Volume</p>
-            <p className="text-xl font-bold text-green-400">
-              {formatBasedAmount(market.totalYesShares || 0n, 2)}
-            </p>
-          </div>
-
-          <div className="p-4 bg-gray-800 rounded-lg">
-            <p className="text-xs text-gray-400 mb-1">NO Volume</p>
-            <p className="text-xl font-bold text-red-400">
-              {formatBasedAmount(market.totalNoShares || 0n, 2)}
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Outcome (if finalized) */}
-      {market.outcome !== undefined && market.state === 5 && (
+      {market.result !== undefined && market.state === 5 && (
         <div className="p-6 bg-purple-500/10 border border-purple-500/30 rounded-xl">
           <h3 className="text-lg font-bold text-purple-400 mb-2">Final Outcome</h3>
           <p className="text-3xl font-bold text-white">
-            {market.outcome === 1 ? 'YES' : market.outcome === 2 ? 'NO' : 'INVALID'}
+            {market.result === 1 ? 'YES' : market.result === 2 ? 'NO' : 'INVALID'}
           </p>
         </div>
       )}

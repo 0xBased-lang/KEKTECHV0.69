@@ -19,7 +19,6 @@ import { useMarketInfoList } from "@/lib/hooks/useMarketInfoList";
 import { formatDistanceToNow } from "date-fns";
 import { formatEther } from "viem";
 import type { Address } from "viem";
-import type { MarketInfo } from "@/lib/contracts/types";
 
 interface MarketMetrics {
   totalBets: number;
@@ -41,7 +40,7 @@ export function ActiveMarketsPanel() {
   const [sortBy, setSortBy] = useState<'volume' | 'activity' | 'expiry'>('volume');
 
   const marketInfoByAddress = useMemo(() => {
-    const map: Record<string, (typeof marketInfos)[number]['info']> = {};
+    const map: Record<string, MarketInfoEntry> = {};
     marketInfos.forEach(({ address, info }) => {
       map[address] = info;
     });
@@ -247,6 +246,8 @@ export function ActiveMarketsPanel() {
   );
 }
 
+type MarketInfoEntry = ReturnType<typeof useMarketInfoList>['marketInfos'][number]['info'];
+
 function ActiveMarketCard({
   marketAddress,
   metrics,
@@ -256,7 +257,7 @@ function ActiveMarketCard({
   marketAddress: Address;
   metrics?: MarketMetrics;
   loadingMetrics: boolean;
-  marketInfo?: MarketInfo;
+  marketInfo?: MarketInfoEntry;
 }) {
 
   const expiryTime = marketInfo?.resolutionTime ? new Date(Number(marketInfo.resolutionTime) * 1000) : null;

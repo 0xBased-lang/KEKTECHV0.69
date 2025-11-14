@@ -111,7 +111,7 @@ export function createAdminWallet(): WalletClient {
   // Add 0x prefix if missing
   const formattedKey = privateKey.startsWith('0x')
     ? (privateKey as `0x${string}`)
-    : (`0x${string}` as `0x${string}`);
+    : (`0x${privateKey}` as `0x${string}`);
 
   return createWalletFromPrivateKey(formattedKey);
 }

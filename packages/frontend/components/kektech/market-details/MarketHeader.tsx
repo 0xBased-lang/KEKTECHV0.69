@@ -8,7 +8,7 @@ import { useMarketInfo } from '@/lib/hooks/kektech';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { MarketState } from '@/lib/contracts/types';
 import { formatRelativeTime, formatDate, copyToClipboard, formatAddress } from '@/lib/utils';
-import { Calendar, Clock, Tag, User, ExternalLink, Copy, CheckCircle } from 'lucide-react';
+import { Calendar, Clock, User, ExternalLink, Copy, CheckCircle } from 'lucide-react';
 import type { Address } from 'viem';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -88,6 +88,7 @@ export function MarketHeader({ marketAddress }: MarketHeaderProps) {
   }
 
   const config = stateConfig[market.state || MarketState.PROPOSED];
+  const resolutionTimestamp = market.resolutionTime ? Number(market.resolutionTime) : null;
 
   return (
     <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
@@ -97,10 +98,10 @@ export function MarketHeader({ marketAddress }: MarketHeaderProps) {
           <p className={cn('text-sm font-semibold', config.color)}>
             {config.label}
           </p>
-          {market.state === MarketState.ACTIVE && market.endTime && (
+          {market.state === MarketState.ACTIVE && resolutionTimestamp && (
             <p className="text-xs text-gray-400 flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              Ends {formatRelativeTime(Number(market.endTime))}
+              Ends {formatRelativeTime(resolutionTimestamp)}
             </p>
           )}
         </div>
@@ -113,26 +114,8 @@ export function MarketHeader({ marketAddress }: MarketHeaderProps) {
           {market.question}
         </h1>
 
-        {/* Description */}
-        {market.description && (
-          <p className="text-gray-300 mb-6 whitespace-pre-wrap leading-relaxed">
-            {market.description}
-          </p>
-        )}
-
         {/* Metadata grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pb-6 border-b border-gray-800">
-          {/* Category */}
-          {market.category && (
-            <div className="flex items-center gap-2">
-              <Tag className="w-4 h-4 text-gray-400" />
-              <div>
-                <p className="text-xs text-gray-400">Category</p>
-                <p className="text-sm font-semibold text-white">{market.category}</p>
-              </div>
-            </div>
-          )}
-
           {/* Creator */}
           {market.creator && (
             <div className="flex items-center gap-2">
@@ -160,13 +143,13 @@ export function MarketHeader({ marketAddress }: MarketHeaderProps) {
           )}
 
           {/* End date */}
-          {market.endTime && (
+          {resolutionTimestamp && (
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-gray-400" />
               <div>
                 <p className="text-xs text-gray-400">End Date</p>
                 <p className="text-sm font-semibold text-white">
-                  {formatDate(Number(market.endTime))}
+                  {formatDate(resolutionTimestamp)}
                 </p>
               </div>
             </div>

@@ -50,7 +50,7 @@ export function useTrendingMarkets(markets: Address[] | undefined, limit: number
         }
 
         // 1. Volume Score (40% weight)
-        const totalVolume = (info.totalYesShares || 0n) + (info.totalNoShares || 0n);
+        const totalVolume = info.totalVolume || 0n;
         const volumeInBased = Number(totalVolume) / 1e18;
         const volumeScore = Math.min(volumeInBased / 100, 1.0); // Max score at 100 BASED volume
 
@@ -111,7 +111,7 @@ export function useTrendingMarkets(markets: Address[] | undefined, limit: number
           score: finalScore,
           volume: totalVolume,
           createdAt,
-          state: info.state,
+          state: (info.state ?? MarketState.PROPOSED) as MarketState,
         };
       });
 

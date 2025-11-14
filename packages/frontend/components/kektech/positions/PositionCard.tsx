@@ -50,8 +50,8 @@ export function PositionCard({
   // Calculate potential profit (simplified)
   const isFinalized = market.state === MarketState.FINALIZED;
   const wonMarket = isFinalized && (
-    (market.outcome === Outcome.YES && hasYesShares) ||
-    (market.outcome === Outcome.NO && hasNoShares)
+    (market.result === Outcome.YES && hasYesShares) ||
+    (market.result === Outcome.NO && hasNoShares)
   );
 
   return (
@@ -63,11 +63,6 @@ export function PositionCard({
             <h3 className="font-semibold text-white group-hover:text-[#3fb8bd] transition line-clamp-2">
               {market.question}
             </h3>
-            {market.category && (
-              <span className="inline-block mt-2 px-2 py-1 bg-gray-800 rounded text-xs text-gray-300">
-                {market.category}
-              </span>
-            )}
           </div>
         )}
 
@@ -77,12 +72,12 @@ export function PositionCard({
           {hasYesShares && (
             <div className={cn(
               'p-3 rounded-lg',
-              wonMarket && market.outcome === Outcome.YES ? 'bg-green-500/10' : 'bg-gray-800'
+              wonMarket && market.result === Outcome.YES ? 'bg-green-500/10' : 'bg-gray-800'
             )}>
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-4 h-4 text-green-400" />
                 <span className="text-sm font-medium text-green-400">YES</span>
-                {wonMarket && market.outcome === Outcome.YES && (
+                {wonMarket && market.result === Outcome.YES && (
                   <Trophy className="w-4 h-4 text-yellow-400 ml-auto" />
                 )}
               </div>
@@ -97,12 +92,12 @@ export function PositionCard({
           {hasNoShares && (
             <div className={cn(
               'p-3 rounded-lg',
-              wonMarket && market.outcome === Outcome.NO ? 'bg-red-500/10' : 'bg-gray-800'
+              wonMarket && market.result === Outcome.NO ? 'bg-red-500/10' : 'bg-gray-800'
             )}>
               <div className="flex items-center gap-2 mb-2">
                 <TrendingDown className="w-4 h-4 text-red-400" />
                 <span className="text-sm font-medium text-red-400">NO</span>
-                {wonMarket && market.outcome === Outcome.NO && (
+                {wonMarket && market.result === Outcome.NO && (
                   <Trophy className="w-4 h-4 text-yellow-400 ml-auto" />
                 )}
               </div>

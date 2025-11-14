@@ -5,23 +5,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useTopComments, TopCommentsTimeframe } from '@/lib/hooks/useTopComments';
+import { useTopComments, TopCommentsTimeframe, TopComment } from '@/lib/hooks/useTopComments';
 import { MessageSquare, ThumbsUp, Clock, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { truncate } from '@/lib/utils';
 import { LoadingSpinner } from '@/components/kektech/ui/LoadingSpinner';
-
-interface Comment {
-  id: string;
-  comment: string;
-  marketAddress: string;
-  userId: string;
-  upvotes: number;
-  downvotes: number;
-  timestamp: string;
-  marketQuestion?: string;
-}
 
 interface CommonSectionProps {
   /** Maximum comments to display */
@@ -136,7 +125,7 @@ function TopCommentCard({
   comment,
   rank,
 }: {
-  comment: Comment;
+  comment: TopComment;
   rank: number;
 }) {
   return (

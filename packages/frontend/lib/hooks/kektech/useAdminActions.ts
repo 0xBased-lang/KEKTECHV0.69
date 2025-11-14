@@ -6,7 +6,7 @@
 'use client';
 
 import { useContractWrite } from './useContractWrite';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
 import type { Address } from 'viem';
 import { CONTRACT_ADDRESSES } from '@/lib/contracts/addresses';

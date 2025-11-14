@@ -1,23 +1,6 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Fredoka } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
-
-const fredoka = Fredoka({
-  variable: '--font-fredoka',
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-})
 
 export const metadata: Metadata = {
   title: 'KEKTECH NFT Collection | $BASED Chain',
@@ -51,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${fredoka.variable} antialiased`}>
+      <body className="antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

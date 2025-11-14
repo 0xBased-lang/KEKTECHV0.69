@@ -7,7 +7,7 @@
 import { useMemo } from 'react';
 import { useMarketInfo } from './kektech';
 import type { Address } from 'viem';
-import type { MarketInfo } from '@/lib/contracts/types';
+type MarketInfoResult = ReturnType<typeof useMarketInfo>;
 
 // Maximum number of markets to fetch at once (prevent too many hooks)
 const MAX_MARKETS = 100;
@@ -20,7 +20,7 @@ export function useMarketInfoList(
   addresses: Address[] | undefined,
   autoRefresh: boolean = false
 ): {
-  marketInfos: Array<{ address: Address; info: MarketInfo | undefined }>;
+  marketInfos: Array<{ address: Address; info: MarketInfoResult | undefined }>;
   isLoading: boolean;
   isError: boolean;
 } {
@@ -57,7 +57,7 @@ export function useMarketInfoList(
 
   // Filter out null addresses and aggregate loading/error states
   const marketInfos = useMemo(() => {
-    const validData: Array<{ address: Address; info: MarketInfo | undefined }> = [];
+    const validData: Array<{ address: Address; info: MarketInfoResult | undefined }> = [];
     let hasLoading = false;
     let hasError = false;
 
@@ -72,7 +72,7 @@ export function useMarketInfoList(
         });
 
         if (data.isLoading) hasLoading = true;
-        if (data.isError) hasError = true;
+        if (data.hasError) hasError = true;
       }
     }
 
@@ -93,7 +93,7 @@ export function useMarketInfoList(
 export function useMarketInfoListBatch(
   addresses: Address[] | undefined
 ): {
-  marketInfos: Array<{ address: Address; info: MarketInfo | undefined }>;
+  marketInfos: Array<{ address: Address; info: MarketInfoResult | undefined }>;
   isLoading: boolean;
   isError: boolean;
 } {

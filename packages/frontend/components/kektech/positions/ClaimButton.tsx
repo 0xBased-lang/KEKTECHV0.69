@@ -48,8 +48,8 @@ export function ClaimButton({
   // No winning position
   const hasYesShares = position.yesShares && position.yesShares > 0n;
   const hasNoShares = position.noShares && position.noShares > 0n;
-  const wonMarket = (market.outcome === Outcome.YES && hasYesShares) ||
-                    (market.outcome === Outcome.NO && hasNoShares);
+  const wonMarket = (market.result === Outcome.YES && hasYesShares) ||
+                   (market.result === Outcome.NO && hasNoShares);
 
   if (!wonMarket) {
     return null;
@@ -70,7 +70,7 @@ export function ClaimButton({
     );
   }
 
-  const winningShares = market.outcome === Outcome.YES ? position.yesShares : position.noShares;
+  const winningShares = market.result === Outcome.YES ? position.yesShares : position.noShares;
 
   const handleClaim = async () => {
     await claimWinnings();
@@ -132,7 +132,7 @@ export function ClaimButton({
           <div>
             <p className="text-xs text-gray-400 mb-1">Outcome</p>
             <p className="text-lg font-bold text-green-400">
-              {market.outcome === Outcome.YES ? 'YES' : 'NO'}
+              {market.result === Outcome.YES ? 'YES' : 'NO'}
             </p>
           </div>
         </div>

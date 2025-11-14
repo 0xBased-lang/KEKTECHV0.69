@@ -56,9 +56,6 @@ export default defineConfig({
 
     /* Maximum time each navigation can take */
     navigationTimeout: 30000,
-
-    /* Extra time for blockchain transactions */
-    timeout: 60000, // 60s for transaction confirmations
   },
 
   /* Configure projects for major browsers */

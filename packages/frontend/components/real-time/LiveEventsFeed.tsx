@@ -164,6 +164,7 @@ function EventCard({ event }: { event: MarketEvent }) {
   };
 
   const timestamp = event.timestamp ? new Date(event.timestamp) : new Date();
+  const eventQuestion = typeof event.data?.question === 'string' ? event.data.question : undefined;
 
   return (
     <div className="group rounded-md border bg-card p-3 transition-all hover:bg-accent/50">
@@ -182,8 +183,8 @@ function EventCard({ event }: { event: MarketEvent }) {
           </div>
 
           {/* Event details */}
-          {event.data?.question && (
-            <p className="text-sm text-muted-foreground">{event.data.question}</p>
+          {eventQuestion && (
+            <p className="text-sm text-muted-foreground">{eventQuestion}</p>
           )}
 
           {/* Market address */}

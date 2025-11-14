@@ -7,7 +7,7 @@
 import { useMarketInfo } from '@/lib/hooks/kektech';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { MarketState } from '@/lib/contracts/types';
-import { formatBasedAmount, formatPercentage, formatRelativeTime, truncate } from '@/lib/utils';
+import { formatBasedAmount, formatPercentage, formatRelativeTime } from '@/lib/utils';
 import { TrendingUp, Users, Clock, CheckCircle2, Pin, Flame, DollarSign, Zap } from 'lucide-react';
 import Link from 'next/link';
 import type { Address } from 'viem';
@@ -142,24 +142,27 @@ export function MarketCard({
     return null;
   }
 
-  const totalShares = (market.totalYesShares || 0n) + (market.totalNoShares || 0n);
-  const yesPercentage = totalShares > 0n ? (Number(market.totalYesShares) / Number(totalShares)) * 100 : 50;
-  const noPercentage = 100 - yesPercentage;
+  const totalVolume = market.totalVolume || 0n;
+  const yesPercentage = 50;
+  const noPercentage = 50;
 
   const config = stateConfig[market.state || MarketState.PROPOSED];
 
   // Calculate engagement metrics
   const engagementScore = calculateEngagementScore(
-    totalShares,
+    totalVolume,
     market.createdAt || 0n,
     market.state || MarketState.PROPOSED
   );
 
   const priorityBadge = getPriorityBadge(
     engagementScore,
-    totalShares,
+    totalVolume,
     market.state || MarketState.PROPOSED
   );
+  const cardClasses = compact
+    ? 'group terminal-card terminal-hover cursor-pointer px-4 py-3'
+    : 'group terminal-card terminal-hover cursor-pointer';
 
   return (
     <div className="relative">
@@ -183,7 +186,7 @@ export function MarketCard({
       )}
 
       <Link href={`/feels-good-markets/kek-futures/market/${marketAddress}`}>
-        <div className="group terminal-card terminal-hover cursor-pointer">
+        <div className={cardClasses}>
           {/* Header */}
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1 min-w-0">
@@ -194,11 +197,6 @@ export function MarketCard({
                 </h3>
               </div>
 
-              {!compact && market.description && (
-                <p className="text-sm text-terminal-tertiary line-clamp-2">
-                  {truncate(market.description, 150)}
-                </p>
-              )}
             </div>
 
             {/* State badge */}
@@ -233,7 +231,7 @@ export function MarketCard({
             <div>
               <p className="text-xs text-terminal-tertiary">Volume</p>
               <p className="text-sm font-semibold text-terminal-primary mono-numbers">
-                {formatBasedAmount((market.totalYesShares ?? 0n) + (market.totalNoShares ?? 0n))}
+                {formatBasedAmount(totalVolume)}
               </p>
             </div>
           </div>
@@ -276,22 +274,14 @@ export function MarketCard({
         )}
 
         {/* Outcome (for finalized markets) */}
-        {market.state === MarketState.FINALIZED && market.outcome !== undefined && (
+        {market.state === MarketState.FINALIZED && market.result !== undefined && (
           <div className="flex items-center gap-2 p-2.5 bg-[#bc8cff]/10 rounded border border-[#bc8cff]/20">
             <CheckCircle2 className="w-4 h-4 text-[#bc8cff]" />
             <span className="text-sm font-semibold text-[#bc8cff] mono-numbers">
-              OUTCOME: {market.outcome === 1 ? 'YES' : market.outcome === 2 ? 'NO' : 'INVALID'}
+              OUTCOME: {market.result === 1 ? 'YES' : market.result === 2 ? 'NO' : 'INVALID'}
             </span>
           </div>
         )}
-
-          {/* Category tag */}
-          {market.category && (
-            <div className="mt-3 inline-flex items-center px-2.5 py-1 bg-terminal-elevated rounded text-xs text-terminal-secondary border border-terminal">
-              <TrendingUp className="w-3 h-3 mr-1 text-[#3fb8bd]" />
-              {market.category}
-            </div>
-          )}
         </div>
       </Link>
     </div>

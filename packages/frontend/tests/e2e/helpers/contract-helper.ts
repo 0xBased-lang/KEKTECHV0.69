@@ -12,7 +12,7 @@ import {  type WalletClient,
   parseEther,
   formatEther,
 } from 'viem';
-import { createPublicClientForBasedAI } from './wallet-client';
+import { createPublicClientForBasedAI, basedAI } from './wallet-client';
 
 // Import contract addresses and ABIs from main codebase
 import { CONTRACT_ADDRESSES } from '../../../lib/contracts/addresses';
@@ -38,6 +38,8 @@ export class ContractHelper {
    */
   async approveMarket(marketAddress: Address): Promise<Hash> {
     const hash = await this.walletClient.writeContract({
+      account: this.walletClient.account!,
+      chain: basedAI,
       address: CONTRACT_ADDRESSES.MarketFactory as Address,
       abi: ABIS.MarketFactory,
       functionName: 'approveMarket',
@@ -55,6 +57,8 @@ export class ContractHelper {
    */
   async rejectMarket(marketAddress: Address, reason: string): Promise<Hash> {
     const hash = await this.walletClient.writeContract({
+      account: this.walletClient.account!,
+      chain: basedAI,
       address: CONTRACT_ADDRESSES.MarketFactory as Address,
       abi: ABIS.MarketFactory,
       functionName: 'rejectMarket',
@@ -83,6 +87,8 @@ export class ContractHelper {
     const amountWei = parseEther(amount);
 
     const hash = await this.walletClient.writeContract({
+      account: this.walletClient.account!,
+      chain: basedAI,
       address: marketAddress,
       abi: ABIS.PredictionMarket,
       functionName: 'placeBet',
@@ -106,6 +112,8 @@ export class ContractHelper {
     shareAmount: bigint
   ): Promise<Hash> {
     const hash = await this.walletClient.writeContract({
+      account: this.walletClient.account!,
+      chain: basedAI,
       address: marketAddress,
       abi: ABIS.PredictionMarket,
       functionName: 'sellShares',
@@ -122,6 +130,8 @@ export class ContractHelper {
    */
   async claimWinnings(marketAddress: Address): Promise<Hash> {
     const hash = await this.walletClient.writeContract({
+      account: this.walletClient.account!,
+      chain: basedAI,
       address: marketAddress,
       abi: ABIS.PredictionMarket,
       functionName: 'claimWinnings',
@@ -137,6 +147,8 @@ export class ContractHelper {
    */
   async activateMarket(marketAddress: Address): Promise<Hash> {
     const hash = await this.walletClient.writeContract({
+      account: this.walletClient.account!,
+      chain: basedAI,
       address: marketAddress,
       abi: ABIS.PredictionMarket,
       functionName: 'activate',
@@ -160,6 +172,8 @@ export class ContractHelper {
     reason: string
   ): Promise<Hash> {
     const hash = await this.walletClient.writeContract({
+      account: this.walletClient.account!,
+      chain: basedAI,
       address: CONTRACT_ADDRESSES.ResolutionManager as Address,
       abi: ABIS.ResolutionManager,
       functionName: 'resolveMarket',
@@ -177,6 +191,8 @@ export class ContractHelper {
    */
   async disputeMarket(marketAddress: Address, reason: string): Promise<Hash> {
     const hash = await this.walletClient.writeContract({
+      account: this.walletClient.account!,
+      chain: basedAI,
       address: marketAddress,
       abi: ABIS.PredictionMarket,
       functionName: 'dispute',

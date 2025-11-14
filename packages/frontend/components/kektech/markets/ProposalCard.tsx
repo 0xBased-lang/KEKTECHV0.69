@@ -9,7 +9,7 @@ import { useMarketInfo } from '@/lib/hooks/kektech';
 import { useAccount } from 'wagmi';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { MarketState } from '@/lib/contracts/types';
-import { truncate, formatRelativeTime } from '@/lib/utils';
+import { formatRelativeTime, formatAddress } from '@/lib/utils';
 import { ThumbsUp, ThumbsDown, TrendingUp, Clock, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import type { Address } from 'viem';
@@ -172,7 +172,7 @@ export function ProposalCard({ marketAddress, compact = false }: ProposalCardPro
             </div>
           )}
           <p className="text-xs text-gray-500">
-            by {truncate(market.creator || '', 10, 6)}
+            by {market.creator ? formatAddress(market.creator, 4) : 'Unknown'}
           </p>
         </div>
 
@@ -277,12 +277,6 @@ export function ProposalCard({ marketAddress, compact = false }: ProposalCardPro
             <Clock className="w-3 h-3" />
             <span>{formatRelativeTime(Number(market.createdAt))}</span>
           </div>
-          {market.category && (
-            <div className="flex items-center gap-1 px-2 py-1 bg-gray-800 rounded-full">
-              <TrendingUp className="w-3 h-3" />
-              <span>{market.category}</span>
-            </div>
-          )}
         </div>
       </div>
     </div>

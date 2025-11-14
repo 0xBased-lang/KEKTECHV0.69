@@ -46,7 +46,7 @@ export class APIHelper {
   /**
    * Check if user has voted
    */
-  async getUserVote(marketAddress: string, userAddress: string): Promise<string | null> {
+  async getUserVote(marketAddress: string, _userAddress: string): Promise<string | null> {
     const votes = await this.getProposalVotes(marketAddress);
     return votes.userVote || null;
   }

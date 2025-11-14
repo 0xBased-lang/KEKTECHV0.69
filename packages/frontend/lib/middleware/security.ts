@@ -91,7 +91,15 @@ export async function applySecurityMiddlewareWithConfig(
   if (securityCheck) return securityCheck;
 
   // 2. Rate limiting with custom config
-  const rateLimitCheck = await rateLimitMiddleware(request, rateLimitConfig);
+  const mergedConfig = rateLimitConfig
+    ? {
+        interval: rateLimitConfig.interval ?? 60 * 1000,
+        requests: rateLimitConfig.requests ?? 10,
+        uniqueTokenPerInterval: rateLimitConfig.uniqueTokenPerInterval ?? 500,
+      }
+    : undefined;
+
+  const rateLimitCheck = await rateLimitMiddleware(request, mergedConfig);
   if (rateLimitCheck) return rateLimitCheck;
 
   return null;
