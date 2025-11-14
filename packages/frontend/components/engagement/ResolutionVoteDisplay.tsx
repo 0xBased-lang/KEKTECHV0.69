@@ -47,12 +47,12 @@ export function ResolutionVoteDisplay({ marketAddress }: ResolutionVoteDisplayPr
     )
   }
 
-  // Calculate vote counts
-  const agreeVotes = votes.filter((v) => v.isAgree).length
-  const disagreeVotes = votes.filter((v) => !v.isAgree).length
-  const totalVotes = votes.length
-  const agreePercentage = (agreeVotes / totalVotes) * 100
-  const disagreePercentage = (disagreeVotes / totalVotes) * 100
+  // Use pre-calculated vote counts from API
+  const agreeVotes = votes.agreeCount
+  const disagreeVotes = votes.disagreeCount
+  const totalVotes = votes.total
+  const agreePercentage = votes.agreePercentage
+  const disagreePercentage = votes.disagreePercentage
 
   return (
     <Card>
