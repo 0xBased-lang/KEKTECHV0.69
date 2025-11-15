@@ -4,6 +4,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
 import type { Address } from 'viem';
 
 // Types
@@ -399,21 +401,47 @@ export function useCommentSubscription(
   onUpdate: () => void
 ) {
   useEffect(() => {
-    // TODO: Implement Supabase real-time subscription when integrated
-    // For now, this is a stub to prevent build errors
+    if (typeof window === 'undefined') {
+      return
+    }
 
-    // Example implementation (when Supabase is ready):
-    // const subscription = supabase
-    //   .from('comments')
-    //   .on('INSERT', () => onUpdate())
-    //   .on('UPDATE', () => onUpdate())
-    //   .on('DELETE', () => onUpdate())
-    //   .subscribe()
-    //
-    // return () => {
-    //   subscription.unsubscribe()
-    // }
+    const normalizedAddress = marketAddress.toLowerCase()
+    let channel: RealtimeChannel | null = null
+    let supabaseClient: ReturnType<typeof createClient> | null = null
 
-    return () => {}
+    try {
+      supabaseClient = createClient()
+      channel = supabaseClient
+        .channel(`comments:${normalizedAddress}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'Comment',
+            filter: `marketAddress=eq.${normalizedAddress}`
+          },
+          () => onUpdate()
+        )
+        .subscribe()
+    } catch (error) {
+      console.warn('[Comments] Supabase realtime unavailable:', error)
+    }
+
+    const eventHandler = (event: Event) => {
+      const detail = (event as CustomEvent<{ marketAddress: string }>).detail
+      if (detail?.marketAddress?.toLowerCase() === normalizedAddress) {
+        onUpdate()
+      }
+    }
+
+    window.addEventListener('comments:updated', eventHandler)
+
+    return () => {
+      window.removeEventListener('comments:updated', eventHandler)
+      if (channel && supabaseClient) {
+        supabaseClient.removeChannel(channel)
+      }
+    }
   }, [marketAddress, onUpdate])
 }

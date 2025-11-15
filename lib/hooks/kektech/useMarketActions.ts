@@ -6,24 +6,74 @@
 'use client';
 
 import { usePredictionMarketWrite, useContractWrite } from './useContractWrite';
-import { useCallback } from 'react';
-import type { Address } from 'viem';
+import { useCallback, useMemo } from 'react';
+import type { Address, Hex } from 'viem';
+import { decodeEventLog } from 'viem';
 import type { Outcome, MarketConfig } from '@/lib/contracts/types';
+import { ABIS, CONTRACT_ADDRESSES } from '@/lib/contracts';
 
 /**
  * Hook for creating a new market
  */
+interface CurveOptions {
+  curveType?: number;
+  curveParams?: bigint;
+}
+
 export function useCreateMarket() {
-  const { write, hash, isLoading, isSuccess, isError, error } = useContractWrite({
+  const {
+    write,
+    hash,
+    receipt,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    friendlyError,
+  } = useContractWrite({
     contractName: 'MarketFactory',
   });
 
   const createMarket = useCallback(
-    (config: MarketConfig, bond: bigint) => {
-      write('createMarket', [config], bond);
+    (config: MarketConfig, bond: bigint, curve?: CurveOptions) => {
+      if (curve && typeof curve.curveType === 'number') {
+        write('createMarketWithCurve', [config, curve.curveType, curve.curveParams ?? 0n], bond);
+      } else {
+        write('createMarket', [config], bond);
+      }
     },
     [write]
   );
+
+  const marketAddress = useMemo(() => {
+    if (!receipt) return null;
+
+    for (const log of receipt.logs ?? []) {
+      if (log.address.toLowerCase() !== CONTRACT_ADDRESSES.MarketFactory.toLowerCase()) {
+        continue;
+      }
+
+      try {
+        const decoded = decodeEventLog({
+          abi: ABIS.MarketFactory,
+          data: log.data,
+          topics: log.topics as [] | [Hex, ...Hex[]],
+        });
+
+        if (decoded.eventName === 'MarketCreated') {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const args = decoded.args as any;
+          if (args?.marketAddress) {
+            return args.marketAddress as Address;
+          }
+        }
+      } catch {
+        // Ignore non-matching logs
+      }
+    }
+
+    return null;
+  }, [receipt]);
 
   return {
     createMarket,
@@ -32,6 +82,8 @@ export function useCreateMarket() {
     isSuccess,
     isError,
     error,
+    friendlyError,
+    marketAddress,
   };
 }
 
@@ -39,7 +91,7 @@ export function useCreateMarket() {
  * Hook for placing a bet on a market
  */
 export function usePlaceBet(marketAddress: Address) {
-  const { write, hash, isLoading, isSuccess, isError, error, isPending, isConfirming } =
+  const { write, hash, isLoading, isSuccess, isError, error, isPending, isConfirming, friendlyError } =
     usePredictionMarketWrite({ marketAddress });
 
   const placeBet = useCallback(
@@ -60,6 +112,7 @@ export function usePlaceBet(marketAddress: Address) {
     error,
     isPending,
     isConfirming,
+    friendlyError,
   };
 }
 
@@ -67,7 +120,7 @@ export function usePlaceBet(marketAddress: Address) {
  * Hook for selling shares
  */
 export function useSellShares(marketAddress: Address) {
-  const { write, hash, isLoading, isSuccess, isError, error } =
+  const { write, hash, isLoading, isSuccess, isError, error, friendlyError } =
     usePredictionMarketWrite({ marketAddress });
 
   const sellShares = useCallback(
@@ -84,6 +137,7 @@ export function useSellShares(marketAddress: Address) {
     isSuccess,
     isError,
     error,
+    friendlyError,
   };
 }
 
@@ -91,7 +145,7 @@ export function useSellShares(marketAddress: Address) {
  * Hook for claiming winnings
  */
 export function useClaimWinnings(marketAddress: Address) {
-  const { write, hash, isLoading, isSuccess, isError, error } =
+  const { write, hash, isLoading, isSuccess, isError, error, friendlyError } =
     usePredictionMarketWrite({ marketAddress });
 
   const claimWinnings = useCallback(() => {
@@ -105,6 +159,7 @@ export function useClaimWinnings(marketAddress: Address) {
     isSuccess,
     isError,
     error,
+    friendlyError,
   };
 }
 
@@ -112,7 +167,7 @@ export function useClaimWinnings(marketAddress: Address) {
  * Hook for resolving a market (admin/resolver only)
  */
 export function useResolveMarket(marketAddress: Address) {
-  const { write, hash, isLoading, isSuccess, isError, error } =
+  const { write, hash, isLoading, isSuccess, isError, error, friendlyError } =
     usePredictionMarketWrite({ marketAddress });
 
   const resolveMarket = useCallback(
@@ -129,6 +184,7 @@ export function useResolveMarket(marketAddress: Address) {
     isSuccess,
     isError,
     error,
+    friendlyError,
   };
 }
 
@@ -136,7 +192,7 @@ export function useResolveMarket(marketAddress: Address) {
  * Hook for disputing a market outcome
  */
 export function useDisputeMarket(marketAddress: Address) {
-  const { write, hash, isLoading, isSuccess, isError, error } =
+  const { write, hash, isLoading, isSuccess, isError, error, friendlyError } =
     usePredictionMarketWrite({ marketAddress });
 
   const disputeMarket = useCallback(
@@ -153,6 +209,7 @@ export function useDisputeMarket(marketAddress: Address) {
     isSuccess,
     isError,
     error,
+    friendlyError,
   };
 }
 

@@ -19,6 +19,7 @@ export {
   useBuyPrice,
   useSellPrice,
   useMarketOdds,
+  useMarketParameters,
 } from './useMarketData';
 
 // Market info list hook (for admin panels handling multiple markets)

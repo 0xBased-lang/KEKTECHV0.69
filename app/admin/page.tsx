@@ -10,6 +10,7 @@ import { ActiveMarketsPanel } from '@/components/admin/ActiveMarketsPanel';
 import { ResolutionControlPanel } from '@/components/admin/ResolutionControlPanel';
 import { MarketOverridePanel } from '@/components/admin/MarketOverridePanel';
 import { ParameterConfigPanel } from '@/components/admin/ParameterConfigPanel';
+import { MarketCreationPanel } from '@/components/admin/MarketCreationPanel';
 import { useAdminRole } from '@/lib/hooks/kektech';
 
 export default function AdminDashboard() {
@@ -81,7 +82,13 @@ export default function AdminDashboard() {
 
         {/* Admin Panels */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 gap-4 bg-gray-900 p-1">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 bg-gray-900 p-1">
+            <TabsTrigger
+              value="creation"
+              className="data-[state=active]:bg-[#3fb8bd] data-[state=active]:text-white"
+            >
+              🧱 Creation
+            </TabsTrigger>
             <TabsTrigger
               value="proposals"
               className="data-[state=active]:bg-kek-green data-[state=active]:text-white"
@@ -113,6 +120,10 @@ export default function AdminDashboard() {
               ⚙️ Config
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="creation" className="space-y-4">
+            <MarketCreationPanel />
+          </TabsContent>
 
           <TabsContent value="proposals" className="space-y-4">
             <ProposalManagementPanel />
