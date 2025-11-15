@@ -8,7 +8,8 @@
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { CONTRACT_ADDRESSES, ABIS, type ContractName, type ABIName } from '@/lib/contracts';
 import type { Address } from 'viem';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { decodeRevertError } from '@/lib/utils/revertErrors';
 
 interface UseContractWriteParams {
   contractName: ContractName;
@@ -55,6 +56,9 @@ export function useContractWrite({ contractName }: UseContractWriteParams) {
     [writeContract, address, abi]
   );
 
+  const latestError = writeError || confirmError;
+  const decodedError = useMemo(() => decodeRevertError(latestError), [latestError]);
+
   return {
     write,
     hash,
@@ -65,6 +69,7 @@ export function useContractWrite({ contractName }: UseContractWriteParams) {
     isPending: isWritePending,
     isConfirming,
     isConfirmed,
+    friendlyError: decodedError?.message,
   };
 }
 
@@ -105,6 +110,9 @@ export function usePredictionMarketWrite({ marketAddress }: { marketAddress: Add
     [writeContract, marketAddress, abi]
   );
 
+  const latestError = writeError || confirmError;
+  const decodedError = useMemo(() => decodeRevertError(latestError), [latestError]);
+
   return {
     write,
     hash,
@@ -115,5 +123,6 @@ export function usePredictionMarketWrite({ marketAddress }: { marketAddress: Add
     isPending: isWritePending,
     isConfirming,
     isConfirmed,
+    friendlyError: decodedError?.message,
   };
 }

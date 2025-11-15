@@ -14,7 +14,7 @@ import type { Outcome, MarketConfig } from '@/lib/contracts/types';
  * Hook for creating a new market
  */
 export function useCreateMarket() {
-  const { write, hash, isLoading, isSuccess, isError, error } = useContractWrite({
+  const { write, hash, isLoading, isSuccess, isError, error, friendlyError } = useContractWrite({
     contractName: 'MarketFactory',
   });
 
@@ -32,6 +32,7 @@ export function useCreateMarket() {
     isSuccess,
     isError,
     error,
+    friendlyError,
   };
 }
 
@@ -39,7 +40,7 @@ export function useCreateMarket() {
  * Hook for placing a bet on a market
  */
 export function usePlaceBet(marketAddress: Address) {
-  const { write, hash, isLoading, isSuccess, isError, error, isPending, isConfirming } =
+  const { write, hash, isLoading, isSuccess, isError, error, isPending, isConfirming, friendlyError } =
     usePredictionMarketWrite({ marketAddress });
 
   const placeBet = useCallback(
@@ -60,6 +61,7 @@ export function usePlaceBet(marketAddress: Address) {
     error,
     isPending,
     isConfirming,
+    friendlyError,
   };
 }
 
@@ -67,7 +69,7 @@ export function usePlaceBet(marketAddress: Address) {
  * Hook for selling shares
  */
 export function useSellShares(marketAddress: Address) {
-  const { write, hash, isLoading, isSuccess, isError, error } =
+  const { write, hash, isLoading, isSuccess, isError, error, friendlyError } =
     usePredictionMarketWrite({ marketAddress });
 
   const sellShares = useCallback(
@@ -84,6 +86,7 @@ export function useSellShares(marketAddress: Address) {
     isSuccess,
     isError,
     error,
+    friendlyError,
   };
 }
 
@@ -91,7 +94,7 @@ export function useSellShares(marketAddress: Address) {
  * Hook for claiming winnings
  */
 export function useClaimWinnings(marketAddress: Address) {
-  const { write, hash, isLoading, isSuccess, isError, error } =
+  const { write, hash, isLoading, isSuccess, isError, error, friendlyError } =
     usePredictionMarketWrite({ marketAddress });
 
   const claimWinnings = useCallback(() => {
@@ -105,6 +108,7 @@ export function useClaimWinnings(marketAddress: Address) {
     isSuccess,
     isError,
     error,
+    friendlyError,
   };
 }
 
@@ -112,7 +116,7 @@ export function useClaimWinnings(marketAddress: Address) {
  * Hook for resolving a market (admin/resolver only)
  */
 export function useResolveMarket(marketAddress: Address) {
-  const { write, hash, isLoading, isSuccess, isError, error } =
+  const { write, hash, isLoading, isSuccess, isError, error, friendlyError } =
     usePredictionMarketWrite({ marketAddress });
 
   const resolveMarket = useCallback(
@@ -129,6 +133,7 @@ export function useResolveMarket(marketAddress: Address) {
     isSuccess,
     isError,
     error,
+    friendlyError,
   };
 }
 
@@ -136,7 +141,7 @@ export function useResolveMarket(marketAddress: Address) {
  * Hook for disputing a market outcome
  */
 export function useDisputeMarket(marketAddress: Address) {
-  const { write, hash, isLoading, isSuccess, isError, error } =
+  const { write, hash, isLoading, isSuccess, isError, error, friendlyError } =
     usePredictionMarketWrite({ marketAddress });
 
   const disputeMarket = useCallback(
@@ -153,6 +158,7 @@ export function useDisputeMarket(marketAddress: Address) {
     isSuccess,
     isError,
     error,
+    friendlyError,
   };
 }
 

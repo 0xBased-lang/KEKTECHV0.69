@@ -5,7 +5,7 @@
 'use client';
 
 import { useState } from 'react';
-import { usePlaceBet, useBuyPrice, useMarketInfo } from '@/lib/hooks/kektech';
+import { usePlaceBet, useBuyPrice, useMarketInfo, useMarketParameters } from '@/lib/hooks/kektech';
 import { useWallet } from '@/lib/hooks/kektech';
 import { Outcome } from '@/lib/contracts/types';
 import { ButtonLoading } from '../ui/LoadingSpinner';
@@ -38,9 +38,10 @@ export function BettingInterface({ marketAddress, onSuccess }: BettingInterfaceP
   const [amount, setAmount] = useState('1.0');
   const [error, setError] = useState<string>('');
 
-  const { placeBet, isLoading, isSuccess, error: txError } = usePlaceBet(marketAddress);
+  const { placeBet, isLoading, isSuccess, error: txError, friendlyError } = usePlaceBet(marketAddress);
   const { price: yesPrice } = useBuyPrice(marketAddress, Outcome.YES, parseEther(amount || '0'));
   const { price: noPrice } = useBuyPrice(marketAddress, Outcome.NO, parseEther(amount || '0'));
+  const { minBet, maxBet, isLoading: paramsLoading } = useMarketParameters();
 
   // 🎯 FIX: Get market state to validate before allowing bets
   const market = useMarketInfo(marketAddress);
@@ -64,6 +65,16 @@ export function BettingInterface({ marketAddress, onSuccess }: BettingInterfaceP
       }
 
       const betAmount = parseEther(amount);
+
+      if (minBet && betAmount < minBet) {
+        setError(`Minimum bet is ${formatEther(minBet)} BASED.`);
+        return;
+      }
+
+      if (maxBet && betAmount > maxBet) {
+        setError(`Maximum bet is ${formatEther(maxBet)} BASED.`);
+        return;
+      }
 
       // Check balance
       if (balance && betAmount > balance) {
@@ -99,6 +110,8 @@ export function BettingInterface({ marketAddress, onSuccess }: BettingInterfaceP
       </div>
     );
   }
+
+  const transactionError = friendlyError ? new Error(friendlyError) : txError || null;
 
   return (
     <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
@@ -174,11 +187,18 @@ export function BettingInterface({ marketAddress, onSuccess }: BettingInterfaceP
           min="0"
           className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd]"
         />
-        {balance && (
-          <p className="text-xs text-gray-400 mt-1">
-            Balance: {formatEther(balance)} BASED
-          </p>
-        )}
+        <div className="text-xs text-gray-400 mt-1 space-y-0.5">
+          {balance && (
+            <p>Balance: {formatEther(balance)} BASED</p>
+          )}
+          {!paramsLoading && (minBet || maxBet) && (
+            <p>
+              Limits:&nbsp;
+              {minBet ? `min ${formatEther(minBet)} BASED` : 'no min'}
+              {maxBet ? ` · max ${formatEther(maxBet)} BASED` : ''}
+            </p>
+          )}
+        </div>
         {error && <InlineError message={error} />}
       </div>
 
@@ -206,9 +226,9 @@ export function BettingInterface({ marketAddress, onSuccess }: BettingInterfaceP
       </button>
 
       {/* Transaction error */}
-      {txError && (
+      {transactionError && (
         <div className="mt-4">
-          <TransactionError error={txError} />
+          <TransactionError error={transactionError} />
         </div>
       )}
     </div>

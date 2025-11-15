@@ -8,6 +8,7 @@
 import { usePredictionMarketRead } from './useContractRead';
 import { useContractRead } from './useContractRead';
 import type { Address } from 'viem';
+import { keccak256, stringToBytes } from 'viem';
 import type { MarketState, Outcome, Position } from '@/lib/contracts/types';
 
 /**
@@ -199,6 +200,37 @@ export function useMarketAddress(marketId: bigint) {
   return {
     marketAddress,
     isLoading,
+  };
+}
+
+const MIN_BET_KEY = keccak256(stringToBytes('minimumBet'));
+const MAX_BET_KEY = keccak256(stringToBytes('maximumBet'));
+
+export function useMarketParameters(watch = false) {
+  const minQuery = useContractRead<bigint>({
+    contractName: 'ParameterStorage',
+    functionName: 'getParameter',
+    args: [MIN_BET_KEY],
+    watch,
+  });
+
+  const maxQuery = useContractRead<bigint>({
+    contractName: 'ParameterStorage',
+    functionName: 'getParameter',
+    args: [MAX_BET_KEY],
+    watch,
+  });
+
+  const normalizeValue = (query: { data?: bigint; isError: boolean }) => {
+    if (query.isError || query.data === undefined || query.data === 0n) return null;
+    return query.data;
+  };
+
+  return {
+    minBet: normalizeValue(minQuery),
+    maxBet: normalizeValue(maxQuery),
+    isLoading: minQuery.isLoading || maxQuery.isLoading,
+    error: minQuery.error || maxQuery.error,
   };
 }
 
