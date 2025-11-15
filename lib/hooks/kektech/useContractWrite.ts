@@ -34,6 +34,7 @@ export function useContractWrite({ contractName }: UseContractWriteParams) {
   } = useWriteContract();
 
   const {
+    data: receipt,
     isLoading: isConfirming,
     isSuccess: isConfirmed,
     isError: isConfirmError,
@@ -62,6 +63,7 @@ export function useContractWrite({ contractName }: UseContractWriteParams) {
   return {
     write,
     hash,
+    receipt,
     isLoading: isWritePending || isConfirming,
     isSuccess: isConfirmed,
     isError: isWriteError || isConfirmError,

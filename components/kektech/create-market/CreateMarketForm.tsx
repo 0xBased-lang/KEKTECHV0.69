@@ -4,17 +4,78 @@
  */
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useCreateMarket } from '@/lib/hooks/kektech';
 import { useWallet } from '@/lib/hooks/kektech';
 import { ButtonLoading } from '../ui/LoadingSpinner';
 import { TransactionError, InlineError } from '../ui/ErrorDisplay';
 import { parseEther } from 'viem';
-import { ArrowRight, ArrowLeft, Check, Calendar, FileText, Tag, AlertCircle } from 'lucide-react';
+import {
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  Calendar,
+  FileText,
+  Tag,
+  AlertCircle,
+  DollarSign,
+  ExternalLink,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { categoryToBytes32 } from '@/lib/utils/category';
+import Link from 'next/link';
+import { DEPLOYMENT_INFO } from '@/lib/contracts/addresses';
 
-type Step = 'question' | 'description' | 'category' | 'outcomes' | 'timing' | 'review' | 'submit';
+type Step =
+  | 'question'
+  | 'description'
+  | 'category'
+  | 'outcomes'
+  | 'timing'
+  | 'economics'
+  | 'review'
+  | 'submit';
+
+type CurveTypeOption = 'LMSR' | 'LINEAR' | 'EXPONENTIAL' | 'SIGMOID';
+
+const CURVE_OPTIONS: {
+  value: CurveTypeOption;
+  label: string;
+  helper: string;
+  defaultParams: string;
+}[] = [
+  {
+    value: 'LMSR',
+    label: 'LMSR (Balanced)',
+    helper: 'Balanced odds curve. Try params around 7500 for most markets.',
+    defaultParams: '7500',
+  },
+  {
+    value: 'LINEAR',
+    label: 'Linear (Simple)',
+    helper: 'Price grows linearly with demand. Params around 1000 feel stable.',
+    defaultParams: '1000',
+  },
+  {
+    value: 'EXPONENTIAL',
+    label: 'Exponential (High Sensitivity)',
+    helper: 'Aggressive curve for speculative markets. Use smaller params like 25.',
+    defaultParams: '25',
+  },
+  {
+    value: 'SIGMOID',
+    label: 'Sigmoid (S-Curve)',
+    helper: 'Slow start, rapid middle growth. Params around 5000 work well.',
+    defaultParams: '5000',
+  },
+];
+
+const CURVE_TYPE_TO_ENUM: Record<CurveTypeOption, number> = {
+  LMSR: 0,
+  LINEAR: 1,
+  EXPONENTIAL: 2,
+  SIGMOID: 3,
+};
 
 interface MarketFormData {
   question: string;
@@ -24,6 +85,8 @@ interface MarketFormData {
   outcome2: string;
   endTime: number;
   creatorBond: string;
+  curveType: CurveTypeOption;
+  curveParams: string;
 }
 
 const STEPS: { id: Step; title: string; icon: React.ComponentType<{ className?: string }> }[] = [
@@ -32,6 +95,7 @@ const STEPS: { id: Step; title: string; icon: React.ComponentType<{ className?: 
   { id: 'category', title: 'Category', icon: Tag },
   { id: 'outcomes', title: 'Outcomes', icon: Check },
   { id: 'timing', title: 'End Time', icon: Calendar },
+  { id: 'economics', title: 'Curve & Fees', icon: DollarSign },
   { id: 'review', title: 'Review', icon: Check },
 ];
 
@@ -47,7 +111,7 @@ const CATEGORIES = [
 ];
 
 interface CreateMarketFormProps {
-  onSuccess?: (marketAddress: string) => void;
+  onSuccess?: (result: { txHash: string; marketAddress?: string }) => void;
   onCancel?: () => void;
 }
 
@@ -59,6 +123,12 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
   const [currentStep, setCurrentStep] = useState<Step>('question');
   const [errors, setErrors] = useState<Partial<Record<keyof MarketFormData, string>>>({});
   const endTimeSetRef = useRef(false); // Track if user has set timing
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastReportedTxRef = useRef<{ hash: string | null; address: string | null }>({
+    hash: null,
+    address: null,
+  });
+  const [copiedField, setCopiedField] = useState<'hash' | 'address' | null>(null);
 
   const [formData, setFormData] = useState<MarketFormData>({
     question: '',
@@ -68,20 +138,41 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
     outcome2: 'No',       // Default negative outcome
     endTime: Math.floor(Date.now() / 1000) + 86400, // Default: 24 hours from now
     creatorBond: '0.1', // Default 0.1 BASED
+    curveType: CURVE_OPTIONS[0].value,
+    curveParams: CURVE_OPTIONS[0].defaultParams,
   });
 
-  const { createMarket, isLoading, isSuccess, hash, error: txError } = useCreateMarket();
+  const { createMarket, isLoading, isSuccess, hash, error: txError, marketAddress } =
+    useCreateMarket();
+  const explorerBaseUrl = DEPLOYMENT_INFO.explorerUrl || 'https://explorer.bf1337.org';
 
   // Reset on success
   useEffect(() => {
-    if (isSuccess && hash) {
-      // Market address will be in the transaction receipt
-      // For now, we'll use a placeholder
-      if (onSuccess) {
-        onSuccess(hash); // In production, parse receipt for market address
-      }
+    if (!isSuccess || !hash || !onSuccess) return;
+
+    const normalizedAddress = marketAddress ?? null;
+    const alreadyReported =
+      lastReportedTxRef.current.hash === hash &&
+      lastReportedTxRef.current.address === normalizedAddress;
+
+    if (alreadyReported) return;
+
+    onSuccess({ txHash: hash, marketAddress });
+    lastReportedTxRef.current = { hash, address: normalizedAddress };
+  }, [isSuccess, hash, marketAddress, onSuccess]);
+
+  const clearCopyTimeout = useCallback(() => {
+    if (copyTimeoutRef.current) {
+      clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = null;
     }
-  }, [isSuccess, hash, onSuccess]);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      clearCopyTimeout();
+    };
+  }, [clearCopyTimeout]);
 
   const validateStep = (step: Step): boolean => {
     const newErrors: Partial<Record<keyof MarketFormData, string>> = {};
@@ -149,6 +240,22 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
           newErrors.endTime = 'Market must run for at least 1 hour';
         }
         break;
+
+      case 'economics': {
+        if (!formData.curveParams.trim()) {
+          newErrors.curveParams = 'Curve parameter is required';
+        } else {
+          try {
+            const val = BigInt(formData.curveParams.trim());
+            if (val <= 0n) {
+              newErrors.curveParams = 'Curve parameter must be greater than 0';
+            }
+          } catch {
+            newErrors.curveParams = 'Curve parameter must be a whole number';
+          }
+        }
+        break;
+      }
     }
 
     setErrors(newErrors);
@@ -231,8 +338,38 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
       console.log('[CreateMarket] Bond:', bondAmount.toString());
     }
 
+    let curveParamsValue: bigint;
+    try {
+      curveParamsValue = BigInt(formData.curveParams.trim());
+    } catch {
+      setErrors({ curveParams: 'Curve parameter must be a whole number' });
+      setCurrentStep('economics');
+      return;
+    }
+
+    if (curveParamsValue <= 0n) {
+      setErrors({ curveParams: 'Curve parameter must be greater than 0' });
+      setCurrentStep('economics');
+      return;
+    }
+
     // Create market (bond sent as msg.value, not in struct)
-    await createMarket(config, bondAmount);
+    await createMarket(config, bondAmount, {
+      curveType: CURVE_TYPE_TO_ENUM[formData.curveType],
+      curveParams: curveParamsValue,
+    });
+  };
+
+  const handleCopy = (value: string, field: 'hash' | 'address') => {
+    if (typeof navigator === 'undefined' || !navigator.clipboard) return;
+    navigator.clipboard.writeText(value).then(() => {
+      setCopiedField(field);
+      clearCopyTimeout();
+      copyTimeoutRef.current = setTimeout(() => {
+        setCopiedField((current) => (current === field ? null : current));
+        copyTimeoutRef.current = null;
+      }, 2000);
+    });
   };
 
   // Wallet connection required
@@ -552,6 +689,77 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
           </div>
         )}
 
+        {currentStep === 'economics' && (
+          <div>
+            <h3 className="text-2xl font-bold text-white mb-6">Curve & Fee Settings</h3>
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Bonding Curve
+                </label>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {CURVE_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          curveType: option.value,
+                          curveParams:
+                            prev.curveType === option.value ? prev.curveParams : option.defaultParams,
+                        }))
+                      }
+                      className={cn(
+                        'p-4 text-left rounded-lg border transition',
+                        formData.curveType === option.value
+                          ? 'border-[#3fb8bd] bg-[#3fb8bd]/10'
+                          : 'border-gray-800 bg-gray-900 hover:border-gray-700'
+                      )}
+                    >
+                      <p className="font-semibold text-white">{option.label}</p>
+                      <p className="text-sm text-gray-400 mt-1">{option.helper}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Curve Parameter
+                </label>
+                <input
+                  type="number"
+                  value={formData.curveParams}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, curveParams: e.target.value }))
+                  }
+                  min="1"
+                  step="1"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#3fb8bd]"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Each curve interprets this value differently. Stick with the suggested defaults
+                  above unless you are experimenting with custom liquidity.
+                </p>
+                {errors.curveParams && (
+                  <div className="mt-2">
+                    <InlineError message={errors.curveParams} />
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                <p className="text-sm text-gray-300">
+                  <span className="font-semibold text-white">Need a refresher?</span> LMSR is the
+                  safest default. Linear offers predictable growth, Exponential is best for high-risk
+                  speculative markets, and Sigmoid provides an S-curve experience.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Review step */}
         {currentStep === 'review' && (
           <div>
@@ -586,6 +794,20 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
                 <label className="text-sm text-gray-400 block mb-1">Creator Bond</label>
                 <p className="text-white">{formData.creatorBond} BASED</p>
               </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-gray-800 rounded-lg">
+                  <label className="text-sm text-gray-400 block mb-1">Curve Type</label>
+                  <p className="text-white">
+                    {CURVE_OPTIONS.find((c) => c.value === formData.curveType)?.label ||
+                      formData.curveType}
+                  </p>
+                </div>
+                <div className="p-4 bg-gray-800 rounded-lg">
+                  <label className="text-sm text-gray-400 block mb-1">Curve Parameter</label>
+                  <p className="text-white">{formData.curveParams}</p>
+                </div>
+              </div>
             </div>
 
             {txError && (
@@ -593,6 +815,74 @@ export function CreateMarketForm({ onSuccess, onCancel }: CreateMarketFormProps)
                 <TransactionError error={txError} />
               </div>
             )}
+          </div>
+        )}
+
+        {hash && (
+          <div className="mt-8 p-4 bg-gray-900/70 rounded-lg border border-gray-800 space-y-4">
+            <div>
+              <p className="text-sm text-gray-400">
+                Transaction submitted. Save these details while the contract finalizes on-chain.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-gray-500">Transaction Hash</p>
+                  <p className="font-mono text-white break-all">{hash}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(hash, 'hash')}
+                    className="px-4 py-2 rounded-md bg-gray-800 text-sm text-gray-200 hover:bg-gray-700 transition"
+                  >
+                    {copiedField === 'hash' ? 'Copied!' : 'Copy Hash'}
+                  </button>
+                  <Link
+                    href={`${explorerBaseUrl}/tx/${hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-[#3fb8bd] hover:text-[#7fd8cf]"
+                  >
+                    View Tx <ExternalLink className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-gray-500">Market Contract</p>
+                  {marketAddress ? (
+                    <p className="font-mono text-white break-all">{marketAddress}</p>
+                  ) : (
+                    <p className="text-sm text-gray-400">
+                      Waiting for the factory receipt to confirm the new market address. This can
+                      take a few seconds.
+                    </p>
+                  )}
+                </div>
+                {marketAddress && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(marketAddress, 'address')}
+                      className="px-4 py-2 rounded-md bg-gray-800 text-sm text-gray-200 hover:bg-gray-700 transition"
+                    >
+                      {copiedField === 'address' ? 'Copied!' : 'Copy Address'}
+                    </button>
+                    <Link
+                      href={`${explorerBaseUrl}/address/${marketAddress}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm text-[#3fb8bd] hover:text-[#7fd8cf]"
+                    >
+                      View Contract <ExternalLink className="w-4 h-4" />
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 

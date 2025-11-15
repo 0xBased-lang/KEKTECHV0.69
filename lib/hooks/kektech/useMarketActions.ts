@@ -6,24 +6,70 @@
 'use client';
 
 import { usePredictionMarketWrite, useContractWrite } from './useContractWrite';
-import { useCallback } from 'react';
-import type { Address } from 'viem';
+import { useCallback, useMemo } from 'react';
+import type { Address, Hex } from 'viem';
+import { decodeEventLog } from 'viem';
 import type { Outcome, MarketConfig } from '@/lib/contracts/types';
+import { ABIS, CONTRACT_ADDRESSES } from '@/lib/contracts';
 
 /**
  * Hook for creating a new market
  */
+interface CurveOptions {
+  curveType?: number;
+  curveParams?: bigint;
+}
+
 export function useCreateMarket() {
-  const { write, hash, isLoading, isSuccess, isError, error, friendlyError } = useContractWrite({
+  const {
+    write,
+    hash,
+    receipt,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    friendlyError,
+  } = useContractWrite({
     contractName: 'MarketFactory',
   });
 
   const createMarket = useCallback(
-    (config: MarketConfig, bond: bigint) => {
-      write('createMarket', [config], bond);
+    (config: MarketConfig, bond: bigint, curve?: CurveOptions) => {
+      if (curve && typeof curve.curveType === 'number') {
+        write('createMarketWithCurve', [config, curve.curveType, curve.curveParams ?? 0n], bond);
+      } else {
+        write('createMarket', [config], bond);
+      }
     },
     [write]
   );
+
+  const marketAddress = useMemo(() => {
+    if (!receipt) return null;
+
+    for (const log of receipt.logs ?? []) {
+      if (log.address.toLowerCase() !== CONTRACT_ADDRESSES.MarketFactory.toLowerCase()) {
+        continue;
+      }
+
+      try {
+        const decoded = decodeEventLog({
+          abi: ABIS.MarketFactory,
+          data: log.data,
+          topics: log.topics as Hex[],
+        });
+
+        if (decoded.eventName === 'MarketCreated' && decoded.args?.marketAddress) {
+          return decoded.args.marketAddress as Address;
+        }
+      } catch {
+        // Ignore non-matching logs
+      }
+    }
+
+    return null;
+  }, [receipt]);
 
   return {
     createMarket,
@@ -33,6 +79,7 @@ export function useCreateMarket() {
     isError,
     error,
     friendlyError,
+    marketAddress,
   };
 }
 
